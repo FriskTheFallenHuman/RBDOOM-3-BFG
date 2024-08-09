@@ -35,10 +35,10 @@ If you have questions concerning this license or the applicable additional terms
 
 #define STBI_NO_STDIO  // images are passed as buffers
 #define STB_IMAGE_IMPLEMENTATION
-#include "../libs/stb/stb_image.h"
+#include "stb_image.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "../libs/stb/stb_image_write.h"
+#include "stb_image_write.h"
 
 #define TINYEXR_IMPLEMENTATION
 #include "../libs/tinyexr/tinyexr.h"

@@ -181,8 +181,8 @@ struct AudioDevice
 #endif // _MSC_VER ; DG end
 
 
-#include "../libs/oggvorbis/ogg/ogg.h"
-#include "../libs/oggvorbis/vorbis/vorbisfile.h"
+#include "ogg/ogg.h"
+#include "vorbis/vorbisfile.h"
 
 //
 // idSoundDecoder_Vorbis

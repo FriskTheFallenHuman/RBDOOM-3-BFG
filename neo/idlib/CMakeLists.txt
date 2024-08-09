@@ -75,10 +75,6 @@ else()
 	source_group("sys\\posix" FILES ${ID_SYS_POSIX_SOURCES})
 endif()
 
-#if(STANDALONE)
-#	add_definitions(-DSTANDALONE)
-#endif()
-
 set(ID_PRECOMPILED_SOURCES ${ID_SOURCES_ALL})
 list(REMOVE_ITEM ID_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/geometry/RenderMatrix.cpp)
 list(REMOVE_ITEM ID_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/SoftwareCache.cpp)

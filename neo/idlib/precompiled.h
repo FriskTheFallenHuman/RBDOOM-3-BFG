@@ -97,7 +97,7 @@ constexpr uint32 NUM_FRAME_DATA	= 3;
 #include "nvrhi/nvrhi.h"
 
 // RB: make Optick profiling available everywhere
-#include "../libs/optick/optick.h"
+#include "optick.h"
 
 #include "../renderer/Cinematic.h"
 #include "../renderer/Material.h"
@@ -118,7 +118,7 @@ constexpr uint32 NUM_FRAME_DATA	= 3;
 #include "../ui/UserInterface.h"
 
 // RB: required for SWF extensions
-//#include "rapidjson/document.h"
+//#include "document.h"
 
 #include "../swf/SWF.h"
 

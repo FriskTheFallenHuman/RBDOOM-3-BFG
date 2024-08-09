@@ -1,0 +1,23 @@
+{
+	"name": "rbdoom3bfg",
+	"version": "1.6.0",
+	"dependencies": [
+		"optick",
+		"zlib",
+		"libogg",
+		"libvorbis",
+		"openal-soft",
+		{
+			"name": "sdl2",
+			"platform": "!windows"
+		},
+		{
+			"name": "ffmpeg",
+			"platform": "!windows"
+		},
+		"stb",
+		"vulkan",
+		"vulkan-memory-allocator",
+		"rapidjson"
+	]
+}

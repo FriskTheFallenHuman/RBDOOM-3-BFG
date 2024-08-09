@@ -73,7 +73,6 @@ void idMenuScreen_Shell_Credits::SetupCreditList()
 	creditList.Append( creditInfo_t( 1,	"Additional Programming" ) );
 	creditList.Append( creditInfo_t( 0,	"Daniel Gibson - Tons of code cleanups, netcode++" ) );
 	creditList.Append( creditInfo_t( 0,	"Jonathan Young - Bugfixes, misc improvements" ) );
-	creditList.Append( creditInfo_t( 0,	"Felix Rueegg - Doomclassic Linux support" ) );
 	creditList.Append( creditInfo_t( 0,	"Carl Kenner - Bink video support" ) );
 	creditList.Append( creditInfo_t( 0,	"Pat Raynor - Compiler tools, QOL patches" ) );
 	creditList.Append( creditInfo_t( 0,	"Biel B. de Luna - Intro skipping, QOL patches" ) );

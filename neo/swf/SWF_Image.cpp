@@ -41,7 +41,7 @@ If you have questions concerning this license or the applicable additional terms
 	#include <jerror.h>
 #else
 	#define STBI_NO_STDIO  // images are passed as buffers
-	#include "../libs/stb/stb_image.h"
+	#include "stb_image.h"
 #endif
 
 idCVar swf_useChannelScale( "swf_useChannelScale", "0", CVAR_BOOL, "compress texture atlas colors" );

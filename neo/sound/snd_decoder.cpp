@@ -276,7 +276,7 @@ int idSoundDecoder_Vorbis::Read( void* pBuffer, int dwSizeToRead )
 
 	do
 	{
-		int ret = ov_read( ov, bufferPtr, total >= 4096 ? 4096 : total, Swap_IsBigEndian(), 2, 1, &ov->stream );
+		int ret = ov_read( ov, bufferPtr, total >= 4096 ? 4096 : total, Swap_IsBigEndian(), 2, 1, 0 );
 		if( ret == 0 )
 		{
 			break;

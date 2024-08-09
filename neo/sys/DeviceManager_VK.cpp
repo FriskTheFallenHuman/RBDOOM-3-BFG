@@ -55,7 +55,7 @@
 	#endif
 #endif
 #include <nvrhi/validation.h>
-#include <libs/optick/optick.h>
+#include <optick.h>
 
 #if defined( USE_AMD_ALLOCATOR )
 	#define VMA_IMPLEMENTATION

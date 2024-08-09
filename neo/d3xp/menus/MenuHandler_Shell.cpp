@@ -71,27 +71,10 @@ void idMenuHandler_Shell::Update()
 			PlaySound( GUI_SOUND_MUSIC );
 		}
 
-#if defined( USE_DOOMCLASSIC )
-		if( nextState == SHELL_STATE_PRESS_START )
-		{
-			HidePacifier();
-			nextScreen = SHELL_AREA_START;
-			transition = MENU_TRANSITION_SIMPLE;
-			state = nextState;
-			if( menuBar != NULL && gui != NULL )
-			{
-				menuBar->ClearSprite();
-			}
-		}
-		else
-#endif
 			if( nextState == SHELL_STATE_IDLE )
 			{
 				HidePacifier();
 				if(
-#if defined( USE_DOOMCLASSIC )
-					nextScreen == SHELL_AREA_START ||
-#endif
 					nextScreen == SHELL_AREA_PARTY_LOBBY ||
 					nextScreen == SHELL_AREA_GAME_LOBBY ||
 					nextScreen == SHELL_AREA_INVALID )
@@ -527,9 +510,6 @@ void idMenuHandler_Shell::Initialize( const char* swfFile, idSoundWorld* sw )
 	}
 	else
 	{
-#if defined( USE_DOOMCLASSIC )
-		BIND_SHELL_SCREEN( SHELL_AREA_START, idMenuScreen_Shell_PressStart, this );
-#endif
 		BIND_SHELL_SCREEN( SHELL_AREA_ROOT, idMenuScreen_Shell_Root, this );
 		BIND_SHELL_SCREEN( SHELL_AREA_CAMPAIGN, idMenuScreen_Shell_Singleplayer, this );
 		BIND_SHELL_SCREEN( SHELL_AREA_SETTINGS, idMenuScreen_Shell_Settings, this );
@@ -981,12 +961,6 @@ void idMenuHandler_Shell::HandleExitGameBtn()
 			{
 				common->Quit();
 			}
-#if defined( USE_DOOMCLASSIC )
-			else if( accept == -1 )
-			{
-				session->MoveToPressStart();
-			}
-#endif
 			return idSWFScriptVar();
 		}
 	private:
@@ -1350,11 +1324,7 @@ void idMenuHandler_Shell::UpdateBGState()
 		}
 	}
 
-	if( smallFrameShowing || largeFrameShowing
-#if defined( USE_DOOMCLASSIC )
-			|| nextScreen == SHELL_AREA_START
-#endif
-	  )
+	if( smallFrameShowing || largeFrameShowing )
 	{
 		ShowLogo( false );
 	}

@@ -1,69 +1,44 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required( VERSION 3.2 )
 
-project(RBDoom3BFG)
+# Check if vcpkg exist in our source folder
+if ( EXISTS "${CMAKE_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake" )
+	set( CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file" )
+	set( VCPKG_OVERLAY_PORTS
+		"${CMAKE_SOURCE_DIR}/../.vcpkg/ports/optick/"
+	)
+else()
+	message( FATAL_ERROR "Vcpkg wasn't not found, aborting, make sure to git clone this with all submodules!")
+endif()
 
-set(CMAKE_CXX_STANDARD 17)
+# Enable folder groups
+set_property( GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER  "" )
+set_property( GLOBAL PROPERTY USE_FOLDERS ON )
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+
+project( RBDoom3BFG CXX C )
+
+set( CMAKE_CXX_STANDARD 17 )
+
 if(CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER_EQUAL 6)
 	# set MSVC startup project
 	set_property (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT RBDoom3BFG)
 endif()
-	
-option(STANDALONE
-		"Skip DOOM-3-BFG base/ folder and use content/ instead" OFF)
 
-option(DOOM_CLASSIC
-		"Build with Doom 1 & 2" ON)
-
-option(FORCE_COLOR_OUTPUT
-		"Always produce ANSI-colored output (GNU/Clang only)." OFF)
-
-option(COMPILE_COMMANDS
-		"Generate compile_commands.json" OFF)
-
-option(USE_PRECOMPILED_HEADERS
-		"Use precompiled headers during build" ON)
-		
-option(OPENAL
-		"Use OpenAL soft instead of XAudio2" OFF)
-
-option(FFMPEG
-		"Use FMPEG to render Bink videos" OFF)
-
-option(BINKDEC
-		"Use included libbinkdec to render Bink videos" ON)
-
-option(USE_MoltenVK
-		"Link directly to MoltenVK library instead of Vulkan loader on macOS" OFF)
-
-option(ONATIVE
-		"Optimize for the host CPU" OFF)
-		
-option(WINDOWS10
-		"Build for Windows 10+" ON)
-		
-option(USE_SYSTEM_ZLIB
-         "Use the system zlib instead of the bundled one" OFF)
-
-option(USE_SYSTEM_RAPIDJSON
-         "Use the system rapidjson instead of the bundled one" OFF)
-
-option(USE_DX12
-		"Use DirectX 12" ON)
-
-option(USE_VULKAN
-		"Use Vulkan" ON)
-
-option(USE_VMA
-		"Use AMD's Vulkan Memory Allocator instead of the NVRHI builtin one" ON)
-
-option(OPTICK
-		"Enable profiling with Optick" OFF)
-
-option(RETAIL
-		"Strip certain developer features and cheats from shipping builds" OFF)
+option( FORCE_COLOR_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." OFF )
+option( COMPILE_COMMANDS "Generate compile_commands.json" OFF )
+option( USE_PRECOMPILED_HEADERS "Use precompiled headers during build" ON )
+option( OPENAL "Use OpenAL soft instead of XAudio2" OFF )
+option( FFMPEG "Use FMPEG to render Bink videos" OFF )
+option( BINKDEC "Use included libbinkdec to render Bink videos" ON )
+option( USE_MoltenVK "Link directly to MoltenVK library instead of Vulkan loader on macOS" OFF )
+option( ONATIVE "Optimize for the host CPU" OFF )
+option( WINDOWS10 "Build for Windows 10+" ON )
+option( USE_DX12 "Use DirectX 12" ON )
+option( USE_VULKAN "Use Vulkan" ON )
+option( USE_VMA "Use AMD's Vulkan Memory Allocator instead of the NVRHI builtin one" ON )
+option( OPTICK "Enable profiling with Optick" OFF )
+option( RETAIL "Strip certain developer features and cheats from shipping builds" OFF )
 
 set(NVRHI_INSTALL OFF)
 
@@ -267,12 +242,6 @@ if (USE_INTRINSICS_SSE)
 	add_definitions(-DUSE_INTRINSICS_SSE)
 endif()
 
-if(STANDALONE)
-	add_definitions(-DSTANDALONE)
-
-	set(DOOM_CLASSIC OFF)
-endif()
-
 if(RETAIL)
 	add_definitions(-DID_RETAIL)
 endif()
@@ -283,29 +252,13 @@ if(APPLE)
 	set(CMAKE_FIND_FRAMEWORK LAST)
 endif()
 
-if(USE_SYSTEM_ZLIB)
-	find_package(ZLIB)
-endif()
-
-if(ZLIB_FOUND)
-	include_directories(${ZLIB_INCLUDE_DIRS})
-	set(ZLIB_LIBRARY ${ZLIB_LIBRARIES})
-else()
-	include_directories("libs/zlib")
-	set(ZLIB_LIBRARY "" )
-endif()
+find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIRS})
+set(ZLIB_LIBRARY ${ZLIB_LIBRARIES})
 
 #SRS - move rapidjson before vulkan and other includes to prioritize bundled iterator fixes
-if (USE_SYSTEM_RAPIDJSON)
-	find_package(rapidjson)
-endif (USE_SYSTEM_RAPIDJSON)
-
-if (RAPIDJSON_FOUND)
-	include_directories("${RAPIDJSON_INCLUDE_DIRS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${RAPIDJSON_CXX_FLAGS}")
-else (RAPIDJSON_FOUND)
-	include_directories("libs/rapidjson/include")
-endif (RAPIDJSON_FOUND)
+find_path( RAPIDJSON_INCLUDES_DIR "rapidjson.h" PATH_SUFFIXES "rapidjson" )
+include_directories( ${RAPIDJSON_INCLUDES_DIR} )
 
 include_directories("libs/imgui")
 include_directories("libs/mikktspace")
@@ -330,11 +283,6 @@ if(USE_VULKAN)
 
 	if(NOT Vulkan_FOUND)
 		message(FATAL_ERROR "Could not find Vulkan library!")
-		#find_library(Vulkan_LIBRARY NAMES vulkan-1 vulkan PATHS ${CMAKE_SOURCE_DIR}/libs/vulkan)
-		#if(Vulkan_LIBRARY)
-		#	set(Vulkan_FOUND ON)
-		#	message("Using bundled Vulkan library version")
-		#endif()
 	else()
 		include_directories(${Vulkan_INCLUDE_DIRS})
 
@@ -383,10 +331,10 @@ if(USE_VULKAN)
 
 	# SRS - Add support for vma allocator vs. NVRHI builtin allocator
 	if(USE_VMA)
+		find_package(VulkanMemoryAllocator CONFIG REQUIRED)
+		find_path( VMA_INCLUDES_DIR "vk_mem_alloc.h" PATH_SUFFIXES "vma" )
+		include_directories( ${VMA_INCLUDES_DIR} )
 		add_definitions(-DUSE_AMD_ALLOCATOR)
-		include_directories("libs/vma/include")
-		file(GLOB VMA_INCLUDES libs/vma/include/*.h)
-		source_group("libs\\vma" FILES ${VMA_INCLUDES})
 	endif()
 
 endif()
@@ -410,15 +358,43 @@ endif()
 include_directories(${NVRHI_DIR}/include)
 include_directories(${SHADERMAKE_DIR}/include)
 
-include_directories("libs/optick")
-
-if(OPTICK)
-	file(GLOB OPTICK_INCLUDES libs/optick/*.h)
-	file(GLOB OPTICK_SOURCES libs/optick/*.cpp)
-
-	source_group("libs\\optick" FILES ${OPTICK_INCLUDES})
-	source_group("libs\\optick" FILES ${OPTICK_SOURCES})
+find_path( OPTICK_INCLUDE_DIRS "optick.h" )
+include_directories( ${OPTICK_INCLUDE_DIRS} )
+if( OPTICK )
+	find_library( OPTICK_LIBRARY_RELEASE NAMES OptickCore )
+	find_library( OPTICK_LIBRARY_DEBUG NAMES OptickCored )
+	set( OPTICK_LIBRARY optimized ${OPTICK_LIBRARY_RELEASE} debug ${OPTICK_LIBRARY_DEBUG} )
 endif()
+
+find_path( OGG_INCLUDE_DIRS "optick.h" )
+include_directories( ${OPTICK_INCLUDE_DIRS} )
+if( OPTICK )
+	find_library( OPTICK_LIBRARY_RELEASE NAMES OptickCore )
+	find_library( OPTICK_LIBRARY_DEBUG NAMES OptickCored )
+	set( OPTICK_LIBRARY optimized ${OPTICK_LIBRARY_RELEASE} debug ${OPTICK_LIBRARY_DEBUG} )
+endif()
+
+find_path( OGG_INCLUDE_DIRS "ogg.h" PATH_SUFFIXES "ogg" )
+include_directories(${OGG_INCLUDE_DIRS})
+find_library( OGG_LIBRARY_RELEASE NAMES ogg )
+find_library( OGG_LIBRARY_DEBUG NAMES ogg )
+set( OOGG_LIBRARY optimized ${OGG_LIBRARY_RELEASE} debug ${OGG_LIBRARY_DEBUG} )
+
+find_path( VORBIS_INCLUDE_DIRS "vorbisfile.h" PATH_SUFFIXES "vorbis" )
+include_directories(${VORBIS_INCLUDE_DIRS})
+find_library( VORBIS_LIBRARY_RELEASE NAMES vorbis )
+find_library( VORBIS_ENCODER_LIBRARY_RELEASE NAMES vorbisenc )
+find_library( VORBIS_FILE_LIBRARY_RELEASE NAMES vorbisfile )
+find_library( VORBIS_LIBRARY_DEBUG NAMES vorbis )
+find_library( VORBIS_ENCODER_LIBRARY_DEBUG NAMES vorbisenc )
+find_library( VORBIS_FILE_LIBRARY_DEBUG NAMES vorbisfile )
+set( VORBIS_LIBRARY optimized ${VORBIS_LIBRARY_RELEASE}
+					optimized ${VORBIS_ENCODER_LIBRARY_RELEASE}
+					optimized ${VORBIS_FILE_LIBRARY_RELEASE}
+					debug ${VORBIS_LIBRARY_DEBUG}
+					debug ${VORBIS_ENCODER_LIBRARY_DEBUG}
+					debug ${VORBIS_FILE_LIBRARY_DEBUG}
+)
 
 add_subdirectory(idlib)
 
@@ -456,9 +432,6 @@ file(GLOB RENDERER_SMAA_INCLUDES renderer/SMAA/*.h)
 file(GLOB RENDERER_NVRHI_INCLUDES renderer/NVRHI/*.h)
 file(GLOB RENDERER_NVRHI_SOURCES renderer/NVRHI/*.cpp)
 
-file(GLOB IRRXML_INCLUDES libs/irrxml/src/*.h)
-file(GLOB IRRXML_SOURCES libs/irrxml/src/*.cpp)
-
 file(GLOB IMGUI_INCLUDES libs/imgui/*.h)
 file(GLOB IMGUI_SOURCES libs/imgui/*.cpp)
 
@@ -470,15 +443,6 @@ file(GLOB TINYEXR_INCLUDES libs/tinyexr/*.h)
 
 file(GLOB MIKKTSPACE_INCLUDES libs/mikktspace/*.h)
 file(GLOB MIKKTSPACE_SOURCES libs/mikktspace/*.c)
-
-
-if (NOT ZLIB_FOUND)
-	file(GLOB ZLIB_INCLUDES libs/zlib/*.h)
-	file(GLOB ZLIB_SOURCES libs/zlib/*.c)
-else()
-	set(ZLIB_INCLUDES "")
-	set(ZLIB_SOURCES "")
-endif()
 
 if(BINKDEC)
 	file(GLOB BINKDEC_INCLUDES libs/libbinkdec/include/*.h)
@@ -571,36 +535,6 @@ set(STUBAUDIO_INCLUDES
 
 set(STUBAUDIO_SOURCES
 	sound/stub/SoundSample.cpp)
-	
-set(OGGVORBIS_INCLUDES
-	libs/oggvorbis/ogg/ogg.h
-	libs/oggvorbis/ogg/os_types.h)
-	
-set(OGGVORBIS_SOURCES
-	libs/oggvorbis/oggsrc/bitwise.c
-	libs/oggvorbis/oggsrc/framing.c
-	
-	libs/oggvorbis/vorbissrc/mdct.c
-	libs/oggvorbis/vorbissrc/smallft.c
-	libs/oggvorbis/vorbissrc/block.c
-	libs/oggvorbis/vorbissrc/envelope.c
-	libs/oggvorbis/vorbissrc/windowvb.c
-	libs/oggvorbis/vorbissrc/lsp.c
-	libs/oggvorbis/vorbissrc/lpc.c
-	libs/oggvorbis/vorbissrc/analysis.c
-	libs/oggvorbis/vorbissrc/synthesis.c
-	libs/oggvorbis/vorbissrc/psy.c
-	libs/oggvorbis/vorbissrc/info.c
-	libs/oggvorbis/vorbissrc/floor1.c
-	libs/oggvorbis/vorbissrc/floor0.c
-	libs/oggvorbis/vorbissrc/res0.c
-	libs/oggvorbis/vorbissrc/mapping0.c
-	libs/oggvorbis/vorbissrc/registry.c
-	libs/oggvorbis/vorbissrc/codebook.c
-	libs/oggvorbis/vorbissrc/sharedbook.c
-	libs/oggvorbis/vorbissrc/lookup.c
-	libs/oggvorbis/vorbissrc/bitrate.c
-	libs/oggvorbis/vorbissrc/vorbisfile.c)
 
 file(GLOB RAPIDJSON_INCLUDES libs/rapidjson/include/rapidjson/*.h)
 	
@@ -840,20 +774,6 @@ file(GLOB IMGUI_EDITOR_LIGHT_SOURCES tools/imgui/lighteditor/*.cpp)
 file(GLOB IMGUI_EDITOR_UTIL_INCLUDES tools/imgui/util/*.h)
 file(GLOB IMGUI_EDITOR_UTIL_SOURCES tools/imgui/util/*.cpp)
 
-file(GLOB DOOMCLASSIC_INCLUDES ../doomclassic/doom/*.h)
-file(GLOB DOOMCLASSIC_SOURCES ../doomclassic/doom/*.cpp)
-
-set(DOOMCLASSIC_STUBAUDIO_SOURCES ../doomclassic/doom/i_sound_stub.cpp)
-set(DOOMCLASSIC_OPENAL_SOURCES ../doomclassic/doom/i_sound_openal.cpp)
-set(DOOMCLASSIC_XAUDIO2_SOURCES ../doomclassic/doom/i_sound_win32.cpp)
-
-list(REMOVE_ITEM DOOMCLASSIC_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../doomclassic/doom/i_sound_stub.cpp)
-list(REMOVE_ITEM DOOMCLASSIC_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../doomclassic/doom/i_sound_openal.cpp)
-list(REMOVE_ITEM DOOMCLASSIC_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../doomclassic/doom/i_sound_win32.cpp)
-
-file(GLOB TIMIDITY_INCLUDES libs/timidity/*.h)
-file(GLOB TIMIDITY_SOURCES libs/timidity/*.cpp)
-
 file(GLOB_RECURSE WIN32_INCLUDES sys/win32/*.h)
 #file(GLOB_RECURSE WIN32_SOURCES sys/win32/*.cpp)
 
@@ -976,9 +896,6 @@ source_group("renderer\\NVRHI" FILES ${RENDERER_NVRHI_SOURCES})
 
 source_group("renderer\\SMAA" FILES ${RENDERER_SMAA_INCLUDES})
 
-source_group("libs\\irrxml" FILES ${IRRXML_INCLUDES})
-source_group("libs\\irrxml" FILES ${IRRXML_SOURCES})
-
 source_group("libs\\imgui" FILES ${IMGUI_INCLUDES})
 source_group("libs\\imgui" FILES ${IMGUI_SOURCES})
 
@@ -994,11 +911,9 @@ source_group("libs\\mikktspace" FILES ${MIKKTSPACE_SOURCES})
 source_group("libs\\libbinkdec" FILES ${BINKDEC_INCLUDES})
 source_group("libs\\libbinkdec" FILES ${BINKDEC_SOURCES})
 
-source_group("libs\\zlib" FILES ${ZLIB_INCLUDES})
-source_group("libs\\zlib" FILES ${ZLIB_SOURCES})
 
-source_group("libs\\zlib\\minizip" FILES ${MINIZIP_INCLUDES})
-source_group("libs\\zlib\\minizip" FILES ${MINIZIP_SOURCES})
+source_group("libs\\minizip" FILES ${MINIZIP_INCLUDES})
+source_group("libs\\minizip" FILES ${MINIZIP_SOURCES})
 
 source_group("libs\\rapidjson" FILES ${RAPIDJSON_INCLUDES})
 
@@ -1016,9 +931,6 @@ source_group("sound\\OpenAL" FILES ${OPENAL_SOURCES})
 source_group("sound\\stub" FILES ${STUBAUDIO_INCLUDES})
 source_group("sound\\stub" FILES ${STUBAUDIO_SOURCES})
 
-source_group("libs\\oggvorbis" FILES ${OGGVORBIS_INCLUDES})
-source_group("libs\\oggvorbis" FILES ${OGGVORBIS_SOURCES})
-
 source_group("ui" FILES ${UI_INCLUDES})
 source_group("ui" FILES ${UI_SOURCES})
 
@@ -1027,17 +939,6 @@ source_group("swf" FILES ${SWF_SOURCES})
 
 source_group("sys" FILES ${SYS_INCLUDES})
 source_group("sys" FILES ${SYS_SOURCES})
-
-source_group("doomclassic" FILES ${DOOMCLASSIC_INCLUDES})
-source_group("doomclassic" FILES ${DOOMCLASSIC_SOURCES})
-
-source_group("doomclassic" FILES ${DOOMCLASSIC_STUBAUDIO_SOURCES})
-source_group("doomclassic" FILES ${DOOMCLASSIC_OPENAL_SOURCES})
-source_group("doomclassic" FILES ${DOOMCLASSIC_XAUDIO2_SOURCES})
-
-source_group("libs\\timidity" FILES ${TIMIDITY_INCLUDES})
-source_group("libs\\timidity" FILES ${TIMIDITY_SOURCES})
-
 
 source_group("game-d3xp" FILES ${GAMED3XP_INCLUDES})
 source_group("game-d3xp" FILES ${GAMED3XP_SOURCES})
@@ -1153,22 +1054,18 @@ set(RBDOOM3_INCLUDES
 			${RENDERER_PASSES_INCLUDES}
 			
 			${RENDERER_SMAA_INCLUDES}
-			${IRRXML_INCLUDES}
 			${FRAMEWORK_IMGUI_INCLUDES}
 			${IMGUI_INCLUDES}
 			${STB_INCLUDES}
 			${MESA_INCLUDES}
 			${TINYEXR_INCLUDES}
 			${MIKKTSPACE_INCLUDES}
-			${ZLIB_INCLUDES}
 			${MINIZIP_INCLUDES}
 			${BINKDEC_INCLUDES}
 			${RAPIDJSON_INCLUDES}
 			#${FREETYPE_SOURCES}
 			${SOUND_INCLUDES}
-			${OGGVORBIS_INCLUDES}
 			${VMA_INCLUDES}
-			${OPTICK_INCLUDES}
 			${UI_INCLUDES}
 			${SWF_INCLUDES}
 			${COMMON_INCLUDES}
@@ -1205,17 +1102,13 @@ set(RBDOOM3_SOURCES
 			${RENDERER_JOBS_PRELIGHTSHADOWVOLUME_SOURCES}
 			${RENDERER_JOBS_STATICSHADOWVOLUME_SOURCES}
 			${RENDERER_PASSES_SOURCES}
-			${IRRXML_SOURCES}
 			${FRAMEWORK_IMGUI_SOURCES}
 			${IMGUI_SOURCES}
 			${MIKKTSPACE_SOURCES}
-			${ZLIB_SOURCES}
 			${MINIZIP_SOURCES}
 			${BINKDEC_SOURCES}
 			#${FREETYPE_SOURCES}
 			${SOUND_SOURCES}
-			${OGGVORBIS_SOURCES}
-			${OPTICK_SOURCES}
 			${UI_SOURCES}
 			${SWF_SOURCES}
 			${COMMON_SOURCES}
@@ -1248,16 +1141,6 @@ macro(AddSubdirectory dirName)
 endmacro()
 
 AddSubdirectory( tools/imgui/afeditor )
-
-if(DOOM_CLASSIC)
-	add_definitions(-DUSE_DOOMCLASSIC)
-
-	list(APPEND RBDOOM3_INCLUDES ${DOOMCLASSIC_INCLUDES})
-	list(APPEND RBDOOM3_INCLUDES ${TIMIDITY_INCLUDES})
-	
-	list(APPEND RBDOOM3_SOURCES ${DOOMCLASSIC_SOURCES})
-	list(APPEND RBDOOM3_SOURCES ${TIMIDITY_SOURCES})
-endif()
 
 add_definitions(-D__DOOM__
 				#-DBUILD_FREETYPE
@@ -1304,10 +1187,7 @@ if(MSVC)
 		
 		list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
 		list(APPEND RBDOOM3_SOURCES	${OPENAL_SOURCES})
-		if(DOOM_CLASSIC)
-			list(APPEND RBDOOM3_SOURCES	${DOOMCLASSIC_OPENAL_SOURCES})
-		endif()		
-		
+
 		set(OpenAL_LIBRARIES
 			OpenAL32)
 			
@@ -1320,10 +1200,6 @@ if(MSVC)
 	else()
 		list(APPEND RBDOOM3_INCLUDES ${XAUDIO2_INCLUDES})
 		list(APPEND RBDOOM3_SOURCES	${XAUDIO2_SOURCES})
-
-		if(DOOM_CLASSIC)
-			list(APPEND RBDOOM3_SOURCES	${DOOMCLASSIC_XAUDIO2_SOURCES})
-		endif()
 	endif()
 	
 	if(FFMPEG)
@@ -1370,7 +1246,7 @@ if(MSVC)
 	
 	if(USE_PRECOMPILED_HEADERS) 
 		set(RBDOOM3_PRECOMPILED_SOURCES ${RBDOOM3_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${TIMIDITY_SOURCES} ${ZLIB_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES} ${OGGVORBIS_SOURCES} ${OPTICK_SOURCES})
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libs/zlib/minizip/ioapi.c)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTDecoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder.cpp)
@@ -1393,13 +1269,6 @@ if(MSVC)
 			OBJECT_OUTPUTS "precompiled.pch"
 		)
 	endif()
-	
-	# SRS - disable certain MSVC warnings for select third-party source libraries, consider updating versions in the future?
-	set_source_files_properties(
-			${OGGVORBIS_SOURCES}
-			PROPERTIES
-			COMPILE_FLAGS "/wd4101 /wd4267"	# C4101: unreferenced local variable, C4267: type conversion with possible loss of data
-			)
 	
 	list(APPEND RBDOOM3_SOURCES ${WIN32_RESOURCES})
 	
@@ -1426,6 +1295,8 @@ if(MSVC)
 		${OpenAL_LIBRARIES}
 		${FFmpeg_LIBRARIES}
         ${ZLIB_LIBRARY}
+        ${OGG_LIBRARY}
+        ${VORBIS_LIBRARY}
 		${CMAKE_DL_LIBS}
 		)
 		
@@ -1482,17 +1353,9 @@ else()
 
 			list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
 			list(APPEND RBDOOM3_SOURCES ${OPENAL_SOURCES})
-				
-			if(DOOM_CLASSIC)
-				list(APPEND RBDOOM3_SOURCES	${DOOMCLASSIC_OPENAL_SOURCES})
-			endif()
 		else()
 			list(APPEND RBDOOM3_INCLUDES ${STUBAUDIO_INCLUDES})
 			list(APPEND RBDOOM3_SOURCES ${STUBAUDIO_SOURCES})
-			
-			if(DOOM_CLASSIC)
-				list(APPEND RBDOOM3_SOURCES	${DOOMCLASSIC_STUBAUDIO_SOURCES})
-			endif()
 		endif()
 		
 		if(USE_VULKAN)
@@ -1508,7 +1371,7 @@ else()
 	
 	if(USE_PRECOMPILED_HEADERS) 	
 		set(RBDOOM3_PRECOMPILED_SOURCES ${RBDOOM3_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${TIMIDITY_SOURCES} ${ZLIB_SOURCES} ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES} ${OGGVORBIS_SOURCES} ${OPTICK_SOURCES})
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libs/zlib/minizip/ioapi.c)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTDecoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder.cpp)
@@ -1534,20 +1397,10 @@ else()
 
 	# SRS - disable certain gcc/clang warnings for select third-party source libraries, consider updating versions in the future?
 	set_source_files_properties(
-			${ZLIB_SOURCES}
 			${MINIZIP_SOURCES}
 			PROPERTIES
 			COMPILE_FLAGS "-Wno-stringop-overread -Wno-deprecated-non-prototype"
 			)
-		
-	# SRS - if using gcc compiler enable gnu extensions for ##__VA_ARGS__ support within optick profiler (i.e. __STRICT_ANSI__ not set)
-	if(CMAKE_COMPILER_IS_GNUCC)
-		set_source_files_properties(
-				${OPTICK_SOURCES}
-				PROPERTIES
-				COMPILE_FLAGS "-std=gnu++${CMAKE_CXX_STANDARD}"
-				)
-	endif()
 	
 	GET_DIRECTORY_PROPERTY(_directory_flags DEFINITIONS)
 	LIST(APPEND _compiler_FLAGS ${_directory_flags})
@@ -1641,6 +1494,8 @@ else()
 			${OPENAL_LIBRARY}
 			${FFMPEG_LIBRARIES}
             ${ZLIB_LIBRARY}
+			${OGG_LIBRARY}
+			${VORBIS_LIBRARY}
 	    	${CMAKE_DL_LIBS}
 			)
 	endif()

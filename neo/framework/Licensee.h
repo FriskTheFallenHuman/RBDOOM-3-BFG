@@ -47,11 +47,7 @@ If you have questions concerning this license or the applicable additional terms
 #define ENGINE_BRANCH					"master"
 // jmarshall end
 
-#ifdef STANDALONE
-	#define	BASE_GAMEDIR				"content"
-#else
-	#define	BASE_GAMEDIR				"base"
-#endif
+#define	BASE_GAMEDIR					"base"
 
 #define CONFIG_FILE						"D3BFGConfig.cfg"
 

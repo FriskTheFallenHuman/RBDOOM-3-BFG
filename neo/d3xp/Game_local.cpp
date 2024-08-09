@@ -5961,11 +5961,6 @@ void idGameLocal::Shell_SyncWithSession()
 	}
 	switch( session->GetState() )
 	{
-#if defined( USE_DOOMCLASSIC)
-		case idSession::PRESS_START:
-			shellHandler->SetShellState( SHELL_STATE_PRESS_START );
-			break;
-#endif
 		case idSession::INGAME:
 			shellHandler->SetShellState( SHELL_STATE_PAUSED );
 			break;
