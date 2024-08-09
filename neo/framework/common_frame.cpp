@@ -529,7 +529,7 @@ void idCommonLocal::Frame()
 		// DG: Add pause from com_pause cvar
 		if( com_pause.GetInteger() || console->Active() || Dialog().IsDialogActive() || session->IsSystemUIShowing()
 				|| ( game && game->InhibitControls() ) ||  ImGuiTools::ReleaseMouseForTools() )
-		// DG end
+			// DG end
 		{
 			// RB: don't release the mouse when opening a PDA or menu
 			// SRS - but always release at main menu after exiting game or demo

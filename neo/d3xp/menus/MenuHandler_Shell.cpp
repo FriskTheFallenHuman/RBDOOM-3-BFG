@@ -71,78 +71,78 @@ void idMenuHandler_Shell::Update()
 			PlaySound( GUI_SOUND_MUSIC );
 		}
 
-			if( nextState == SHELL_STATE_IDLE )
+		if( nextState == SHELL_STATE_IDLE )
+		{
+			HidePacifier();
+			if(
+				nextScreen == SHELL_AREA_PARTY_LOBBY ||
+				nextScreen == SHELL_AREA_GAME_LOBBY ||
+				nextScreen == SHELL_AREA_INVALID )
 			{
-				HidePacifier();
-				if(
-					nextScreen == SHELL_AREA_PARTY_LOBBY ||
-					nextScreen == SHELL_AREA_GAME_LOBBY ||
-					nextScreen == SHELL_AREA_INVALID )
-				{
-					nextScreen = SHELL_AREA_ROOT;
-				}
+				nextScreen = SHELL_AREA_ROOT;
+			}
 
-				if( menuBar != NULL && gui != NULL )
-				{
-					idSWFScriptObject& root = gui->GetRootObject();
-					menuBar->BindSprite( root );
-					SetupPCOptions();
-				}
+			if( menuBar != NULL && gui != NULL )
+			{
+				idSWFScriptObject& root = gui->GetRootObject();
+				menuBar->BindSprite( root );
+				SetupPCOptions();
+			}
+			transition = MENU_TRANSITION_SIMPLE;
+			state = nextState;
+		}
+		else if( nextState == SHELL_STATE_PARTY_LOBBY )
+		{
+			HidePacifier();
+			nextScreen = SHELL_AREA_PARTY_LOBBY;
+			transition = MENU_TRANSITION_SIMPLE;
+			state = nextState;
+		}
+		else if( nextState == SHELL_STATE_GAME_LOBBY )
+		{
+			HidePacifier();
+			if( state != SHELL_STATE_IN_GAME )
+			{
+				timeRemaining = WAIT_START_TIME_LONG;
+				idMatchParameters matchParameters = session->GetActivePlatformLobbyBase().GetMatchParms();
+				/*if ( MatchTypeIsPrivate( matchParameters.matchFlags ) && ActiveScreen() == SHELL_AREA_PARTY_LOBBY ) {
+					timeRemaining = 0;
+					session->StartMatch();
+					state = SHELL_STATE_IN_GAME;
+				} else {*/
+				nextScreen = SHELL_AREA_GAME_LOBBY;
 				transition = MENU_TRANSITION_SIMPLE;
-				state = nextState;
-			}
-			else if( nextState == SHELL_STATE_PARTY_LOBBY )
-			{
-				HidePacifier();
-				nextScreen = SHELL_AREA_PARTY_LOBBY;
-				transition = MENU_TRANSITION_SIMPLE;
-				state = nextState;
-			}
-			else if( nextState == SHELL_STATE_GAME_LOBBY )
-			{
-				HidePacifier();
-				if( state != SHELL_STATE_IN_GAME )
-				{
-					timeRemaining = WAIT_START_TIME_LONG;
-					idMatchParameters matchParameters = session->GetActivePlatformLobbyBase().GetMatchParms();
-					/*if ( MatchTypeIsPrivate( matchParameters.matchFlags ) && ActiveScreen() == SHELL_AREA_PARTY_LOBBY ) {
-						timeRemaining = 0;
-						session->StartMatch();
-						state = SHELL_STATE_IN_GAME;
-					} else {*/
-					nextScreen = SHELL_AREA_GAME_LOBBY;
-					transition = MENU_TRANSITION_SIMPLE;
-					//}
-
-					state = nextState;
-				}
-			}
-			else if( nextState == SHELL_STATE_PAUSED )
-			{
-				HidePacifier();
-				transition = MENU_TRANSITION_SIMPLE;
-
-				if( gameComplete )
-				{
-					nextScreen = SHELL_AREA_CREDITS;
-				}
-				else
-				{
-					nextScreen = SHELL_AREA_ROOT;
-				}
+				//}
 
 				state = nextState;
 			}
-			else if( nextState == SHELL_STATE_CONNECTING )
+		}
+		else if( nextState == SHELL_STATE_PAUSED )
+		{
+			HidePacifier();
+			transition = MENU_TRANSITION_SIMPLE;
+
+			if( gameComplete )
 			{
-				ShowPacifier( "#str_dlg_connecting" );
-				state = nextState;
+				nextScreen = SHELL_AREA_CREDITS;
 			}
-			else if( nextState == SHELL_STATE_SEARCHING )
+			else
 			{
-				ShowPacifier( "#str_online_mpstatus_searching" );
-				state = nextState;
+				nextScreen = SHELL_AREA_ROOT;
 			}
+
+			state = nextState;
+		}
+		else if( nextState == SHELL_STATE_CONNECTING )
+		{
+			ShowPacifier( "#str_dlg_connecting" );
+			state = nextState;
+		}
+		else if( nextState == SHELL_STATE_SEARCHING )
+		{
+			ShowPacifier( "#str_online_mpstatus_searching" );
+			state = nextState;
+		}
 	}
 
 	if( activeScreen != nextScreen )
