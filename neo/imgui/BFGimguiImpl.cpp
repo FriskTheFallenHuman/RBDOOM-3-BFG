@@ -258,6 +258,8 @@ bool Init( int windowWidth, int windowHeight )
 
 	IMGUI_CHECKVERSION();
 
+	ImGui::CreateContext();
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
