@@ -1,0 +1,130 @@
+From 12d2ac570d02151ed18f11d575078067f1fc04ad Mon Sep 17 00:00:00 2001
+From: Krispy <nikodash2020@hotmail.com>
+Date: Mon, 19 Aug 2024 16:29:07 -0500
+Subject: [PATCH] don't use std::string use idStr
+
+---
+ misc/cpp/imgui_stdlib.cpp | 41 +++++++++++++++++++++------------------
+ misc/cpp/imgui_stdlib.h   | 10 +++++-----
+ 2 files changed, 27 insertions(+), 24 deletions(-)
+
+diff --git a/misc/cpp/imgui_stdlib.cpp b/misc/cpp/imgui_stdlib.cpp
+index cf69aa89..717dc134 100644
+--- a/misc/cpp/imgui_stdlib.cpp
++++ b/misc/cpp/imgui_stdlib.cpp
+@@ -10,15 +10,22 @@
+ #include "imgui.h"
+ #include "imgui_stdlib.h"
+ 
+-// Clang warnings with -Weverything
+-#if defined(__clang__)
+-#pragma clang diagnostic push
+-#pragma clang diagnostic ignored "-Wsign-conversion"    // warning: implicit conversion changes signedness
+-#endif
++// RB: replaced idStr with idStr
++#include "sys/sys_defines.h"
++#include "sys/sys_builddefines.h"
++#include "sys/sys_includes.h"
++#include "sys/sys_assert.h"
++#include "sys/sys_types.h"
++#include "sys/sys_intrinsics.h"
++#include "sys/sys_threading.h"
++
++#include "CmdArgs.h"
++#include "containers/Sort.h"
++#include "Str.h"
+ 
+ struct InputTextCallback_UserData
+ {
+-    std::string*            Str;
++    idStr*            Str;
+     ImGuiInputTextCallback  ChainCallback;
+     void*                   ChainCallbackUserData;
+ };
+@@ -28,11 +35,11 @@ static int InputTextCallback(ImGuiInputTextCallbackData* data)
+     InputTextCallback_UserData* user_data = (InputTextCallback_UserData*)data->UserData;
+     if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+     {
+-        // Resize string callback
++        // ReAllocate string callback
+         // If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them back to what we want.
+-        std::string* str = user_data->Str;
++        idStr* str = user_data->Str;
+         IM_ASSERT(data->Buf == str->c_str());
+-        str->resize(data->BufTextLen);
++        str->ReAllocate(data->BufTextLen, true);
+         data->Buf = (char*)str->c_str();
+     }
+     else if (user_data->ChainCallback)
+@@ -44,7 +51,7 @@ static int InputTextCallback(ImGuiInputTextCallbackData* data)
+     return 0;
+ }
+ 
+-bool ImGui::InputText(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
++bool ImGui::InputText(const char* label, idStr* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+ {
+     IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+     flags |= ImGuiInputTextFlags_CallbackResize;
+@@ -53,10 +60,10 @@ bool ImGui::InputText(const char* label, std::string* str, ImGuiInputTextFlags f
+     cb_user_data.Str = str;
+     cb_user_data.ChainCallback = callback;
+     cb_user_data.ChainCallbackUserData = user_data;
+-    return InputText(label, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
++    return InputText(label, (char*)str->c_str(), str->Size() + 1, flags, InputTextCallback, &cb_user_data);
+ }
+ 
+-bool ImGui::InputTextMultiline(const char* label, std::string* str, const ImVec2& size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
++bool ImGui::InputTextMultiline(const char* label, idStr* str, const ImVec2& size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+ {
+     IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+     flags |= ImGuiInputTextFlags_CallbackResize;
+@@ -65,10 +72,10 @@ bool ImGui::InputTextMultiline(const char* label, std::string* str, const ImVec2
+     cb_user_data.Str = str;
+     cb_user_data.ChainCallback = callback;
+     cb_user_data.ChainCallbackUserData = user_data;
+-    return InputTextMultiline(label, (char*)str->c_str(), str->capacity() + 1, size, flags, InputTextCallback, &cb_user_data);
++    return InputTextMultiline(label, (char*)str->c_str(), str->Size() + 1, size, flags, InputTextCallback, &cb_user_data);
+ }
+ 
+-bool ImGui::InputTextWithHint(const char* label, const char* hint, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
++bool ImGui::InputTextWithHint(const char* label, const char* hint, idStr* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+ {
+     IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+     flags |= ImGuiInputTextFlags_CallbackResize;
+@@ -77,9 +84,5 @@ bool ImGui::InputTextWithHint(const char* label, const char* hint, std::string*
+     cb_user_data.Str = str;
+     cb_user_data.ChainCallback = callback;
+     cb_user_data.ChainCallbackUserData = user_data;
+-    return InputTextWithHint(label, hint, (char*)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &cb_user_data);
++    return InputTextWithHint(label, hint, (char*)str->c_str(), str->Size() + 1, flags, InputTextCallback, &cb_user_data);
+ }
+-
+-#if defined(__clang__)
+-#pragma clang diagnostic pop
+-#endif
+diff --git a/misc/cpp/imgui_stdlib.h b/misc/cpp/imgui_stdlib.h
+index 835a808f..0a029af4 100644
+--- a/misc/cpp/imgui_stdlib.h
++++ b/misc/cpp/imgui_stdlib.h
+@@ -9,13 +9,13 @@
+ 
+ #pragma once
+ 
+-#include <string>
++class idStr;
+ 
+ namespace ImGui
+ {
+-    // ImGui::InputText() with std::string
++    // ImGui::InputText() with idStr
+     // Because text input needs dynamic resizing, we need to setup a callback to grow the capacity
+-    IMGUI_API bool  InputText(const char* label, std::string* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
+-    IMGUI_API bool  InputTextMultiline(const char* label, std::string* str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
+-    IMGUI_API bool  InputTextWithHint(const char* label, const char* hint, std::string* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* user_data = nullptr);
++    IMGUI_API bool  InputText(const char* label, idStr* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
++    IMGUI_API bool  InputTextMultiline(const char* label, idStr* str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
++    IMGUI_API bool  InputTextWithHint(const char* label, const char* hint, idStr* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
+ }
+-- 
+2.45.2.windows.1
+

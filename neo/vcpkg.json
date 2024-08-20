@@ -4,6 +4,7 @@
 	"dependencies": [
 		"optick",
 		"zlib",
+		"minizip",
 		"libogg",
 		"libvorbis",
 		"openal-soft",
@@ -18,6 +19,11 @@
 		"stb",
 		"vulkan",
 		"vulkan-memory-allocator",
-		"rapidjson"
+		"rapidjson",
+		{
+			"name": "imgui",
+			"features": ["docking-experimental"]
+		},
+		"imguizmo"
 	]
 }

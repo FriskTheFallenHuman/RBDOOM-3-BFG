@@ -5,6 +5,8 @@ if ( EXISTS "${CMAKE_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake" )
 	set( CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file" )
 	set( VCPKG_OVERLAY_PORTS
 		"${CMAKE_SOURCE_DIR}/../.vcpkg/ports/optick/"
+		"${CMAKE_SOURCE_DIR}/../.vcpkg/ports/imgui/"
+		"${CMAKE_SOURCE_DIR}/../.vcpkg/ports/imguizmo/"
 	)
 else()
 	message( FATAL_ERROR "Vcpkg wasn't not found, aborting, make sure to git clone this with all submodules!")
@@ -65,19 +67,19 @@ if(UNIX)
 	set(USE_DX12 OFF)
 	set(USE_VULKAN ON)
 	
-    # SRS - Disable precompiled headers when cross-compiling on OSX, e.g. when creating universal binaries
-    #     - Also disable precompiled headers when using the Ninja Multi-Config generator on linux or macOS
-    if((CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64" AND CMAKE_OSX_ARCHITECTURES MATCHES "arm64" ) OR
-       (CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "arm64"  AND CMAKE_OSX_ARCHITECTURES MATCHES "x86_64") OR
-       (CMAKE_GENERATOR MATCHES "Ninja Multi-Config"))
-        set(USE_PRECOMPILED_HEADERS OFF)
-    endif()
-    
+	# SRS - Disable precompiled headers when cross-compiling on OSX, e.g. when creating universal binaries
+	#     - Also disable precompiled headers when using the Ninja Multi-Config generator on linux or macOS
+	if((CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64" AND CMAKE_OSX_ARCHITECTURES MATCHES "arm64" ) OR
+	   (CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "arm64"  AND CMAKE_OSX_ARCHITECTURES MATCHES "x86_64") OR
+	   (CMAKE_GENERATOR MATCHES "Ninja Multi-Config"))
+		set(USE_PRECOMPILED_HEADERS OFF)
+	endif()
+	
 	# SRS - For single-config dev builds, define NO_MULTI_CONFIG to search for basepath up 1 dir level vs 2
-    if((CMAKE_GENERATOR MATCHES "Makefiles") OR
-       (CMAKE_GENERATOR MATCHES "Ninja" AND NOT CMAKE_GENERATOR MATCHES "Multi-Config"))
+	if((CMAKE_GENERATOR MATCHES "Makefiles") OR
+	   (CMAKE_GENERATOR MATCHES "Ninja" AND NOT CMAKE_GENERATOR MATCHES "Multi-Config"))
 		add_definitions(-DNO_MULTI_CONFIG)
-    endif()
+	endif()
 endif()
 
 if(COMPILE_COMMANDS)
@@ -155,21 +157,21 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 	add_compile_options(-fno-strict-aliasing)
 
 	# SRS - Make sure OSX can find system headers and add support for minimum OSX runtime version
-    if(APPLE)
+	if(APPLE)
 		# SRS - Also add -fasm-blocks otherwise Xcode complains and -Qunused-arguments to silence MMX/SSE unused arg warnings when compiling for Apple arm64
 		add_definitions(-fasm-blocks -Qunused-arguments)
-        if(CMAKE_OSX_SYSROOT)
-            add_definitions(-isysroot "${CMAKE_OSX_SYSROOT}")
-            message(STATUS "Using macOS sysroot: " ${CMAKE_OSX_SYSROOT})
-        endif()
+		if(CMAKE_OSX_SYSROOT)
+			add_definitions(-isysroot "${CMAKE_OSX_SYSROOT}")
+			message(STATUS "Using macOS sysroot: " ${CMAKE_OSX_SYSROOT})
+		endif()
 		if(CMAKE_OSX_DEPLOYMENT_TARGET)
 			add_definitions(-mmacosx-version-min="${CMAKE_OSX_DEPLOYMENT_TARGET}")
 		endif()
 	endif()
 
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -D_DEBUG -O0")
-    #set(CMAKE_C_FLAGS_DEBUGALL "${CMAKE_C_FLAGS_DEBUGALL} -g -ggdb -D_DEBUG")
-    #set(CMAKE_C_FLAGS_PROFILE "${CMAKE_C_FLAGS_PROFILE} -g -ggdb -D_DEBUG -O1 -fno-omit-frame-pointer")
+	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -D_DEBUG -O0")
+	#set(CMAKE_C_FLAGS_DEBUGALL "${CMAKE_C_FLAGS_DEBUGALL} -g -ggdb -D_DEBUG")
+	#set(CMAKE_C_FLAGS_PROFILE "${CMAKE_C_FLAGS_PROFILE} -g -ggdb -D_DEBUG -O1 -fno-omit-frame-pointer")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -ffp-contract=off -fomit-frame-pointer -fno-math-errno -fno-trapping-math")
 	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -g -O3 -ffp-contract=off -fomit-frame-pointer -fno-math-errno -fno-trapping-math")
 	set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -Os -ffp-contract=off -fomit-frame-pointer -fno-math-errno -fno-trapping-math")
@@ -260,6 +262,16 @@ set(ZLIB_LIBRARY ${ZLIB_LIBRARIES})
 find_path( RAPIDJSON_INCLUDES_DIR "rapidjson.h" PATH_SUFFIXES "rapidjson" )
 include_directories( ${RAPIDJSON_INCLUDES_DIR} )
 
+find_path(IMGUI_INCLUDE_DIRS "imgui.h")
+find_library(IMGUI_LIBRARY_RELEASE imgui)
+find_library(IMGUI_LIBRARY_DEBUG imguid)
+set( IMGUI_LIBRARY optimized ${IMGUI_LIBRARY_RELEASE} debug ${IMGUI_LIBRARY_DEBUG} )
+include_directories(${IMGUI_INCLUDE_DIRS})
+
+find_path(IMGUIZMO_INCLUDE_DIRS "ImGuizmo.h" PATH_SUFFIXES "imguizmo")
+find_library(IMGUIZMO_LIBRARY NAMES imguizmo)
+include_directories(${IMGUIZMO_INCLUDE_DIRS})
+
 include_directories("libs/imgui")
 include_directories("libs/mikktspace")
 
@@ -275,9 +287,9 @@ if(USE_VULKAN)
 	if(NOT CMAKE_VERSION VERSION_LESS 3.7.0)
 		message( STATUS "Using module to find Vulkan and components" )
 		list(APPEND Vulkan_COMPONENTS dxc)
-	    if(APPLE AND USE_MoltenVK)
+		if(APPLE AND USE_MoltenVK)
 			list(APPEND Vulkan_COMPONENTS MoltenVK)
-    	endif()
+		endif()
 		find_package(Vulkan OPTIONAL_COMPONENTS ${Vulkan_COMPONENTS})
 	endif()
 
@@ -291,18 +303,18 @@ if(USE_VULKAN)
 			set(DXC_CUSTOM_PATH ${Vulkan_dxc_EXECUTABLE})
 		endif()
 
-        if(APPLE)
-            # SRS - Enable Beta extensions for Vulkan portability subset features on macOS
-            add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
-            # SRS - Optionally link directly to MoltenVK headers/library for runtime config functions on OSX
-            if(USE_MoltenVK)
-            	if(Vulkan_MoltenVK_FOUND)
+		if(APPLE)
+			# SRS - Enable Beta extensions for Vulkan portability subset features on macOS
+			add_definitions(-DVK_ENABLE_BETA_EXTENSIONS)
+			# SRS - Optionally link directly to MoltenVK headers/library for runtime config functions on OSX
+			if(USE_MoltenVK)
+				if(Vulkan_MoltenVK_FOUND)
 					add_definitions(-DUSE_MoltenVK)
-                	include_directories(${Vulkan_MoltenVK_INCLUDE_DIR})
-                	set(Vulkan_LIBRARY ${Vulkan_MoltenVK_LIBRARY} CACHE FILEPATH "Path to MoltenVK library." FORCE)
-                else()
-		            message(FATAL_ERROR "Must define VULKAN_SDK location if USE_MoltenVK option enabled!")
-                endif()
+					include_directories(${Vulkan_MoltenVK_INCLUDE_DIR})
+					set(Vulkan_LIBRARY ${Vulkan_MoltenVK_LIBRARY} CACHE FILEPATH "Path to MoltenVK library." FORCE)
+				else()
+					message(FATAL_ERROR "Must define VULKAN_SDK location if USE_MoltenVK option enabled!")
+				endif()
 			else()
 				# If using Xcode and the Vulkan loader's environment variables are defined, make them available within Xcode scheme
 				if(CMAKE_GENERATOR MATCHES "Xcode")
@@ -316,15 +328,15 @@ if(USE_VULKAN)
 						set(CMAKE_XCODE_SCHEME_ENVIRONMENT "${CMAKE_XCODE_SCHEME_ENVIRONMENT};VK_DRIVER_FILES=$ENV{VK_DRIVER_FILES}")
 					endif()
 				endif()
-            endif()
+			endif()
 		endif()
 		message(STATUS "Using Vulkan: " ${Vulkan_LIBRARY})
 	endif()
 	
 	# Eric: For use with SDL2/Vulkan
 	if(UNIX)
-        # SRS - For UNIX-like target OSs use the generic SDL Vulkan platform
-        add_definitions(-DVULKAN_USE_PLATFORM_SDL)
+		# SRS - For UNIX-like target OSs use the generic SDL Vulkan platform
+		add_definitions(-DVULKAN_USE_PLATFORM_SDL)
 	elseif(WIN32)
 		add_definitions(-DVK_USE_PLATFORM_WIN32_KHR)
 	endif()
@@ -431,9 +443,6 @@ file(GLOB RENDERER_SMAA_INCLUDES renderer/SMAA/*.h)
 
 file(GLOB RENDERER_NVRHI_INCLUDES renderer/NVRHI/*.h)
 file(GLOB RENDERER_NVRHI_SOURCES renderer/NVRHI/*.cpp)
-
-file(GLOB IMGUI_INCLUDES libs/imgui/*.h)
-file(GLOB IMGUI_SOURCES libs/imgui/*.cpp)
 
 file(GLOB STB_INCLUDES libs/stb/*.h)
 
@@ -700,9 +709,6 @@ source_group("renderer\\NVRHI" FILES ${RENDERER_NVRHI_SOURCES})
 
 source_group("renderer\\SMAA" FILES ${RENDERER_SMAA_INCLUDES})
 
-source_group("libs\\imgui" FILES ${IMGUI_INCLUDES})
-source_group("libs\\imgui" FILES ${IMGUI_SOURCES})
-
 source_group("libs\\stb" FILES ${STB_INCLUDES})
 
 source_group("libs\\mesa" FILES ${MESA_INCLUDES})
@@ -810,7 +816,6 @@ set(RBDOOM3_INCLUDES
 			
 			${RENDERER_SMAA_INCLUDES}
 			${FRAMEWORK_IMGUI_INCLUDES}
-			${IMGUI_INCLUDES}
 			${STB_INCLUDES}
 			${MESA_INCLUDES}
 			${TINYEXR_INCLUDES}
@@ -853,7 +858,6 @@ set(RBDOOM3_SOURCES
 			${RENDERER_JOBS_STATICSHADOWVOLUME_SOURCES}
 			${RENDERER_PASSES_SOURCES}
 			${FRAMEWORK_IMGUI_SOURCES}
-			${IMGUI_SOURCES}
 			${MIKKTSPACE_SOURCES}
 			${MINIZIP_SOURCES}
 			${BINKDEC_SOURCES}
@@ -987,7 +991,7 @@ if(MSVC)
 	
 	if(USE_PRECOMPILED_HEADERS) 
 		set(RBDOOM3_PRECOMPILED_SOURCES ${RBDOOM3_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${BINKDEC_SOURCES} ${MIKKTSPACE_SOURCES})
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libs/zlib/minizip/ioapi.c)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTDecoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder.cpp)
@@ -1016,8 +1020,8 @@ if(MSVC)
 	add_executable(RBDoom3BFG WIN32 ${RBDOOM3_INCLUDES} ${RBDOOM3_SOURCES})
 
 	add_dependencies(RBDoom3BFG idlib)
-    
-    if(USE_DX12)
+	
+	if(USE_DX12)
 		add_dependencies(RBDoom3BFG nvrhi_d3d12)
 	endif()
 	
@@ -1035,9 +1039,11 @@ if(MSVC)
 		${Vulkan_LIBRARIES}
 		${OpenAL_LIBRARIES}
 		${FFmpeg_LIBRARIES}
-        ${ZLIB_LIBRARY}
-        ${OGG_LIBRARY}
-        ${VORBIS_LIBRARY}
+		${IMGUI_LIBRARY}
+		${IMGUIZMO_LIBRARY}
+		${ZLIB_LIBRARY}
+		${OGG_LIBRARY}
+		${VORBIS_LIBRARY}
 		${CMAKE_DL_LIBS}
 		)
 		
@@ -1072,7 +1078,7 @@ else()
 		include_directories(${SDL2_INCLUDE_DIRS})
 		set(SDLx_LIBRARY ${SDL2_LIBRARIES})
 
-        if(APPLE)
+		if(APPLE)
 			list(REMOVE_ITEM POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_linux.cpp)
 		else()
 			list(REMOVE_ITEM POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sys/posix/platform_osx.cpp)
@@ -1087,7 +1093,7 @@ else()
 			add_definitions(-DUSE_OPENAL)
 
 			# SRS - Added support for OpenAL Soft headers on OSX (vs default macOS SDK headers)
-            if(APPLE AND NOT OPENAL_INCLUDE_DIR MATCHES "SDKs/MacOSX.*\.sdk")
+			if(APPLE AND NOT OPENAL_INCLUDE_DIR MATCHES "SDKs/MacOSX.*\.sdk")
 				include_directories(${OPENAL_INCLUDE_DIR})
 				add_definitions(-DUSE_OPENAL_SOFT_INCLUDES)
 			endif()
@@ -1100,11 +1106,11 @@ else()
 		endif()
 		
 		if(USE_VULKAN)
-            list(APPEND RBDOOM3_INCLUDES ${RENDERER_NVRHI_INCLUDES})
-            list(APPEND RBDOOM3_SOURCES ${RENDERER_NVRHI_SOURCES})
+			list(APPEND RBDOOM3_INCLUDES ${RENDERER_NVRHI_INCLUDES})
+			list(APPEND RBDOOM3_SOURCES ${RENDERER_NVRHI_SOURCES})
 
-            #set(Vulkan_LIBRARIES ${Vulkan_LIBRARY})
-        endif()
+			#set(Vulkan_LIBRARIES ${Vulkan_LIBRARY})
+		endif()
 			
 	endif()
 
@@ -1112,7 +1118,7 @@ else()
 	
 	if(USE_PRECOMPILED_HEADERS) 	
 		set(RBDOOM3_PRECOMPILED_SOURCES ${RBDOOM3_SOURCES})
-		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${BINKDEC_SOURCES} ${IMGUI_SOURCES} ${MIKKTSPACE_SOURCES})
+		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${BINKDEC_SOURCES} ${MIKKTSPACE_SOURCES})
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libs/zlib/minizip/ioapi.c)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTDecoder.cpp)
 		list(REMOVE_ITEM RBDOOM3_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/renderer/DXT/DXTEncoder.cpp)
@@ -1189,8 +1195,8 @@ else()
 	endif()
 
 	if(USE_VULKAN)
-        add_dependencies(RBDoom3BFG nvrhi_vk)
-    endif()
+		add_dependencies(RBDoom3BFG nvrhi_vk)
+	endif()
 	if (USE_PRECOMPILED_HEADERS)
 		# make sure precompiled header is created before executable is compiled
 		add_dependencies(RBDoom3BFG precomp_header_rbdoom3bfg)
@@ -1222,7 +1228,7 @@ else()
 	endif()
 
 	if(NOT WIN32)
-        if(NOT APPLE)
+		if(NOT APPLE)
 			set(RT_LIBRARY rt)
 		endif()
 
@@ -1234,10 +1240,12 @@ else()
 			${SDLx_LIBRARY}
 			${OPENAL_LIBRARY}
 			${FFMPEG_LIBRARIES}
-            ${ZLIB_LIBRARY}
+			${IMGUI_LIBRARY}
+			${IMGUIZMO_LIBRARY}
+			${ZLIB_LIBRARY}
 			${OGG_LIBRARY}
 			${VORBIS_LIBRARY}
-	    	${CMAKE_DL_LIBS}
+			${CMAKE_DL_LIBS}
 			)
 	endif()
 endif()

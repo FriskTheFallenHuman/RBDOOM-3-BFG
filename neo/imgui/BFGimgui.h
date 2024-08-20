@@ -29,7 +29,8 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef NEO_IMGUI_BFGIMGUI_H_
 #define NEO_IMGUI_BFGIMGUI_H_
 
-#include "imgui.h"
+#include <imgui.h>
+#include <imgui_stdlib.h>
 
 #include "../idlib/math/Vector.h"
 
