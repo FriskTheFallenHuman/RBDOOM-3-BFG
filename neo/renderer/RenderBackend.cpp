@@ -5430,10 +5430,6 @@ void idRenderBackend::ExecuteBackEndCommands( const emptyCommand_t* cmds )
 				break;
 			}
 
-			case RC_CRT_POST_PROCESS:
-				CRTPostProcess();
-				break;
-
 			default:
 				common->Error( "RB_ExecuteBackEndCommands: bad commandId" );
 				break;
@@ -6216,7 +6212,7 @@ void idRenderBackend::PostProcess( const void* data )
 	}
 #endif
 
-	if( r_useFilmicPostFX.GetBool() || r_renderMode.GetInteger() > 0 )
+	if( r_useFilmicPostFX.GetBool() )
 	{
 		OPTICK_GPU_EVENT( "Render_FilmicPostFX" );
 
@@ -6235,37 +6231,7 @@ void idRenderBackend::PostProcess( const void* data )
 		GL_SelectTexture( 1 );
 		globalImages->blueNoiseImage256->Bind();
 
-		float jitterTexScale[4] = {};
-
-		if( r_renderMode.GetInteger() == RENDERMODE_C64 || r_renderMode.GetInteger() == RENDERMODE_C64_HIGHRES )
-		{
-			jitterTexScale[0] = r_renderMode.GetInteger() == RENDERMODE_C64_HIGHRES ? 2.0 : 1.0;
-
-			renderProgManager.BindShader_PostProcess_RetroC64();
-		}
-		else if( r_renderMode.GetInteger() == RENDERMODE_CPC || r_renderMode.GetInteger() == RENDERMODE_CPC_HIGHRES )
-		{
-			jitterTexScale[0] = r_renderMode.GetInteger() == RENDERMODE_CPC_HIGHRES ? 2.0 : 1.0;
-
-			renderProgManager.BindShader_PostProcess_RetroCPC();
-		}
-		else if( r_renderMode.GetInteger() == RENDERMODE_GENESIS || r_renderMode.GetInteger() == RENDERMODE_GENESIS_HIGHRES )
-		{
-			jitterTexScale[0] = r_renderMode.GetInteger() == RENDERMODE_GENESIS_HIGHRES ? 2.0 : 1.0;
-
-			renderProgManager.BindShader_PostProcess_RetroGenesis();
-		}
-		else if( r_renderMode.GetInteger() == RENDERMODE_PSX )
-		{
-			renderProgManager.BindShader_PostProcess_RetroPSX();
-		}
-		else
-		{
-			renderProgManager.BindShader_PostProcess();
-		}
-
-		jitterTexScale[1] = r_retroDitherScale.GetFloat();
-		SetFragmentParm( RENDERPARM_JITTERTEXSCALE, jitterTexScale ); // rpJitterTexScale
+		renderProgManager.BindShader_PostProcess();
 
 		float jitterTexOffset[4];
 		jitterTexOffset[0] = 1.0f / globalImages->blueNoiseImage256->GetUploadWidth();
@@ -6313,105 +6279,4 @@ void idRenderBackend::PostProcess( const void* data )
 
 	renderLog.CloseBlock();
 	renderLog.CloseMainBlock();
-}
-
-void idRenderBackend::CRTPostProcess()
-{
-#if 1
-	nvrhi::ObjectType commandObject = nvrhi::ObjectTypes::D3D12_GraphicsCommandList;
-	if( deviceManager->GetGraphicsAPI() == nvrhi::GraphicsAPI::VULKAN )
-	{
-		commandObject = nvrhi::ObjectTypes::VK_CommandBuffer;
-	}
-	OPTICK_GPU_CONTEXT( ( void* ) commandList->getNativeObject( commandObject ) );
-	OPTICK_GPU_EVENT( "CRTPostProcess" );
-
-	renderLog.OpenMainBlock( MRB_CRT_POSTPROCESS );
-	renderLog.OpenBlock( "Render_CRTPostFX", colorBlue );
-
-	GL_State( GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO | GLS_DEPTHMASK | GLS_DEPTHFUNC_ALWAYS |  GLS_CULL_TWOSIDED );
-
-	int screenWidth = renderSystem->GetWidth();
-	int screenHeight = renderSystem->GetHeight();
-
-	// set the window clipping
-	GL_Viewport( 0, 0, screenWidth, screenHeight );
-	GL_Scissor( 0, 0, screenWidth, screenHeight );
-
-	if( r_useCRTPostFX.GetInteger() > 0 )
-	{
-		OPTICK_GPU_EVENT( "Render_CRTPostFX" );
-
-		BlitParameters blitParms;
-		blitParms.sourceTexture = ( nvrhi::ITexture* )globalImages->ldrImage->GetTextureID();
-		blitParms.targetFramebuffer = globalFramebuffers.smaaBlendFBO->GetApiObject();
-
-		blitParms.targetViewport = nvrhi::Viewport( renderSystem->GetWidth(), renderSystem->GetHeight() );
-		commonPasses.BlitTexture( commandList, blitParms, &bindingCache );
-
-		GL_SelectTexture( 0 );
-		globalImages->smaaBlendImage->Bind();
-
-		globalFramebuffers.ldrFBO->Bind();
-
-		GL_SelectTexture( 1 );
-		globalImages->blueNoiseImage256->Bind();
-
-		if( r_useCRTPostFX.GetInteger() == 1 )
-		{
-			renderProgManager.BindShader_CrtMattias();
-		}
-		else
-		{
-			renderProgManager.BindShader_CrtNewPixie();
-		}
-
-		float windowCoordParm[4];
-		windowCoordParm[0] = r_crtCurvature.GetFloat();
-		windowCoordParm[1] = r_crtVignette.GetFloat();
-		windowCoordParm[2] = screenWidth;
-		windowCoordParm[3] = screenHeight;
-		SetFragmentParm( RENDERPARM_WINDOWCOORD, windowCoordParm ); // rpWindowCoord
-
-		float jitterTexOffset[4];
-		jitterTexOffset[0] = 1.0f / globalImages->blueNoiseImage256->GetUploadWidth();
-		jitterTexOffset[1] = 1.0f / globalImages->blueNoiseImage256->GetUploadHeight();
-
-		if( r_shadowMapRandomizeJitter.GetBool() )
-		{
-			jitterTexOffset[2] = Sys_Milliseconds() / 1000.0f;
-			jitterTexOffset[3] = tr.frameCount % 64;
-		}
-		else
-		{
-			jitterTexOffset[2] = 0.0f;
-			jitterTexOffset[3] = 0.0f;
-		}
-
-		SetFragmentParm( RENDERPARM_JITTERTEXOFFSET, jitterTexOffset ); // rpJitterTexOffset
-
-		// Draw
-		DrawElementsWithCounters( &unitSquareSurface );
-	}
-
-	//GL_SelectTexture( 0 );
-	//renderProgManager.Unbind();
-
-	{
-		OPTICK_GPU_EVENT( "Blit_CRTPostFX" );
-
-		// copy LDR result to DX12 / Vulkan swapchain image
-		BlitParameters blitParms;
-		blitParms.sourceTexture = ( nvrhi::ITexture* )globalImages->ldrImage->GetTextureID();
-		blitParms.targetFramebuffer = deviceManager->GetCurrentFramebuffer();
-		blitParms.targetViewport = nvrhi::Viewport( renderSystem->GetWidth(), renderSystem->GetHeight() );
-		commonPasses.BlitTexture( commandList, blitParms, &bindingCache );
-	}
-
-	GL_SelectTexture( 0 );
-	globalImages->currentRenderImage->Bind();
-
-	renderLog.CloseBlock();
-	renderLog.CloseMainBlock();
-#endif
 }

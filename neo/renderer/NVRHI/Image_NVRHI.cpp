@@ -30,8 +30,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "precompiled.h"
 #pragma hdrstop
 
-idCVar image_pixelLook( "image_pixelLook", "0", CVAR_BOOL | CVAR_ARCHIVE | CVAR_NEW, "Turn off linear filtering on most textures to achieve the 90s software renderer look" );
-
 #include "../RenderCommon.h"
 
 #include "sys/DeviceManager.h"
@@ -309,24 +307,9 @@ idImage::GetSampler
 */
 void* idImage::GetSampler( SamplerCache& samplerCache )
 {
-	if( R_UsePixelatedLook() )
+	if( !sampler )
 	{
-		if( !sampler )
-		{
-			nvrhi::SamplerDesc sampDesc = samplerDesc;
-
-			// turn off linear filtering
-			sampDesc.setAllFilters( false );
-
-			sampler = samplerCache.GetOrCreateSampler( samplerDesc );
-		}
-	}
-	else
-	{
-		if( !sampler )
-		{
-			sampler = samplerCache.GetOrCreateSampler( samplerDesc );
-		}
+		sampler = samplerCache.GetOrCreateSampler( samplerDesc );
 	}
 
 	return ( void* )sampler.Get();

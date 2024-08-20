@@ -1306,11 +1306,9 @@ public:
 			SYSTEM_FIELD_VSYNC,
 			SYSTEM_FIELD_ANTIALIASING,
 			// RB begin
-			SYSTEM_FIELD_RENDERMODE,
-			SYSTEM_FIELD_AMBIENT_BRIGHTNESS,
+			SYSTEM_FIELD_POSTFX,
 			SYSTEM_FIELD_SSAO,
-			SYSTEM_FIELD_FILMIC_POSTFX,
-			SYSTEM_FIELD_CRT_POSTFX,
+			SYSTEM_FIELD_AMBIENT_BRIGHTNESS,
 			// RB end
 			SYSTEM_FIELD_BRIGHTNESS,
 			SYSTEM_FIELD_VOLUME,
@@ -1345,11 +1343,9 @@ public:
 		float originalVolume;
 		// RB begin
 		//int originalShadowMapping; // TODO use for quality of shadowmaps?
-		int originalRenderMode;
-		float originalAmbientBrightness;
 		int originalSSAO;
 		int originalPostProcessing;
-		int originalCRTPostFX;
+		float originalAmbientBrightness;
 		// RB end
 
 		idList<vidMode_t>			modeList;
