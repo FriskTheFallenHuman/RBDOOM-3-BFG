@@ -224,10 +224,17 @@ Exits with mapSpawned = false
 */
 void idCommonLocal::UnloadMap()
 {
+	StopPlayingRenderDemo();
+
 	// end the current map in the game
 	if( game )
 	{
 		game->MapShutdown();
+	}
+
+	if( writeDemo )
+	{
+		StopRecordingRenderDemo();
 	}
 
 	mapSpawned = false;
@@ -240,6 +247,7 @@ idCommonLocal::LoadLoadingGui
 */
 void idCommonLocal::LoadLoadingGui( const char* mapName, bool& hellMap )
 {
+
 	defaultLoadscreen = false;
 	loadGUI = new idSWF( "loading/default", NULL );
 

@@ -207,11 +207,8 @@ void idResolutionScale::GetConsoleText( idStr& s )
 	GetCurrentResolutionScale( x, y );
 	if( rs_display.GetInteger() > 0 )
 	{
-		// x *= 1280.0f;
-		// y *= 720.0f;
-		x *= renderSystem->GetWidth();
-		y *= renderSystem->GetHeight();
-
+		x *= 1280.0f;
+		y *= 720.0f;
 		if( rs_enable.GetInteger() == 1 )
 		{
 			y = 1.0f;

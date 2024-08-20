@@ -25,98 +25,68 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-#ifndef __GUISCRIPT_H
-#define __GUISCRIPT_H
+#ifndef REGEXP_H_
+#define REGEXP_H_
 
-#include "Window.h"
-#include "Winvar.h"
+class idWindow;
 
-struct idGSWinVar
+class idRegister
 {
-	idGSWinVar()
-	{
-		var = NULL;
-		own = false;
-	}
-	idWinVar* var;
-	bool own;
-};
-
-class idGuiScriptList;
-
-class idGuiScript
-{
-	friend class idGuiScriptList;
-	friend class idWindow;
-
 public:
-	idGuiScript();
-	~idGuiScript();
-
-	bool Parse( idTokenParser* src );
-	void Execute( idWindow* win )
+	idRegister() {};
+	idRegister( const char* p, int t )
 	{
-		if( handler )
-		{
-			handler( win, &parms );
-		}
-	}
-	void FixupParms( idWindow* win );
-	size_t Size()
+		name = p;
+		type = t;
+		assert( t >= 0 && t < NUMTYPES );
+		regCount = REGCOUNT[t];
+		enabled = ( type == STRING ) ? false : true;
+	};
+	bool enabled;
+	int type;
+	int regCount;
+	enum REGTYPE { VEC4 = 0, FLOAT, BOOL, INT, STRING, VEC2, VEC3, NUMTYPES } ;
+	static int REGCOUNT[NUMTYPES];
+	idStr name;
+	int regs[4];
+	void SetToRegs( float* registers, idTypedDict* state );
+	void SetToRegList( idList<float>* registers, idTypedDict* state );
+	void GetFromRegs( float* registers, idTypedDict* state );
+	void CopyRegs( idRegister* src )
 	{
-		int sz = sizeof( *this );
-		for( int i = 0; i < parms.Num(); i++ )
-		{
-			sz += parms[i].var->Size();
-		}
-		return sz;
+		regs[0] = src->regs[0];
+		regs[1] = src->regs[1];
+		regs[2] = src->regs[2];
+		regs[3] = src->regs[3];
 	}
-
-	void WriteToSaveGame( idFile* savefile );
-	void ReadFromSaveGame( idFile* savefile );
-
-protected:
-	int conditionReg;
-	idGuiScriptList* ifList;
-	idGuiScriptList* elseList;
-	idList<idGSWinVar, TAG_OLD_UI> parms;
-	void ( *handler )( idWindow* window, idList<idGSWinVar, TAG_OLD_UI>* src );
+	void Enable( bool b )
+	{
+		enabled = b;
+	}
+	void ReadFromDemoFile( idDemoFile* f );
+	void WriteToDemoFile( idDemoFile* f );
 
 };
 
-
-class idGuiScriptList
+class idRegisterList
 {
-	idList<idGuiScript*, TAG_OLD_UI> list;
+	idList<idRegister> regs;
 public:
-	idGuiScriptList()
-	{
-		list.SetGranularity( 4 );
-	};
-	~idGuiScriptList()
-	{
-		list.DeleteContents( true );
-	};
-	void Execute( idWindow* win );
-	void Append( idGuiScript* gs )
-	{
-		list.Append( gs );
-	}
-	size_t Size()
-	{
-		int sz = sizeof( *this );
-		for( int i = 0; i < list.Num(); i++ )
-		{
-			sz += list[i]->Size();
-		}
-		return sz;
-	}
-	void FixupParms( idWindow* win );
-	void ReadFromDemoFile( class idDemoFile* f ) {};
-	void WriteToDemoFile( class idDemoFile* f ) {};
 
-	void WriteToSaveGame( idFile* savefile );
-	void ReadFromSaveGame( idFile* savefile );
+	//
+	void RemoveReg( const char* name );
+	//
+
+	void AddReg( const char* name, int type, idTokenParser* src, idWindow* win );
+	void AddReg( const char* name, int type, idVec4 data, idWindow* win );
+	idRegister* FindReg( const char* name );
+	int			FindRegIndex( const char* name );
+	void SetToRegs( float* registers, idTypedDict* state );
+	void GetFromRegs( float* registers, idTypedDict* state );
+	void Reset();
+	void ReadFromDemoFile( idDemoFile* f );
+	void WriteToDemoFile( idDemoFile* f );
+
 };
 
-#endif // __GUISCRIPT_H
+#endif

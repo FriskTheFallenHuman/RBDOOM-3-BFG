@@ -56,6 +56,8 @@ public:
 	{
 		enabled = b;
 	}
+	void				ReadFromDemoFile( idDemoFile* f );
+	void				WriteToDemoFile( idDemoFile* f );
 	void				WriteToSaveGame( idFile* savefile );
 	void				ReadFromSaveGame( idFile* savefile );
 };
@@ -96,6 +98,8 @@ public:
 	void				SetToRegs( float* registers );
 	void				GetFromRegs( float* registers );
 	void				Reset();
+	void				ReadFromDemoFile( idDemoFile* f );
+	void				WriteToDemoFile( idDemoFile* f );
 	void				WriteToSaveGame( idFile* savefile );
 	void				ReadFromSaveGame( idFile* savefile );
 

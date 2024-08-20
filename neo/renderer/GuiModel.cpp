@@ -67,6 +67,24 @@ void idGuiModel::Clear()
 
 /*
 ================
+idGuiModel::WriteToDemo
+================
+*/
+void idGuiModel::WriteToDemo( idDemoFile* demo )
+{
+}
+
+/*
+================
+idGuiModel::ReadFromDemo
+================
+*/
+void idGuiModel::ReadFromDemo( idDemoFile* demo )
+{
+}
+
+/*
+================
 idGuiModel::BeginFrame
 ================
 */

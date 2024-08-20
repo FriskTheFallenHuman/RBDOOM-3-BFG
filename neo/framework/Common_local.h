@@ -205,6 +205,15 @@ public:
 	virtual int					ButtonState( int key );
 	virtual int					KeyState( int key );
 
+	virtual idDemoFile* 		ReadDemo()
+	{
+		return readDemo;
+	}
+	virtual idDemoFile* 		WriteDemo()
+	{
+		return writeDemo;
+	}
+
 	virtual idGame* 			Game()
 	{
 		return game;
@@ -466,6 +475,14 @@ public:	// These are public because they are called directly by static functions
 	void	StartNewGame( const char* mapName, bool devmap, int gameMode );
 	void	LeaveGame();
 
+	void	DemoShot( const char* name );
+	void	StartRecordingRenderDemo( const char* name );
+	void	StopRecordingRenderDemo();
+	void	StartPlayingRenderDemo( idStr name );
+	void	StopPlayingRenderDemo();
+	void	CompressDemoFile( const char* scheme, const char* name );
+	void	TimeRenderDemo( const char* name, bool twice = false, bool quit = false );
+
 	// localization
 	void	InitLanguageDict();
 	void	LocalizeGui( const char* fileName, idLangDict& langDict );
@@ -507,6 +524,11 @@ private:
 	// The main render world and sound world
 	idRenderWorld* 		renderWorld;
 	idSoundWorld* 		soundWorld;
+
+	// The renderer and sound system will write changes to writeDemo.
+	// Demos can be recorded and played at the same time when splicing.
+	idDemoFile* 		readDemo;
+	idDemoFile* 		writeDemo;
 
 	bool				menuActive;
 	idSoundWorld* 		menuSoundWorld;			// so the game soundWorld can be muted
@@ -693,6 +715,8 @@ private:
 
 	void	StartMenu( bool playIntro = false );
 	void	GuiFrameEvents();
+
+	void	AdvanceRenderDemo( bool singleFrameOnly );
 
 	void	ProcessGameReturn( const gameReturn_t& ret );
 

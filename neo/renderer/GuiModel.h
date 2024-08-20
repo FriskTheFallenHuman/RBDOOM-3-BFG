@@ -52,6 +52,9 @@ public:
 
 	void		Clear();
 
+	void		WriteToDemo( idDemoFile* demo );
+	void		ReadFromDemo( idDemoFile* demo );
+
 	// allocates memory for verts and indexes in frame-temporary buffer memory
 	void		BeginFrame();
 
