@@ -37,7 +37,6 @@ If you have questions concerning this license or the applicable additional terms
 
 
 idCVar imgui_showDemoWindow( "imgui_showDemoWindow", "0", CVAR_GUI | CVAR_BOOL, "show big ImGui demo window" );
-idCVar imgui_style( "imgui_style", "0", CVAR_SYSTEM | CVAR_INTEGER | CVAR_ARCHIVE, "Which ImGui style to use. 0: Dhewm3 theme, 1: Default ImGui theme, 2: User theme", 0.0f, 2.0f );
 
 // our custom ImGui functions from BFGimgui.h
 
@@ -88,28 +87,354 @@ bool ImGui::DragVec3fitLabel( const char* label, idVec3& v, float v_speed,
 	return ImGui::DragVec3( label, v, v_speed, v_min, v_max, display_format, power, false );
 }
 
+idImGuiHookLocal	imguiLocal;
+idImGuiHook* imgui = &imguiLocal;
+
 // the ImGui hooks to integrate it into the engine
 
-
-
-namespace ImGuiHook
+idImGuiHookLocal::idImGuiHookLocal() :
+	g_IsInit( false ),
+	g_Time( 0.0f ),
+	g_MouseWheel( 0.0f ),
+	g_MousePos( -1.0f, -1.0f ),
+	g_DisplaySize( 0.0f, 0.0f ),
+	g_haveNewFrame( false )
 {
-namespace
+	for( int i = 0; i < 5; ++i )
+	{
+		g_MousePressed[i] = false;
+	}
+}
+
+bool idImGuiHookLocal::Init( int windowWidth, int windowHeight )
 {
-bool	g_IsInit = false;
-double	g_Time = 0.0f;
-bool	g_MousePressed[5] = { false, false, false, false, false };
-float	g_MouseWheel = 0.0f;
-ImVec2	g_MousePos = ImVec2( -1.0f, -1.0f ); //{-1.0f, -1.0f};
-ImVec2	g_DisplaySize = ImVec2( 0.0f, 0.0f ); //{0.0f, 0.0f};
+	if( IsInitialized() )
+	{
+		Destroy();
+	}
 
+	common->Printf( "Initializing ImGui\n" );
 
+	IMGUI_CHECKVERSION();
 
-bool g_haveNewFrame = false;
+	ImGui::CreateContext();
 
-bool HandleKeyEvent( const sysEvent_t& keyEvent )
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+	// Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
+	io.KeyMap[ImGuiKey_Tab] = K_TAB;
+	io.KeyMap[ImGuiKey_LeftArrow] = K_LEFTARROW;
+	io.KeyMap[ImGuiKey_RightArrow] = K_RIGHTARROW;
+	io.KeyMap[ImGuiKey_UpArrow] = K_UPARROW;
+	io.KeyMap[ImGuiKey_DownArrow] = K_DOWNARROW;
+	io.KeyMap[ImGuiKey_PageUp] = K_PGUP;
+	io.KeyMap[ImGuiKey_PageDown] = K_PGDN;
+	io.KeyMap[ImGuiKey_Home] = K_HOME;
+	io.KeyMap[ImGuiKey_End] = K_END;
+	io.KeyMap[ImGuiKey_Delete] = K_DEL;
+	io.KeyMap[ImGuiKey_Backspace] = K_BACKSPACE;
+	io.KeyMap[ImGuiKey_Enter] = K_ENTER;
+	io.KeyMap[ImGuiKey_Escape] = K_ESCAPE;
+
+	FillCharKeys( io.KeyMap );
+
+	g_DisplaySize.x = windowWidth;
+	g_DisplaySize.y = windowHeight;
+	io.DisplaySize = g_DisplaySize;
+
+	// RB: FIXME double check
+	io.SetClipboardTextFn = SetClipboardText;
+	io.GetClipboardTextFn = GetClipboardText;
+	io.ClipboardUserData = NULL;
+
+	// SRS - store imgui.ini file in fs_savepath (not in cwd please!)
+	static idStr BFG_IniFilename = fileSystem->BuildOSPath( cvarSystem->GetCVarString( "fs_savepath" ), io.IniFilename );
+	io.IniFilename = BFG_IniFilename;
+
+	// Setup style
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsLight();
+	//ImGui::StyleColorsClassic();
+
+	ImGuiStyle* style = &ImGui::GetStyle();
+	ImVec4* colors = style->Colors;
+
+	colors[ImGuiCol_Text]                   = ImVec4( 0.92f, 0.92f, 0.92f, 1.00f );
+	colors[ImGuiCol_TextDisabled]           = ImVec4( 0.44f, 0.44f, 0.44f, 1.00f );
+	colors[ImGuiCol_WindowBg]               = ImVec4( 0.06f, 0.06f, 0.06f, 1.00f );
+	colors[ImGuiCol_ChildBg]                = ImVec4( 0.00f, 0.00f, 0.00f, 0.00f );
+	colors[ImGuiCol_PopupBg]                = ImVec4( 0.08f, 0.08f, 0.08f, 0.94f );
+	colors[ImGuiCol_Border]                 = ImVec4( 0.51f, 0.36f, 0.15f, 1.00f );
+	colors[ImGuiCol_BorderShadow]           = ImVec4( 0.00f, 0.00f, 0.00f, 0.00f );
+	colors[ImGuiCol_FrameBg]                = ImVec4( 0.11f, 0.11f, 0.11f, 1.00f );
+	colors[ImGuiCol_FrameBgHovered]         = ImVec4( 0.51f, 0.36f, 0.15f, 1.00f );
+	colors[ImGuiCol_FrameBgActive]          = ImVec4( 0.78f, 0.55f, 0.21f, 1.00f );
+	colors[ImGuiCol_TitleBg]                = ImVec4( 0.51f, 0.36f, 0.15f, 1.00f );
+	colors[ImGuiCol_TitleBgActive]          = ImVec4( 0.91f, 0.64f, 0.13f, 1.00f );
+	colors[ImGuiCol_TitleBgCollapsed]       = ImVec4( 0.00f, 0.00f, 0.00f, 0.51f );
+	colors[ImGuiCol_MenuBarBg]              = ImVec4( 0.11f, 0.11f, 0.11f, 1.00f );
+	colors[ImGuiCol_ScrollbarBg]            = ImVec4( 0.06f, 0.06f, 0.06f, 0.53f );
+	colors[ImGuiCol_ScrollbarGrab]          = ImVec4( 0.21f, 0.21f, 0.21f, 1.00f );
+	colors[ImGuiCol_ScrollbarGrabHovered]   = ImVec4( 0.47f, 0.47f, 0.47f, 1.00f );
+	colors[ImGuiCol_ScrollbarGrabActive]    = ImVec4( 0.81f, 0.83f, 0.81f, 1.00f );
+	colors[ImGuiCol_CheckMark]              = ImVec4( 0.78f, 0.55f, 0.21f, 1.00f );
+	colors[ImGuiCol_SliderGrab]             = ImVec4( 0.91f, 0.64f, 0.13f, 1.00f );
+	colors[ImGuiCol_SliderGrabActive]       = ImVec4( 0.91f, 0.64f, 0.13f, 1.00f );
+	colors[ImGuiCol_Button]                 = ImVec4( 0.51f, 0.36f, 0.15f, 1.00f );
+	colors[ImGuiCol_ButtonHovered]          = ImVec4( 0.91f, 0.64f, 0.13f, 1.00f );
+	colors[ImGuiCol_ButtonActive]           = ImVec4( 0.78f, 0.55f, 0.21f, 1.00f );
+	colors[ImGuiCol_Header]                 = ImVec4( 0.51f, 0.36f, 0.15f, 1.00f );
+	colors[ImGuiCol_HeaderHovered]          = ImVec4( 0.91f, 0.64f, 0.13f, 1.00f );
+	colors[ImGuiCol_HeaderActive]           = ImVec4( 0.93f, 0.65f, 0.14f, 1.00f );
+	colors[ImGuiCol_Separator]              = ImVec4( 0.21f, 0.21f, 0.21f, 1.00f );
+	colors[ImGuiCol_SeparatorHovered]       = ImVec4( 0.91f, 0.64f, 0.13f, 1.00f );
+	colors[ImGuiCol_SeparatorActive]        = ImVec4( 0.78f, 0.55f, 0.21f, 1.00f );
+	colors[ImGuiCol_ResizeGrip]             = ImVec4( 0.21f, 0.21f, 0.21f, 1.00f );
+	colors[ImGuiCol_ResizeGripHovered]      = ImVec4( 0.91f, 0.64f, 0.13f, 1.00f );
+	colors[ImGuiCol_ResizeGripActive]       = ImVec4( 0.78f, 0.55f, 0.21f, 1.00f );
+	colors[ImGuiCol_Tab]                    = ImVec4( 0.51f, 0.36f, 0.15f, 1.00f );
+	colors[ImGuiCol_TabHovered]             = ImVec4( 0.91f, 0.64f, 0.13f, 1.00f );
+	colors[ImGuiCol_TabActive]              = ImVec4( 0.78f, 0.55f, 0.21f, 1.00f );
+	colors[ImGuiCol_TabUnfocused]           = ImVec4( 0.07f, 0.10f, 0.15f, 0.97f );
+	colors[ImGuiCol_TabUnfocusedActive]     = ImVec4( 0.14f, 0.26f, 0.42f, 1.00f );
+	colors[ImGuiCol_TabSelectedOverline]	= ImVec4( 0.99f, 0.59f, 0.20f, 1.00f );
+	colors[ImGuiCol_TabDimmed]				= ImVec4( 0.15f, 0.11f, 0.07f, 0.97f );
+	colors[ImGuiCol_TabDimmedSelected]		= ImVec4( 0.42f, 0.29f, 0.14f, 1.00f );
+	colors[ImGuiCol_TextLink]				= ImVec4( 0.98f, 0.69f, 0.26f, 1.00f );
+	colors[ImGuiCol_TextSelectedBg]			= ImVec4( 0.98f, 0.69f, 0.26f, 0.35f );
+	colors[ImGuiCol_PlotLines]              = ImVec4( 0.61f, 0.61f, 0.61f, 1.00f );
+	colors[ImGuiCol_PlotLinesHovered]       = ImVec4( 1.00f, 0.43f, 0.35f, 1.00f );
+	colors[ImGuiCol_PlotHistogram]          = ImVec4( 0.90f, 0.70f, 0.00f, 1.00f );
+	colors[ImGuiCol_PlotHistogramHovered]   = ImVec4( 1.00f, 0.60f, 0.00f, 1.00f );
+	colors[ImGuiCol_TextSelectedBg]         = ImVec4( 0.26f, 0.59f, 0.98f, 0.35f );
+	colors[ImGuiCol_DragDropTarget]         = ImVec4( 1.00f, 1.00f, 0.00f, 0.90f );
+	colors[ImGuiCol_DockingPreview]			= ImVec4( 0.98f, 0.76f, 0.26f, 0.70f );
+	colors[ImGuiCol_NavHighlight]           = ImVec4( 0.26f, 0.59f, 0.98f, 1.00f );
+	colors[ImGuiCol_NavWindowingHighlight]  = ImVec4( 1.00f, 1.00f, 1.00f, 0.70f );
+	colors[ImGuiCol_NavWindowingDimBg]      = ImVec4( 0.80f, 0.80f, 0.80f, 0.20f );
+	colors[ImGuiCol_NavHighlight]			= ImVec4( 0.98f, 0.69f, 0.26f, 1.00f );
+	colors[ImGuiCol_ModalWindowDimBg]       = ImVec4( 0.80f, 0.80f, 0.80f, 0.35f );
+
+	style->FramePadding = ImVec2( 4, 2 );
+	style->ItemSpacing = ImVec2( 10, 2 );
+	style->IndentSpacing = 12;
+	style->ScrollbarSize = 15;
+
+	style->WindowRounding = 2;
+	style->FrameRounding = 2;
+	style->PopupRounding = 2;
+	style->ScrollbarRounding = 3;
+	style->GrabRounding = 3;
+	style->TabRounding = 3;
+
+	style->DisplaySafeAreaPadding = ImVec2( 4, 4 );
+
+	g_IsInit = true;
+
+	return true;
+}
+
+void idImGuiHookLocal::NotifyDisplaySizeChanged( int width, int height )
 {
-	assert( keyEvent.evType == SE_KEY );
+	if( g_DisplaySize.x != width || g_DisplaySize.y != height )
+	{
+		g_DisplaySize = ImVec2( ( float )width, ( float )height );
+
+		if( IsInitialized() )
+		{
+			Destroy();
+			Init( width, height );
+
+			// reuse the default ImGui font
+			const idMaterial* image = declManager->FindMaterial( "_imguiFont" );
+
+			ImGuiIO& io = ImGui::GetIO();
+
+			byte* pixels = NULL;
+			io.Fonts->GetTexDataAsRGBA32( &pixels, &width, &height );
+
+			io.Fonts->TexID = ( void* )image;
+		}
+	}
+}
+
+// inject a sys event
+bool idImGuiHookLocal::InjectSysEvent( const sysEvent_t* event )
+{
+	if( IsInitialized() && UseInput() )
+	{
+		if( event == NULL )
+		{
+			assert( 0 ); // I think this shouldn't happen
+			return false;
+		}
+
+		const sysEvent_t& ev = *event;
+
+		switch( ev.evType )
+		{
+			case SE_KEY:
+				return HandleKeyEvent( ev );
+
+			case SE_MOUSE_ABSOLUTE:
+				// RB: still allow mouse movement if right mouse button is pressed
+				//if( !g_MousePressed[1] )
+			{
+				g_MousePos.x = ev.evValue;
+				g_MousePos.y = ev.evValue2;
+				return true;
+			}
+
+			case SE_CHAR:
+				if( ev.evValue < 0x10000 )
+				{
+					ImGui::GetIO().AddInputCharacter( ev.evValue );
+					return true;
+				}
+				break;
+
+			case SE_MOUSE_LEAVE:
+				g_MousePos = ImVec2( -1.0f, -1.0f );
+				return true;
+
+			default:
+				break;
+		}
+	}
+	return false;
+}
+
+bool idImGuiHookLocal::InjectMouseWheel( int delta )
+{
+	if( IsInitialized() && UseInput() && delta != 0 )
+	{
+		g_MouseWheel = ( delta > 0 ) ? 1 : -1;
+		return true;
+	}
+	return false;
+}
+
+void idImGuiHookLocal::NewFrame()
+{
+	if( !g_haveNewFrame && IsInitialized() && ShowWindows() )
+	{
+		ImGuiIO& io = ImGui::GetIO();
+
+		// Setup display size (every frame to accommodate for window resizing)
+		io.DisplaySize = g_DisplaySize;
+
+		// Setup time step
+		int	time = Sys_Milliseconds();
+		double current_time = time * 0.001;
+		io.DeltaTime = g_Time > 0.0 ? ( float )( current_time - g_Time ) : ( float )( 1.0f / 60.0f );
+
+		if( io.DeltaTime <= 0.0F )
+		{
+			io.DeltaTime = ( 1.0f / 60.0f );
+		}
+
+		g_Time = current_time;
+
+		// Setup inputs
+		io.MousePos = g_MousePos;
+
+		// If a mouse press event came, always pass it as "mouse held this frame",
+		// so we don't miss click-release events that are shorter than 1 frame.
+		for( int i = 0; i < 5; ++i )
+		{
+			io.MouseDown[i] = g_MousePressed[i] || usercmdGen->KeyState( K_MOUSE1 + i ) == 1;
+			//g_MousePressed[i] = false;
+		}
+
+		io.MouseWheel = g_MouseWheel;
+		g_MouseWheel = 0.0f;
+
+		// Hide OS mouse cursor if ImGui is drawing it TODO: hide mousecursor?
+		// ShowCursor(io.MouseDrawCursor ? 0 : 1);
+
+		ImGui::GetIO().MouseDrawCursor = UseInput();
+
+		// Start the frame
+		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
+
+		g_haveNewFrame = true;
+	}
+}
+
+bool idImGuiHookLocal::IsReadyToRender()
+{
+	if( IsInitialized() && ShowWindows() )
+	{
+		if( !g_haveNewFrame )
+		{
+			// for screenshots etc, where we didn't go through idCommonLocal::Frame()
+			// before idRenderSystemLocal::SwapCommandBuffers_FinishRendering()
+			NewFrame();
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+void idImGuiHookLocal::Render()
+{
+	if( IsInitialized() && ShowWindows() )
+	{
+		if( !g_haveNewFrame )
+		{
+			// for screenshots etc, where we didn't go through idCommonLocal::Frame()
+			// before idRenderSystemLocal::SwapCommandBuffers_FinishRendering()
+			NewFrame();
+		}
+
+		// make dockspace transparent
+		static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
+		ImGui::DockSpaceOverViewport( NULL, NULL, dockspaceFlags, NULL );
+
+		if( imguiTools )
+		{
+			imguiTools->DrawToolWindows();
+		}
+
+		if( imgui_showDemoWindow.GetBool() )
+		{
+			ImGui::ShowDemoWindow();
+		}
+
+		ImGui::Render();
+		idRenderBackend::ImGui_RenderDrawLists( ImGui::GetDrawData() );
+		g_haveNewFrame = false;
+	}
+}
+
+void idImGuiHookLocal::Destroy()
+{
+	if( IsInitialized() )
+	{
+		common->Printf( "Shutting down ImGui\n" );
+
+		common->Printf( "delete imguiTools;\n" );
+		imguiTools = NULL;
+
+		ImGui::DestroyContext();
+		g_IsInit = false;
+		g_haveNewFrame = false;
+	}
+}
+
+bool idImGuiHookLocal::IsInitialized()
+{
+	// checks if imgui is up and running
+	return g_IsInit;
+}
+
+bool idImGuiHookLocal::HandleKeyEvent( const sysEvent_t& keyEvent )
+{
+	idassert( keyEvent.evType == SE_KEY );
 
 	keyNum_t keyNum = static_cast<keyNum_t>( keyEvent.evValue );
 	bool pressed = keyEvent.evValue2 > 0;
@@ -141,9 +466,7 @@ bool HandleKeyEvent( const sysEvent_t& keyEvent )
 	return false;
 }
 
-// Gross hack. I'm sorry.
-// sets the kb-layout specific keys in the keymap
-void FillCharKeys( int* keyMap )
+void idImGuiHookLocal::FillCharKeys( int* keyMap )
 {
 	// set scancodes as default values in case the real keys aren't found below
 	keyMap[ImGuiKey_A] = K_A;
@@ -197,10 +520,7 @@ void FillCharKeys( int* keyMap )
 	}
 }
 
-// Sys_GetClipboardData() expects that you Mem_Free() its returned data
-// ImGui can't do that, of course, so copy it into a static buffer here,
-// Mem_Free() and return the copy
-const char* GetClipboardText( void* )
+const char* idImGuiHookLocal::GetClipboardText( void* )
 {
 	char* txt = Sys_GetClipboardData();
 	if( txt == NULL )
@@ -216,21 +536,25 @@ const char* GetClipboardText( void* )
 	return clipboardBuf.c_str();
 }
 
-void SetClipboardText( void*, const char* text )
+void idImGuiHookLocal::SetClipboardText( void*, const char* text )
 {
 	Sys_SetClipboardData( text );
 }
 
-bool ShowWindows()
+bool idImGuiHookLocal::ShowWindows()
 {
-	return ( ImGuiTools::AreEditorsActive() || imgui_showDemoWindow.GetBool() || com_showFPS.GetInteger() > 1 );
+	return ( imguiTools && imguiTools->AreEditorsActive() || imgui_showDemoWindow.GetBool() || com_showFPS.GetInteger() > 1 );
 }
 
-bool UseInput()
+bool idImGuiHookLocal::UseInput()
 {
-	return ImGuiTools::ReleaseMouseForTools() || imgui_showDemoWindow.GetBool();
+	return imguiTools && imguiTools->ReleaseMouseForTools() || imgui_showDemoWindow.GetBool();
 }
 
+namespace ImGuiHook
+{
+namespace
+{
 static inline ImVec4 ImLerp( const ImVec4& a, const ImVec4& b, float t )
 {
 	return ImVec4( a.x + ( b.x - a.x ) * t, a.y + ( b.y - a.y ) * t, a.z + ( b.z - a.z ) * t, a.w + ( b.w - a.w ) * t );
@@ -247,293 +571,4 @@ static inline ImVec4  operator+( const ImVec4& lhs, const ImVec4& rhs )
 }
 } //anon namespace
 
-bool Init( int windowWidth, int windowHeight )
-{
-	if( IsInitialized() )
-	{
-		Destroy();
-	}
-
-	common->Printf( "Initializing ImGui\n" );
-
-	IMGUI_CHECKVERSION();
-
-	ImGui::CreateContext();
-
-	ImGuiIO& io = ImGui::GetIO();
-
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-	// Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
-	io.KeyMap[ImGuiKey_Tab] = K_TAB;
-	io.KeyMap[ImGuiKey_LeftArrow] = K_LEFTARROW;
-	io.KeyMap[ImGuiKey_RightArrow] = K_RIGHTARROW;
-	io.KeyMap[ImGuiKey_UpArrow] = K_UPARROW;
-	io.KeyMap[ImGuiKey_DownArrow] = K_DOWNARROW;
-	io.KeyMap[ImGuiKey_PageUp] = K_PGUP;
-	io.KeyMap[ImGuiKey_PageDown] = K_PGDN;
-	io.KeyMap[ImGuiKey_Home] = K_HOME;
-	io.KeyMap[ImGuiKey_End] = K_END;
-	io.KeyMap[ImGuiKey_Delete] = K_DEL;
-	io.KeyMap[ImGuiKey_Backspace] = K_BACKSPACE;
-	io.KeyMap[ImGuiKey_Enter] = K_ENTER;
-	io.KeyMap[ImGuiKey_Escape] = K_ESCAPE;
-
-	FillCharKeys( io.KeyMap );
-
-	g_DisplaySize.x = windowWidth;
-	g_DisplaySize.y = windowHeight;
-	io.DisplaySize = g_DisplaySize;
-
-	// RB: FIXME double check
-	io.SetClipboardTextFn = SetClipboardText;
-	io.GetClipboardTextFn = GetClipboardText;
-	io.ClipboardUserData = NULL;
-
-	// SRS - store imgui.ini file in fs_savepath (not in cwd please!)
-	static idStr BFG_IniFilename = fileSystem->BuildOSPath( cvarSystem->GetCVarString( "fs_savepath" ), io.IniFilename );
-	io.IniFilename = BFG_IniFilename;
-
-	// Setup style
-	ImGui::StyleColorsDark();
-	//ImGui::StyleColorsLight();
-	//ImGui::StyleColorsClassic();
-
-	// make it a bit prettier with rounded edges
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.WindowRounding = 2.0f;
-	style.FrameRounding = 3.0f;
-	//style.ChildRounding = 6.0f;
-	style.ScrollbarRounding = 8.0f;
-	style.GrabRounding = 1.0f;
-	style.PopupRounding = 2.0f;
-
-	ImVec4* colors = ImGui::GetStyle().Colors;
-	colors[ImGuiCol_FrameBg]                = ImVec4( 0.76f, 0.52f, 0.16f, 0.54f );
-	colors[ImGuiCol_FrameBgHovered]         = ImVec4( 0.98f, 0.69f, 0.26f, 0.40f );
-	colors[ImGuiCol_FrameBgActive]          = ImVec4( 0.98f, 0.67f, 0.26f, 0.67f );
-	colors[ImGuiCol_TitleBg]                = ImVec4( 0.95f, 0.42f, 0.02f, 1.00f );
-	colors[ImGuiCol_TitleBgActive]          = ImVec4( 1.00f, 0.50f, 0.00f, 1.00f );
-	colors[ImGuiCol_CheckMark]              = ImVec4( 0.98f, 0.62f, 0.26f, 1.00f );
-	colors[ImGuiCol_SliderGrab]             = ImVec4( 0.87f, 0.44f, 0.12f, 1.00f );
-	colors[ImGuiCol_SliderGrabActive]       = ImVec4( 0.98f, 0.62f, 0.26f, 1.00f );
-	colors[ImGuiCol_Button]                 = ImVec4( 0.98f, 0.62f, 0.26f, 0.40f );
-	colors[ImGuiCol_ButtonHovered]          = ImVec4( 0.98f, 0.67f, 0.26f, 1.00f );
-	colors[ImGuiCol_ButtonActive]           = ImVec4( 1.00f, 0.63f, 0.00f, 1.00f );
-	colors[ImGuiCol_Header]                 = ImVec4( 1.00f, 0.52f, 0.04f, 0.31f );
-	colors[ImGuiCol_HeaderHovered]          = ImVec4( 0.98f, 0.59f, 0.26f, 0.80f );
-	colors[ImGuiCol_HeaderActive]           = ImVec4( 0.98f, 0.64f, 0.26f, 1.00f );
-	colors[ImGuiCol_SeparatorHovered]       = ImVec4( 0.82f, 0.42f, 0.03f, 0.78f );
-	colors[ImGuiCol_SeparatorActive]        = ImVec4( 1.00f, 0.53f, 0.00f, 1.00f );
-	colors[ImGuiCol_ResizeGrip]             = ImVec4( 0.98f, 0.69f, 0.26f, 0.20f );
-	colors[ImGuiCol_ResizeGripHovered]      = ImVec4( 0.98f, 0.59f, 0.26f, 0.67f );
-	colors[ImGuiCol_ResizeGripActive]       = ImVec4( 0.98f, 0.64f, 0.26f, 0.95f );
-	colors[ImGuiCol_TabHovered]             = ImVec4( 0.98f, 0.69f, 0.26f, 0.80f );
-	colors[ImGuiCol_Tab]                    = ImVec4( 0.58f, 0.39f, 0.18f, 0.86f );
-	colors[ImGuiCol_TabSelected]            = ImVec4( 0.68f, 0.42f, 0.20f, 1.00f );
-	colors[ImGuiCol_TabSelectedOverline]    = ImVec4( 0.98f, 0.69f, 0.26f, 1.00f );
-	colors[ImGuiCol_TabDimmed]              = ImVec4( 0.15f, 0.11f, 0.07f, 0.97f );
-	colors[ImGuiCol_TabDimmedSelected]      = ImVec4( 0.42f, 0.28f, 0.14f, 1.00f );
-	colors[ImGuiCol_DockingPreview]         = ImVec4( 0.98f, 0.62f, 0.26f, 0.70f );
-	colors[ImGuiCol_TextLink]               = ImVec4( 0.98f, 0.67f, 0.26f, 1.00f );
-	colors[ImGuiCol_TextSelectedBg]         = ImVec4( 0.98f, 0.69f, 0.26f, 0.35f );
-	colors[ImGuiCol_NavHighlight]           = ImVec4( 0.98f, 0.67f, 0.26f, 1.00f );
-
-	g_IsInit = true;
-
-	return true;
-}
-
-void NotifyDisplaySizeChanged( int width, int height )
-{
-	if( g_DisplaySize.x != width || g_DisplaySize.y != height )
-	{
-		g_DisplaySize = ImVec2( ( float )width, ( float )height );
-
-		if( IsInitialized() )
-		{
-			Destroy();
-			Init( width, height );
-
-			// reuse the default ImGui font
-			const idMaterial* image = declManager->FindMaterial( "_imguiFont" );
-
-			ImGuiIO& io = ImGui::GetIO();
-
-			byte* pixels = NULL;
-			io.Fonts->GetTexDataAsRGBA32( &pixels, &width, &height );
-
-			io.Fonts->TexID = ( void* )image;
-		}
-	}
-}
-
-// inject a sys event
-bool InjectSysEvent( const sysEvent_t* event )
-{
-	if( IsInitialized() && UseInput() )
-	{
-		if( event == NULL )
-		{
-			assert( 0 ); // I think this shouldn't happen
-			return false;
-		}
-
-		const sysEvent_t& ev = *event;
-
-		switch( ev.evType )
-		{
-			case SE_KEY:
-				return HandleKeyEvent( ev );
-
-			case SE_MOUSE_ABSOLUTE:
-				// RB: still allow mouse movement if right mouse button is pressed
-				//if( !g_MousePressed[1] )
-			{
-				g_MousePos.x = ev.evValue;
-				g_MousePos.y = ev.evValue2;
-				return true;
-			}
-
-			case SE_CHAR:
-				if( ev.evValue < 0x10000 )
-				{
-					ImGui::GetIO().AddInputCharacter( ev.evValue );
-					return true;
-				}
-				break;
-
-			case SE_MOUSE_LEAVE:
-				g_MousePos = ImVec2( -1.0f, -1.0f );
-				return true;
-
-			default:
-				break;
-		}
-	}
-	return false;
-}
-
-bool InjectMouseWheel( int delta )
-{
-	if( IsInitialized() && UseInput() && delta != 0 )
-	{
-		g_MouseWheel = ( delta > 0 ) ? 1 : -1;
-		return true;
-	}
-	return false;
-}
-
-void NewFrame()
-{
-	if( !g_haveNewFrame && IsInitialized() && ShowWindows() )
-	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		// Setup display size (every frame to accommodate for window resizing)
-		io.DisplaySize = g_DisplaySize;
-
-		// Setup time step
-		int	time = Sys_Milliseconds();
-		double current_time = time * 0.001;
-		io.DeltaTime = g_Time > 0.0 ? ( float )( current_time - g_Time ) : ( float )( 1.0f / 60.0f );
-
-		if( io.DeltaTime <= 0.0F )
-		{
-			io.DeltaTime = ( 1.0f / 60.0f );
-		}
-
-		g_Time = current_time;
-
-		// Setup inputs
-		io.MousePos = g_MousePos;
-
-		// If a mouse press event came, always pass it as "mouse held this frame",
-		// so we don't miss click-release events that are shorter than 1 frame.
-		for( int i = 0; i < 5; ++i )
-		{
-			io.MouseDown[i] = g_MousePressed[i] || usercmdGen->KeyState( K_MOUSE1 + i ) == 1;
-			//g_MousePressed[i] = false;
-		}
-
-		io.MouseWheel = g_MouseWheel;
-		g_MouseWheel = 0.0f;
-
-		// Hide OS mouse cursor if ImGui is drawing it TODO: hide mousecursor?
-		// ShowCursor(io.MouseDrawCursor ? 0 : 1);
-
-		ImGui::GetIO().MouseDrawCursor = UseInput();
-
-		// Start the frame
-		ImGui::NewFrame();
-		ImGuizmo::BeginFrame();
-
-		g_haveNewFrame = true;
-	}
-}
-
-bool IsReadyToRender()
-{
-	if( IsInitialized() && ShowWindows() )
-	{
-		if( !g_haveNewFrame )
-		{
-			// for screenshots etc, where we didn't go through idCommonLocal::Frame()
-			// before idRenderSystemLocal::SwapCommandBuffers_FinishRendering()
-			NewFrame();
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-void Render()
-{
-	if( IsInitialized() && ShowWindows() )
-	{
-		if( !g_haveNewFrame )
-		{
-			// for screenshots etc, where we didn't go through idCommonLocal::Frame()
-			// before idRenderSystemLocal::SwapCommandBuffers_FinishRendering()
-			NewFrame();
-		}
-
-		// make dockspace transparent
-		static ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
-		ImGui::DockSpaceOverViewport( NULL, NULL, dockspaceFlags, NULL );
-
-		ImGuiTools::DrawToolWindows();
-
-		if( imgui_showDemoWindow.GetBool() )
-		{
-			ImGui::ShowDemoWindow();
-		}
-
-		ImGui::Render();
-		idRenderBackend::ImGui_RenderDrawLists( ImGui::GetDrawData() );
-		g_haveNewFrame = false;
-	}
-}
-
-void Destroy()
-{
-	if( IsInitialized() )
-	{
-		common->Printf( "Shutting down ImGui\n" );
-
-		ImGui::DestroyContext();
-		g_IsInit = false;
-		g_haveNewFrame = false;
-	}
-}
-
-bool IsInitialized()
-{
-	// checks if imgui is up and running
-	return g_IsInit;
-}
 } //namespace ImGuiHook

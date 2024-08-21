@@ -361,7 +361,7 @@ void idCommonLocal::Draw()
 		SCOPED_PROFILE_EVENT( "Post-Draw" );
 
 		// draw Imgui before the console
-		ImGuiHook::Render();
+		imgui->Render();
 
 		// draw the wipe material on top of this if it hasn't completed yet
 		DrawWipeModel();
@@ -511,7 +511,7 @@ void idCommonLocal::Frame()
 		renderSystem->OnFrame();
 
 		// DG: prepare new ImGui frame - I guess this is a good place, as all new events should be available?
-		ImGuiHook::NewFrame();
+		imgui->NewFrame();
 
 		// Activate the shell if it's been requested
 		if( showShellRequested && game )
@@ -525,12 +525,12 @@ void idCommonLocal::Frame()
 
 		// DG: Add pause from com_pause cvar
 		if( com_pause.GetInteger() || console->Active() || Dialog().IsDialogActive() || session->IsSystemUIShowing()
-				|| ( game && game->InhibitControls() ) ||  ImGuiTools::ReleaseMouseForTools() )
+				|| ( game && game->InhibitControls() ) || imguiTools && imguiTools->ReleaseMouseForTools() )
 			// DG end
 		{
 			// RB: don't release the mouse when opening a PDA or menu
 			// SRS - but always release at main menu after exiting game or demo
-			if( console->Active() || !mapSpawned || ImGuiTools::ReleaseMouseForTools() )
+			if( console->Active() || !mapSpawned || imguiTools && imguiTools->ReleaseMouseForTools() )
 			{
 				Sys_GrabMouseCursor( false );
 			}

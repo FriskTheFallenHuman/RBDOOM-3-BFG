@@ -26,8 +26,10 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#ifndef NEO_IMGUI_BFGIMGUI_H_
-#define NEO_IMGUI_BFGIMGUI_H_
+#ifndef __BFGIMGUI_H__
+#define __BFGIMGUI_H__
+
+#include "ImGui_Hooks.h"
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
@@ -49,4 +51,64 @@ bool DragVec3fitLabel( const char* label, idVec3& v, float v_speed = 1.0f,
 
 }
 
-#endif /* NEO_IMGUI_BFGIMGUI_H_ */
+class idImGuiHookLocal : public idImGuiHook
+{
+public:
+	idImGuiHookLocal();
+
+	// ---------------------- Public idImGuiHook Interface -------------------
+
+	virtual bool	Init( int windowWidth, int windowHeight );
+
+	virtual bool	IsInitialized();
+
+	// tell imgui that the (game) window size has changed
+	virtual void	NotifyDisplaySizeChanged( int width, int height );
+
+	// inject a sys event (keyboard, mouse, unicode character)
+	virtual bool	InjectSysEvent( const sysEvent_t* keyEvent );
+
+	// inject the current mouse wheel delta for scrolling
+	virtual bool	InjectMouseWheel( int delta );
+
+	// call this once per frame *before* calling ImGui::* commands to draw widgets etc
+	// (but ideally after getting all new events)
+	virtual void	NewFrame();
+
+	// call this to enable custom ImGui windows which are not editors
+	virtual bool	IsReadyToRender();
+
+	// call this once per frame (at the end) - it'll render all ImGui::* commands
+	// since NewFrame()
+	virtual void	Render();
+
+	virtual void	Destroy();
+
+protected:
+
+	bool			HandleKeyEvent( const sysEvent_t& keyEvent );
+	// Gross hack. I'm sorry.
+	// sets the kb-layout specific keys in the keymap
+	void			FillCharKeys( int* keyMap );
+	// Sys_GetClipboardData() expects that you Mem_Free() its returned data
+	// ImGui can't do that, of course, so copy it into a static buffer here,
+	// Mem_Free() and return the copy
+	static const char* 	GetClipboardText( void* );
+	static void		SetClipboardText( void*, const char* text );
+	bool			ShowWindows();
+	bool			UseInput();
+
+private:
+
+	bool	g_IsInit;
+	double	g_Time;
+	bool	g_MousePressed[5];
+	float	g_MouseWheel;
+	ImVec2	g_MousePos;
+	ImVec2	g_DisplaySize;
+	bool	g_haveNewFrame;
+};
+
+extern idImGuiHookLocal imguiLocal;
+
+#endif /* __BFGIMGUI_H__ */

@@ -1229,7 +1229,7 @@ void LightEditor::Draw()
 	if( isShown && !showTool )
 	{
 		isShown = showTool;
-		impl::SetReleaseToolMouse( false );
+		imguiTools->SetReleaseToolMouse( false );
 	}
 }
 

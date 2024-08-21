@@ -36,6 +36,11 @@ If you have questions concerning this license or the applicable additional terms
 #include <direct.h>
 #include <io.h>
 #include <conio.h>
+#include <uxtheme.h>
+#include <commctrl.h>
+
+#pragma comment(lib, "uxtheme.lib")
+#pragma comment(lib, "comctl32.lib")
 
 #include "win_local.h"
 #include "rc/doom_resource.h"
@@ -374,13 +379,26 @@ void Sys_CreateConsole()
 		return;
 	}
 
+	// InitCommonControlsEx() is required on Windows XP if an application
+	// manifest specifies use of ComCtl32.dll version 6 or later to enable
+	// visual styles.  Otherwise, any window creation will fail.
+	INITCOMMONCONTROLSEX InitCtrls;
+	InitCtrls.dwSize = sizeof( InitCtrls );
+	// Set this to include all the common control classes you want to use
+	// in your application.
+	InitCtrls.dwICC = ICC_WIN95_CLASSES;
+	InitCommonControlsEx( &InitCtrls );
+
+	SetWindowTheme( s_wcd.hWnd, L"Explorer", NULL );
+
 	//
 	// create fonts
 	//
 	hDC = GetDC( s_wcd.hWnd );
 	nHeight = -MulDiv( 8, GetDeviceCaps( hDC, LOGPIXELSY ), 72 );
 
-	s_wcd.hfBufferFont = CreateFont( nHeight, 0, 0, 0, FW_LIGHT, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_MODERN | FIXED_PITCH, "Courier New" );
+	s_wcd.hfButtonFont = CreateFont( nHeight, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, VARIABLE_PITCH, "MS Shell Dlg" );
+	s_wcd.hfBufferFont = CreateFont( nHeight, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, VARIABLE_PITCH, "Cascadia Mono" );
 
 	ReleaseDC( s_wcd.hWnd, hDC );
 
@@ -402,6 +420,7 @@ void Sys_CreateConsole()
 										 s_wcd.hWnd,
 										 ( HMENU ) COPY_ID,	// child window ID
 										 win32.hInstance, NULL );
+	SendMessage( s_wcd.hwndButtonCopy, WM_SETFONT, ( WPARAM )s_wcd.hfButtonFont, TRUE );
 	SendMessage( s_wcd.hwndButtonCopy, WM_SETTEXT, 0, ( LPARAM ) "copy" );
 
 	s_wcd.hwndButtonClear = CreateWindow( "button", NULL, BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
@@ -409,6 +428,7 @@ void Sys_CreateConsole()
 										  s_wcd.hWnd,
 										  ( HMENU ) CLEAR_ID,	// child window ID
 										  win32.hInstance, NULL );
+	SendMessage( s_wcd.hwndButtonClear, WM_SETFONT, ( WPARAM )s_wcd.hfButtonFont, TRUE );
 	SendMessage( s_wcd.hwndButtonClear, WM_SETTEXT, 0, ( LPARAM ) "clear" );
 
 	s_wcd.hwndButtonQuit = CreateWindow( "button", NULL, BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
@@ -416,6 +436,7 @@ void Sys_CreateConsole()
 										 s_wcd.hWnd,
 										 ( HMENU ) QUIT_ID,	// child window ID
 										 win32.hInstance, NULL );
+	SendMessage( s_wcd.hwndButtonQuit, WM_SETFONT, ( WPARAM )s_wcd.hfButtonFont, TRUE );
 	SendMessage( s_wcd.hwndButtonQuit, WM_SETTEXT, 0, ( LPARAM ) "quit" );
 
 

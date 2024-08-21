@@ -341,14 +341,8 @@ idCommonLocal::InitTool
 */
 void idCommonLocal::InitTool( const toolFlag_t tool, const idDict* dict, idEntity* entity )
 {
-	if( tool & EDITOR_LIGHT )
-	{
-		ImGuiTools::LightEditorInit( dict, entity );
-	}
-
-	if( tool & EDITOR_AF )
-	{
-		ImGuiTools::AfEditorInit();
+	if ( imguiTools ) {
+		imguiTools->InitTool( tool, dict, entity );
 	}
 }
 // DG end
@@ -1493,8 +1487,9 @@ void idCommonLocal::Shutdown()
 	delete loadGUI;
 	loadGUI = NULL;
 
-	printf( "ImGuiHook::Destroy();\n" );
-	ImGuiHook::Destroy();
+	printf( "delete imgui;\n" );
+	imgui->Destroy();
+	imgui = NULL;
 
 	printf( "delete renderWorld;\n" );
 	// SRS - Call FreeRenderWorld() vs. delete, otherwise worlds list not updated on shutdown
@@ -1816,7 +1811,7 @@ bool idCommonLocal::ProcessEvent( const sysEvent_t* event )
 		return true;
 	}
 
-	if( ImGuiHook::InjectSysEvent( event ) )
+	if( imgui->InjectSysEvent( event ) )
 	{
 		return true;
 	}

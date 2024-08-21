@@ -7,6 +7,7 @@ if ( EXISTS "${CMAKE_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake" )
 		"${CMAKE_SOURCE_DIR}/../.vcpkg/ports/optick/"
 		"${CMAKE_SOURCE_DIR}/../.vcpkg/ports/imgui/"
 		"${CMAKE_SOURCE_DIR}/../.vcpkg/ports/imguizmo/"
+		"${CMAKE_SOURCE_DIR}/../.vcpkg/ports/zlib/"
 	)
 else()
 	message( FATAL_ERROR "Vcpkg wasn't not found, aborting, make sure to git clone this with all submodules!")
@@ -637,8 +638,6 @@ file(GLOB COMPILER_AAS_SOURCES tools/compilers/aas/*.cpp)
 file(GLOB COMPILER_DMAP_INCLUDES tools/compilers/dmap/*.h)
 file(GLOB COMPILER_DMAP_SOURCES tools/compilers/dmap/*.cpp)
 
-set(TOOLS_INCLUDES tools/edit_public.h)
-
 file(GLOB IMGUI_EDITOR_INCLUDES tools/imgui/*.h)
 file(GLOB IMGUI_EDITOR_SOURCES tools/imgui/*.cpp)
 
@@ -669,6 +668,7 @@ endif()
 set(WIN32_RESOURCES
 	sys/win32/rc/res/doom.ico
 	sys/win32/rc/doom.rc
+	sys/win32/rc/RBDoom3BFG.exe.manifest
 )
 
 file(GLOB POSIX_INCLUDES sys/posix/*.h)
@@ -789,8 +789,6 @@ source_group("tools\\compilers\\aas" FILES ${COMPILER_AAS_SOURCES})
 source_group("tools\\compilers\\dmap" FILES ${COMPILER_DMAP_INCLUDES})
 source_group("tools\\compilers\\dmap" FILES ${COMPILER_DMAP_SOURCES})
 
-source_group("tools" FILES ${TOOLS_INCLUDES})
-
 source_group("tools\\imgui" FILES ${IMGUI_EDITOR_INCLUDES})
 source_group("tools\\imgui" FILES ${IMGUI_EDITOR_SOURCES})
 
@@ -832,7 +830,7 @@ set(RBDOOM3_INCLUDES
 			${COMPILER_AAS_INCLUDES} ${COMPILER_AAS_SOURCES}
 			${COMPILER_DMAP_INCLUDES} ${COMPILER_DMAP_SOURCES}
 			
-			${TOOLS_INCLUDES}
+			${IMGUI_EDITOR_INCLUDES}
 			
 			${GAMED3XP_INCLUDES}
 			${GAMED3XP_AI_INCLUDES} 

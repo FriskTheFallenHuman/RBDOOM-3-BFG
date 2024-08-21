@@ -473,7 +473,7 @@ void R_SetNewMode( const bool fullInit )
 			if( GLimp_Init( parms ) )
 #endif
 			{
-				ImGuiHook::Init( glConfig.nativeScreenWidth, glConfig.nativeScreenHeight );
+				imgui->Init( glConfig.nativeScreenWidth, glConfig.nativeScreenHeight );
 				break;
 			}
 		}
@@ -488,7 +488,7 @@ void R_SetNewMode( const bool fullInit )
 #endif
 			{
 				Framebuffer::ResizeFramebuffers();
-				ImGuiHook::NotifyDisplaySizeChanged( glConfig.nativeScreenWidth, glConfig.nativeScreenHeight );
+				imgui->NotifyDisplaySizeChanged( glConfig.nativeScreenWidth, glConfig.nativeScreenHeight );
 				break;
 			}
 		}

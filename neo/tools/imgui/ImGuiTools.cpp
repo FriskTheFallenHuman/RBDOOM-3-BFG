@@ -36,55 +36,25 @@ If you have questions concerning this license or the applicable additional terms
 #include "afeditor/AfEditor.h"
 #include "lighteditor/LightEditor.h"
 
-
-extern idCVar g_editEntityMode;
-
-static bool releaseMouse = false;
-#if 0 // currently this doesn't make too much sense
-void ShowEditors_f( const idCmdArgs& args )
+class idImGuiToolsLocal final : public idImGuiTools
 {
-	showToolWindows = true;
-}
-#endif // 0
+public:
+	idImGuiToolsLocal();
 
-namespace ImGuiTools
-{
+	virtual void	InitTool( const toolFlag_t tool, const idDict* dict, idEntity* entity );
+	virtual bool	AreEditorsActive();
+	virtual void	DrawToolWindows();
+	virtual void	SetReleaseToolMouse( bool doRelease );
+	virtual bool	ReleaseMouseForTools();
 
-// things in impl need to be used in at least one other file, but should generally not be touched
-namespace impl
-{
+private:
+	bool g_releaseMouse;
+};
 
-void SetReleaseToolMouse( bool doRelease )
-{
-	releaseMouse = doRelease;
-}
+idImGuiToolsLocal	imguiToolsLocal;
+idImGuiTools* imguiTools = &imguiToolsLocal;
 
-} //namespace impl
-
-bool AreEditorsActive()
-{
-	// FIXME: this is not exactly clean and must be changed if we ever support game dlls
-	return g_editEntityMode.GetInteger() > 0 || com_editors != 0;
-}
-
-bool ReleaseMouseForTools()
-{
-	return AreEditorsActive() && releaseMouse;
-}
-
-void DrawToolWindows()
-{
-	if( LightEditor::Instance().IsShown() )
-	{
-		LightEditor::Instance().Draw();
-	}
-	else if( AfEditor::Instance().IsShown() )
-	{
-		AfEditor::Instance().Draw();
-	}
-}
-
-void LightEditorInit( const idDict* dict, idEntity* ent )
+static void LightEditorInit( const idDict* dict, idEntity* ent )
 {
 	if( dict == NULL || ent == NULL )
 	{
@@ -97,16 +67,57 @@ void LightEditorInit( const idDict* dict, idEntity* ent )
 			  && "LightEditorInit() must only be called with light entities or NULL!" );
 
 
-	LightEditor::Instance().ShowIt( true );
-	impl::SetReleaseToolMouse( true );
+	ImGuiTools::LightEditor::Instance().ShowIt( true );
+	imguiTools->SetReleaseToolMouse( true );
 
-	LightEditor::ReInit( dict, ent );
+	ImGuiTools::LightEditor::ReInit( dict, ent );
 }
 
-void AfEditorInit()
+static void AFEditorInit( const idDict* dict )
 {
-	AfEditor::Instance().ShowIt( true );
-	impl::SetReleaseToolMouse( true );
+	ImGuiTools::AfEditor::Instance().ShowIt( true );
+	imguiTools->SetReleaseToolMouse( true );
 }
 
-} //namespace ImGuiTools
+idImGuiToolsLocal::idImGuiToolsLocal() : g_releaseMouse( false )
+{
+}
+
+void idImGuiToolsLocal::InitTool( const toolFlag_t tool, const idDict* dict, idEntity* entity )
+{
+	if( tool & EDITOR_LIGHT )
+	{
+		LightEditorInit( dict, entity );
+	}
+	else if( tool & EDITOR_AF )
+	{
+		AFEditorInit( dict );
+	}
+}
+
+bool idImGuiToolsLocal::AreEditorsActive()
+{
+	return cvarSystem->GetCVarInteger( "g_editEntityMode" ) > 0 || com_editors != 0;
+}
+
+void idImGuiToolsLocal::SetReleaseToolMouse( bool doRelease )
+{
+	g_releaseMouse = doRelease;
+}
+
+void idImGuiToolsLocal::DrawToolWindows()
+{
+	if( ImGuiTools::LightEditor::Instance().IsShown() )
+	{
+		ImGuiTools::LightEditor::Instance().Draw();
+	}
+	else if( ImGuiTools::AfEditor::Instance().IsShown() )
+	{
+		ImGuiTools::AfEditor::Instance().Draw();
+	}
+}
+
+bool idImGuiToolsLocal::ReleaseMouseForTools()
+{
+	return AreEditorsActive() && g_releaseMouse;
+}

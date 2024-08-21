@@ -26,43 +26,24 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#ifndef __IMGUI_HOOKS_H__
-#define __IMGUI_HOOKS_H__
+#ifndef __IMGUITOOLS_H__
+#define __IMGUITOOLS_H__
 
-#include "../sys/sys_public.h"
+static void LightEditorInit( const idDict* dict, idEntity* ent );
+static void AFEditorInit( const idDict* dict );
 
-class idImGuiHook
+class idImGuiTools
 {
 public:
-	virtual			~idImGuiHook() {}
+	idImGuiTools() {}
 
-	virtual bool	Init( int windowWidth, int windowHeight ) = 0;
-
-	virtual bool	IsInitialized() = 0;
-
-	// tell imgui that the (game) window size has changed
-	virtual void	NotifyDisplaySizeChanged( int width, int height ) = 0;
-
-	// inject a sys event (keyboard, mouse, unicode character)
-	virtual bool	InjectSysEvent( const sysEvent_t* keyEvent ) = 0;
-
-	// inject the current mouse wheel delta for scrolling
-	virtual bool	InjectMouseWheel( int delta ) = 0;
-
-	// call this once per frame *before* calling ImGui::* commands to draw widgets etc
-	// (but ideally after getting all new events)
-	virtual void	NewFrame() = 0;
-
-	// call this to enable custom ImGui windows which are not editors
-	virtual bool	IsReadyToRender() = 0;
-
-	// call this once per frame (at the end) - it'll render all ImGui::* commands
-	// since NewFrame()
-	virtual void	Render() = 0;
-
-	virtual void	Destroy() = 0;
+	virtual void	InitTool( const toolFlag_t tool, const idDict* dict, idEntity* entity ) = 0;
+	virtual bool	AreEditorsActive() = 0;
+	virtual void	DrawToolWindows() = 0;
+	virtual void	SetReleaseToolMouse( bool doRelease ) = 0;
+	virtual bool	ReleaseMouseForTools() = 0;
 };
 
-extern idImGuiHook* imgui;
+extern idImGuiTools* imguiTools;
 
-#endif /* !__IMGUI_HOOKS_H__ */
+#endif /* !__IMGUITOOLS_H__ */

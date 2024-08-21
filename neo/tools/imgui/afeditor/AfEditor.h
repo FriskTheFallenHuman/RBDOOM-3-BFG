@@ -30,8 +30,6 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef EDITOR_TOOLS_AFEDITOR_H_
 #define EDITOR_TOOLS_AFEDITOR_H_
 
-#include "../../edit_public.h"
-
 #include "AfBodyEditor.h"
 #include "AfConstraintEditor.h"
 #include "AfPropertyEditor.h"

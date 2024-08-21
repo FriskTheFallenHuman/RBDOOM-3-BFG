@@ -158,7 +158,7 @@ idConsole* console = &localConsole;
 
 idCVar idConsoleLocal::con_speed( "con_speed", "3", CVAR_SYSTEM, "speed at which the console moves up and down" );
 idCVar idConsoleLocal::con_notifyTime( "con_notifyTime", "3", CVAR_SYSTEM, "time messages are displayed onscreen when console is pulled up" );
-#ifdef DEBUG
+#ifdef _DEBUG
 	idCVar idConsoleLocal::con_noPrint( "con_noPrint", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "print on the console but not onscreen when console is pulled up" );
 #else
 	idCVar idConsoleLocal::con_noPrint( "con_noPrint", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "print on the console but not onscreen when console is pulled up" );
@@ -232,7 +232,7 @@ float idConsoleLocal::DrawFPS( float y )
 	static int previous;
 	static int valuesOffset = 0;
 
-	bool renderImGuiPerfWindow = ImGuiHook::IsReadyToRender() && ( com_showFPS.GetInteger() > 1 );
+	bool renderImGuiPerfWindow = imgui->IsReadyToRender() && ( com_showFPS.GetInteger() > 1 );
 
 	// don't use serverTime, because that will be drifting to
 	// correct for internet lag changes, timescales, timedemos, etc
@@ -338,10 +338,8 @@ float idConsoleLocal::DrawFPS( float y )
 	previousCpuUsage[( index - 1 ) % FPS_FRAMES] = float( rendererCPUBusyTime ) / float( frameBusyTime + frameIdleTime ) * 100.0;
 	previousGpuUsage[( index - 1 ) % FPS_FRAMES] = float( rendererGPUTime ) / float( rendererGPUTime + rendererGPUIdleTime ) * 100.0;
 
-#if 1
-
 	// RB: use ImGui to show more detailed stats about the scene loads
-	if( ImGuiHook::IsReadyToRender() )
+	if( imgui->IsReadyToRender() )
 	{
 		// start smaller
 		int32 statsWindowWidth = 320;
@@ -352,6 +350,9 @@ float idConsoleLocal::DrawFPS( float y )
 			statsWindowWidth += 230;
 			statsWindowHeight += 120;
 		}
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.FramePadding = ImVec2( 0, 0 );
 
 		ImVec2 pos;
 		pos.x = renderSystem->GetWidth() - statsWindowWidth;
@@ -378,7 +379,9 @@ float idConsoleLocal::DrawFPS( float y )
 		static ImVec4 colorGold		= ImVec4( 0.68f, 0.63f, 0.36f, 1.00f );
 		static ImVec4 colorPastelMagenta = ImVec4( 1.0f, 0.5f, 1.0f, 1.00f );
 
-		ImGui::Begin( "Performance Stats" );
+		bool toolActive = false;
+
+		ImGui::Begin( "Performance Stats", &toolActive, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize );
 
 		static const int gfxNumValues = 3;
 
@@ -533,58 +536,12 @@ float idConsoleLocal::DrawFPS( float y )
 		ImGui::TextColored( frameBusyTime > maxTime || rendererGPUTime > maxTime ? colorRed : colorWhite, "Total:   %5lld us   Total:        %5lld us", frameBusyTime, rendererGPUTime );
 		ImGui::TextColored( colorWhite,														"Idle:    %5lld us   Idle:         %5lld us", frameIdleTime, rendererGPUIdleTime );
 		// SRS - Show CPU and GPU overall usage statistics
-		//ImGui::TextColored( colorWhite,														"Frame:     %3.0f %%    Frame:          %3.0f %%", cpuUsage, gpuUsage );
+		ImGui::TextColored( colorWhite,														"Frame:     %3.0f %%    Frame:          %3.0f %%", cpuUsage, gpuUsage );
 
 		ImGui::End();
 	}
 
 	return y;
-#else
-
-	// print the resolution scale so we can tell when we are at reduced resolution
-	idStr resolutionText;
-	resolutionScale.GetConsoleText( resolutionText );
-	int w = resolutionText.Length() * BIGCHAR_WIDTH;
-	renderSystem->DrawBigStringExt( LOCALSAFE_RIGHT - w, idMath::Ftoi( y ) + 2, resolutionText.c_str(), colorWhite, true );
-
-	y += SMALLCHAR_HEIGHT + 4;
-	idStr timeStr;
-	timeStr.Format( "%sG+RF: %4d", gameThreadTotalTime > maxTime ? S_COLOR_RED : "", gameThreadTotalTime );
-	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, idMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
-	y += SMALLCHAR_HEIGHT + 4;
-
-	timeStr.Format( "%sG: %4d", gameThreadGameTime > maxTime ? S_COLOR_RED : "", gameThreadGameTime );
-	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, idMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
-	y += SMALLCHAR_HEIGHT + 4;
-
-	timeStr.Format( "%sRF: %4d", gameThreadRenderTime > maxTime ? S_COLOR_RED : "", gameThreadRenderTime );
-	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, idMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
-	y += SMALLCHAR_HEIGHT + 4;
-
-	timeStr.Format( "%sRB: %4.1f", rendererBackEndTime > maxTime * 1000 ? S_COLOR_RED : "", rendererBackEndTime / 1000.0f );
-	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, idMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
-	y += SMALLCHAR_HEIGHT + 4;
-
-	timeStr.Format( "%sSV: %4.1f", rendererShadowsTime > maxTime * 1000 ? S_COLOR_RED : "", rendererShadowsTime / 1000.0f );
-	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, idMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
-	y += SMALLCHAR_HEIGHT + 4;
-
-	timeStr.Format( "%sIDLE: %4.1f", rendererGPUIdleTime > maxTime * 1000 ? S_COLOR_RED : "", rendererGPUIdleTime / 1000.0f );
-	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, idMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
-	y += SMALLCHAR_HEIGHT + 4;
-
-	timeStr.Format( "%sGPU: %4.1f", rendererGPUTime > maxTime * 1000 ? S_COLOR_RED : "", rendererGPUTime / 1000.0f );
-	w = timeStr.LengthWithoutColors() * SMALLCHAR_WIDTH;
-	renderSystem->DrawSmallStringExt( LOCALSAFE_RIGHT - w, idMath::Ftoi( y ) + 2, timeStr.c_str(), colorWhite, false );
-
-	return y + BIGCHAR_HEIGHT + 4;
-#endif
 }
 
 /*
