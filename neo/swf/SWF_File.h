@@ -66,7 +66,7 @@ public:
 	}
 
 
-	static int		BitCountS( const int64 value, bool isSigned );
+	static int		BitCountS( const int64_t value, bool isSigned );
 	static int		BitCountU( const int value );
 	static int		BitCountFloat( const float value );
 
@@ -78,9 +78,9 @@ public:
 	void			WriteUBits( int value, int numBits );
 	void			WriteSBits( int value, int numBits );
 
-	void			WriteU8( uint8 value );
-	void			WriteU16( uint16 value );
-	void			WriteU32( uint32 value );
+	void			WriteU8( uint8_t value );
+	void			WriteU16( uint16_t value );
+	void			WriteU32( uint32_t value );
 
 	void			WriteRect( const swfRect_t& rect );
 	void			WriteMatrix( const swfMatrix_t& matrix );
@@ -88,8 +88,8 @@ public:
 	void			WriteColorRGBA( const swfColorRGBA_t& color );
 	void			WriteColorXFormRGBA( const swfColorXform_t& xcf );
 
-	static int32	GetTagHeaderSize( swfTag_t tag, int32 tagLength );
-	void			WriteTagHeader( swfTag_t tag, int32 tagLength );
+	static int32_t	GetTagHeaderSize( swfTag_t tag, int32_t tagLength );
+	void			WriteTagHeader( swfTag_t tag, int32_t tagLength );
 
 private:
 

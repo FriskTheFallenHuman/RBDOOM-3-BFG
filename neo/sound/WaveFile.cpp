@@ -70,9 +70,9 @@ bool idWaveFile::Open( const char* filename )
 
 	struct header_t
 	{
-		uint32 id;
-		uint32 size;
-		uint32 format;
+		uint32_t id;
+		uint32_t size;
+		uint32_t format;
 	} header;
 
 	file->Read( &header, sizeof( header ) );
@@ -87,16 +87,16 @@ bool idWaveFile::Open( const char* filename )
 		return false;
 	}
 
-	uint32 riffSize = header.size + 8;
-	uint32 offset = sizeof( header );
+	uint32_t riffSize = header.size + 8;
+	uint32_t offset = sizeof( header );
 
 	// Scan the file collecting chunks
 	while( offset < riffSize )
 	{
 		struct chuckHeader_t
 		{
-			uint32 id;
-			uint32 size;
+			uint32_t id;
+			uint32_t size;
 		} chunkHeader;
 		if( file->Read( &chunkHeader, sizeof( chunkHeader ) ) != sizeof( chunkHeader ) )
 		{
@@ -134,7 +134,7 @@ idWaveFile::SeekToChunk
 Seeks to the specified chunk and returns the size of the chunk or 0 if the chunk wasn't found.
 ========================
 */
-uint32 idWaveFile::SeekToChunk( uint32 id )
+uint32_t idWaveFile::SeekToChunk( uint32_t id )
 {
 	for( int i = 0; i < chunks.Num(); i++ )
 	{
@@ -154,7 +154,7 @@ idWaveFile::GetChunkOffset
 Seeks to the specified chunk and returns the size of the chunk or 0 if the chunk wasn't found.
 ========================
 */
-uint32 idWaveFile::GetChunkOffset( uint32 id )
+uint32_t idWaveFile::GetChunkOffset( uint32_t id )
 {
 	for( int i = 0; i < chunks.Num(); i++ )
 	{
@@ -171,7 +171,7 @@ typedef struct XMA2STREAMFORMAT
 {
 	byte Channels;			// Number of channels in the stream (1 or 2)
 	byte RESERVED;			// Reserved for future use
-	uint16 ChannelMask;		// Spatial positions of the channels in the stream
+	uint16_t ChannelMask;		// Spatial positions of the channels in the stream
 } XMA2STREAMFORMAT;
 
 // Legacy XMA2 format structure (big-endian byte ordering)
@@ -182,18 +182,18 @@ typedef struct XMA2WAVEFORMAT
 	byte NumStreams;		// Number of interleaved audio streams
 	byte RESERVED;			// Reserved for future use
 	byte LoopCount;			// Number of loop repetitions; 255 = infinite
-	uint32 LoopBegin;		// Loop begin point, in samples
-	uint32 LoopEnd;			// Loop end point, in samples
-	uint32 SampleRate;		// The file's decoded sample rate
-	uint32 EncodeOptions;		// Options for the XMA encoder/decoder
-	uint32 PsuedoBytesPerSec;	// Used internally by the XMA encoder
-	uint32 BlockSizeInBytes;	// Size in bytes of this file's XMA blocks (except
+	uint32_t LoopBegin;		// Loop begin point, in samples
+	uint32_t LoopEnd;			// Loop end point, in samples
+	uint32_t SampleRate;		// The file's decoded sample rate
+	uint32_t EncodeOptions;		// Options for the XMA encoder/decoder
+	uint32_t PsuedoBytesPerSec;	// Used internally by the XMA encoder
+	uint32_t BlockSizeInBytes;	// Size in bytes of this file's XMA blocks (except
 	// possibly the last one).  Always a multiple of
 	// 2Kb, since XMA blocks are arrays of 2Kb packets.
-	uint32 SamplesEncoded;		// Total number of PCM samples encoded in this file
-	uint32 SamplesInSource;		// Actual number of PCM samples in the source
+	uint32_t SamplesEncoded;		// Total number of PCM samples encoded in this file
+	uint32_t SamplesInSource;		// Actual number of PCM samples in the source
 	// material used to generate this file
-	uint32 BlockCount;			// Number of XMA blocks in this file (and hence
+	uint32_t BlockCount;			// Number of XMA blocks in this file (and hence
 	// also the number of entries in its seek table)
 } XMA2WAVEFORMAT;
 
@@ -209,7 +209,7 @@ const char* idWaveFile::ReadWaveFormat( waveFmt_t& format )
 {
 	memset( &format, 0, sizeof( format ) );
 
-	uint32 formatSize = SeekToChunk( waveFmt_t::id );
+	uint32_t formatSize = SeekToChunk( waveFmt_t::id );
 	if( formatSize == 0 )
 	{
 		return "No format chunk";
@@ -430,7 +430,7 @@ bool idWaveFile::WriteWaveFormatDirect( waveFmt_t& format, idFile* file, bool wa
 	// RB: this is also called by .idwav saving code and it was missing
 	if( wavFile )
 	{
-		static const uint32 id = 'fmt ';
+		static const uint32_t id = 'fmt ';
 		file->WriteBig( id );
 
 		if( format.basic.formatTag != FORMAT_PCM )
@@ -485,32 +485,32 @@ Writes a wave format header to a file ptr,
 
 bool idWaveFile::WriteSampleDataDirect( idList< sampleData_t >& sampleData, idFile* file )
 {
-	static const uint32 sample = 'smpl';
+	static const uint32_t sample = 'smpl';
 	file->WriteBig( sample );
-	uint32 samplerData = sampleData.Num() * 24;
-	uint32 chunkSize = 36 + samplerData;
-	uint32 zero = 0;
-	uint32 numSamples = sampleData.Num();
+	uint32_t samplerData = sampleData.Num() * 24;
+	uint32_t chunkSize = 36 + samplerData;
+	uint32_t zero = 0;
+	uint32_t numSamples = sampleData.Num();
 
-	file->Write( &chunkSize, sizeof( uint32 ) );
-	file->Write( &zero, sizeof( uint32 ) );
-	file->Write( &zero, sizeof( uint32 ) );
-	file->Write( &zero, sizeof( uint32 ) );
-	file->Write( &zero, sizeof( uint32 ) );
-	file->Write( &zero, sizeof( uint32 ) );
-	file->Write( &zero, sizeof( uint32 ) );
-	file->Write( &zero, sizeof( uint32 ) );
-	file->Write( &numSamples, sizeof( uint32 ) );
-	file->Write( &samplerData, sizeof( uint32 ) );
+	file->Write( &chunkSize, sizeof( uint32_t ) );
+	file->Write( &zero, sizeof( uint32_t ) );
+	file->Write( &zero, sizeof( uint32_t ) );
+	file->Write( &zero, sizeof( uint32_t ) );
+	file->Write( &zero, sizeof( uint32_t ) );
+	file->Write( &zero, sizeof( uint32_t ) );
+	file->Write( &zero, sizeof( uint32_t ) );
+	file->Write( &zero, sizeof( uint32_t ) );
+	file->Write( &numSamples, sizeof( uint32_t ) );
+	file->Write( &samplerData, sizeof( uint32_t ) );
 
 	for( int i = 0; i < sampleData.Num(); ++i )
 	{
-		file->Write( &zero, sizeof( uint32 ) );
-		file->Write( &zero, sizeof( uint32 ) );
-		file->Write( &sampleData[ i ].start, sizeof( uint32 ) );
-		file->Write( &sampleData[ i ].end, sizeof( uint32 ) );
-		file->Write( &zero, sizeof( uint32 ) );
-		file->Write( &zero, sizeof( uint32 ) );
+		file->Write( &zero, sizeof( uint32_t ) );
+		file->Write( &zero, sizeof( uint32_t ) );
+		file->Write( &sampleData[ i ].start, sizeof( uint32_t ) );
+		file->Write( &sampleData[ i ].end, sizeof( uint32_t ) );
+		file->Write( &zero, sizeof( uint32_t ) );
+		file->Write( &zero, sizeof( uint32_t ) );
 	}
 	return true;
 }
@@ -523,11 +523,11 @@ Writes a data chunk to a file ptr
 ========================
 */
 
-bool idWaveFile::WriteDataDirect( char* _data, uint32 size, idFile* file )
+bool idWaveFile::WriteDataDirect( char* _data, uint32_t size, idFile* file )
 {
-	static const uint32 data = 'data';
+	static const uint32_t data = 'data';
 	file->WriteBig( data );
-	file->Write( &size, sizeof( uint32 ) );
+	file->Write( &size, sizeof( uint32_t ) );
 	//file->WriteBigArray( _data, size ); // RB: this is super slow
 	file->Write( _data, size );
 	return true;
@@ -541,10 +541,10 @@ Writes a wave header to a file ptr,
 ========================
 */
 
-bool idWaveFile::WriteHeaderDirect( uint32 fileSize, idFile* file )
+bool idWaveFile::WriteHeaderDirect( uint32_t fileSize, idFile* file )
 {
-	static const uint32 riff = 'RIFF';
-	static const uint32 wave = 'WAVE';
+	static const uint32_t riff = 'RIFF';
+	static const uint32_t wave = 'WAVE';
 	file->WriteBig( riff );
 	file->WriteUnsignedInt( fileSize );
 	file->WriteBig( wave );
@@ -560,7 +560,7 @@ Reads a loop point from a 'smpl' chunk in a wave file, returns 0 if none are fou
 */
 bool idWaveFile::ReadLoopData( int& start, int& end )
 {
-	uint32 chunkSize = SeekToChunk( samplerChunk_t::id );
+	uint32_t chunkSize = SeekToChunk( samplerChunk_t::id );
 	if( chunkSize < sizeof( samplerChunk_t ) )
 	{
 		return false;

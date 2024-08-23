@@ -56,7 +56,7 @@ public:
 	void	Append( const idStr& s );
 	void	Append( idSWFScriptString* s );
 	void	Append( const float f );
-	void	Append( const int32 i );
+	void	Append( const int32_t i );
 	void	Append( const bool b );
 };
 

@@ -1631,7 +1631,7 @@ idFile_ReadBuffered::BufferData
 Buffer a section of the file
 =================
 */
-void idFile_Cached::CacheData( uint64 offset, uint64 length )
+void idFile_Cached::CacheData( uint64_t offset, uint64_t length )
 {
 	Mem_Free( buffered );
 	bufferedStartOffset = offset;
@@ -1665,7 +1665,7 @@ int idFile_Cached::Read( void* buffer, int len )
 	int read = idFile_Permanent::Read( buffer, len );
 	if( read != -1 )
 	{
-		internalFilePos += ( int64 )read;
+		internalFilePos += ( int64_t )read;
 	}
 	return read;
 }

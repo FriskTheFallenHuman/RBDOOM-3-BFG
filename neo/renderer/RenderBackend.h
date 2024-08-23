@@ -215,7 +215,7 @@ private:
 	void				GL_EndFrame();
 
 public:
-	uint64				GL_GetCurrentState() const;
+	uint64_t				GL_GetCurrentState() const;
 	idVec2				GetCurrentPixelOffset() const;
 
 	nvrhi::ICommandList* GL_GetCommandList() const
@@ -224,11 +224,11 @@ public:
 	}
 
 private:
-	uint64				GL_GetCurrentStateMinusStencil() const;
+	uint64_t				GL_GetCurrentStateMinusStencil() const;
 	void				GL_SetDefaultState();
 
-	void				GL_State( uint64 stateBits, bool forceGlState = false );
-//	void				GL_SeparateStencil( stencilFace_t face, uint64 stencilBits );
+	void				GL_State( uint64_t stateBits, bool forceGlState = false );
+//	void				GL_SeparateStencil( stencilFace_t face, uint64_t stencilBits );
 
 	void				GL_SelectTexture( int unit );
 //	void				GL_BindTexture( idImage* image );
@@ -344,7 +344,7 @@ public:
 	float				depthBias;
 
 private:
-	uint64				glStateBits;
+	uint64_t				glStateBits;
 
 	const viewDef_t* 	viewDef;
 

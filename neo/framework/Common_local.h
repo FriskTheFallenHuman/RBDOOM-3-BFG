@@ -123,14 +123,14 @@ struct netTimes_t
 
 struct frameTiming_t
 {
-	uint64	startSyncTime;
-	uint64	finishSyncTime;
-	uint64	startGameTime;
-	uint64	finishGameTime;
-	uint64	finishDrawTime;
-	uint64	startRenderTime;
-	uint64	finishRenderTime;
-	uint64  finishSyncTime_EndFrame;
+	uint64_t	startSyncTime;
+	uint64_t	finishSyncTime;
+	uint64_t	startGameTime;
+	uint64_t	finishGameTime;
+	uint64_t	finishDrawTime;
+	uint64_t	startRenderTime;
+	uint64_t	finishRenderTime;
+	uint64_t  finishSyncTime_EndFrame;
 };
 
 #define	MAX_PRINT_MSG_SIZE	4096
@@ -291,137 +291,137 @@ public:
 		return gameThread.GetThreadRenderTime();
 	}
 
-	uint64		GetRendererBackEndMicroseconds() const
+	uint64_t		GetRendererBackEndMicroseconds() const
 	{
 		return time_backend;
 	}
 
-	uint64		GetRendererShadowsMicroseconds() const
+	uint64_t		GetRendererShadowsMicroseconds() const
 	{
 		return time_shadows;
 	}
 
-	uint64 	GetRendererIdleMicroseconds() const
+	uint64_t 	GetRendererIdleMicroseconds() const
 	{
 		return mainFrameTiming.startRenderTime - mainFrameTiming.finishSyncTime;
 	}
 
-	uint64		GetRendererGPUMicroseconds() const
+	uint64_t		GetRendererGPUMicroseconds() const
 	{
 		return time_gpu;
 	}
 
 	// RB begin
-	uint64		GetRendererGpuBeginDrawingMicroseconds() const
+	uint64_t		GetRendererGpuBeginDrawingMicroseconds() const
 	{
 		return stats_backend.gpuBeginDrawingMicroSec;
 	}
 
-	uint64		GetRendererGpuEarlyZMicroseconds() const
+	uint64_t		GetRendererGpuEarlyZMicroseconds() const
 	{
 		return stats_backend.gpuDepthMicroSec;
 	}
 
-	uint64		GetRendererGpuGeometryMicroseconds() const
+	uint64_t		GetRendererGpuGeometryMicroseconds() const
 	{
 		return stats_backend.gpuGeometryMicroSec;
 	}
 
-	uint64		GetRendererGpuSSAOMicroseconds() const
+	uint64_t		GetRendererGpuSSAOMicroseconds() const
 	{
 		return stats_backend.gpuScreenSpaceAmbientOcclusionMicroSec;
 	}
 
-	uint64		GetRendererGpuSSRMicroseconds() const
+	uint64_t		GetRendererGpuSSRMicroseconds() const
 	{
 		return stats_backend.gpuScreenSpaceReflectionsMicroSec;
 	}
 
-	uint64		GetRendererGpuAmbientPassMicroseconds() const
+	uint64_t		GetRendererGpuAmbientPassMicroseconds() const
 	{
 		return stats_backend.gpuAmbientPassMicroSec;
 	}
 
-	uint64		GetRendererGpuShadowAtlasPassMicroseconds() const
+	uint64_t		GetRendererGpuShadowAtlasPassMicroseconds() const
 	{
 		return stats_backend.gpuShadowAtlasPassMicroSec;
 	}
 
-	uint64		GetRendererGpuInteractionsMicroseconds() const
+	uint64_t		GetRendererGpuInteractionsMicroseconds() const
 	{
 		return stats_backend.gpuInteractionsMicroSec;
 	}
 
-	uint64		GetRendererGpuShaderPassMicroseconds() const
+	uint64_t		GetRendererGpuShaderPassMicroseconds() const
 	{
 		return stats_backend.gpuShaderPassMicroSec;
 	}
 
-	uint64		GetRendererGpuFogAllLightsMicroseconds() const
+	uint64_t		GetRendererGpuFogAllLightsMicroseconds() const
 	{
 		return stats_backend.gpuFogAllLightsMicroSec;
 	}
 
-	uint64		GetRendererGpuBloomMicroseconds() const
+	uint64_t		GetRendererGpuBloomMicroseconds() const
 	{
 		return stats_backend.gpuBloomMicroSec;
 	}
 
-	uint64		GetRendererGpuShaderPassPostMicroseconds() const
+	uint64_t		GetRendererGpuShaderPassPostMicroseconds() const
 	{
 		return stats_backend.gpuShaderPassPostMicroSec;
 	}
 
-	uint64		GetRendererGpuMotionVectorsMicroseconds() const
+	uint64_t		GetRendererGpuMotionVectorsMicroseconds() const
 	{
 		return stats_backend.gpuMotionVectorsMicroSec;
 	}
 
-	uint64		GetRendererGpuTAAMicroseconds() const
+	uint64_t		GetRendererGpuTAAMicroseconds() const
 	{
 		return stats_backend.gpuTemporalAntiAliasingMicroSec;
 	}
 
-	uint64		GetRendererGpuToneMapPassMicroseconds() const
+	uint64_t		GetRendererGpuToneMapPassMicroseconds() const
 	{
 		return stats_backend.gpuToneMapPassMicroSec;
 	}
 
-	uint64		GetRendererGpuPostProcessingMicroseconds() const
+	uint64_t		GetRendererGpuPostProcessingMicroseconds() const
 	{
 		return stats_backend.gpuPostProcessingMicroSec;
 	}
 
-	uint64		GetRendererGpuDrawGuiMicroseconds() const
+	uint64_t		GetRendererGpuDrawGuiMicroseconds() const
 	{
 		return stats_backend.gpuDrawGuiMicroSec;
 	}
 
-	uint64		GetRendererGpuCrtPostProcessingMicroseconds() const
+	uint64_t		GetRendererGpuCrtPostProcessingMicroseconds() const
 	{
 		return stats_backend.gpuCrtPostProcessingMicroSec;
 	}
 	// RB end
 
 	// SRS start
-	void		SetRendererMvkEncodeMicroseconds( uint64 mvkEncodeMicroSeconds )
+	void		SetRendererMvkEncodeMicroseconds( uint64_t mvkEncodeMicroSeconds )
 	{
 		metal_encode = mvkEncodeMicroSeconds;
 		return;
 	}
 
-	uint64		GetRendererMvkEncodeMicroseconds() const
+	uint64_t		GetRendererMvkEncodeMicroseconds() const
 	{
 		return metal_encode;
 	}
 
-	void		SetRendererGpuMemoryMB( uint64 gpuMemoryMB )
+	void		SetRendererGpuMemoryMB( uint64_t gpuMemoryMB )
 	{
 		gpu_memory = gpuMemoryMB;
 		return;
 	}
 
-	uint64		GetRendererGpuMemoryMB() const
+	uint64_t		GetRendererGpuMemoryMB() const
 	{
 		return gpu_memory;
 	}
@@ -565,14 +565,14 @@ private:
 	float			optimalTimeBuffered;
 	float			optimalTimeBufferedWindow;
 
-	uint64			snapRate;
-	uint64			actualRate;
+	uint64_t			snapRate;
+	uint64_t			actualRate;
 
-	uint64			snapTime;			// time we got the most recent snapshot
-	uint64			snapTimeDelta;		// time interval that current ss was sent in
+	uint64_t			snapTime;			// time we got the most recent snapshot
+	uint64_t			snapTimeDelta;		// time interval that current ss was sent in
 
-	uint64			snapTimeWrite;
-	uint64			snapCurrentTime;	// realtime playback time
+	uint64_t			snapTimeWrite;
+	uint64_t			snapCurrentTime;	// realtime playback time
 	netTimes_t		snapCurrent;		// current snapshot
 	netTimes_t		snapPrevious;		// previous snapshot
 	float			snapCurrentResidual;
@@ -630,19 +630,19 @@ private:
 	int					time_gameFrame;			// game logic time
 	int					time_maxGameFrame;		// maximum single frame game logic time
 	int					time_gameDraw;			// game present time
-	uint64				time_frontend;			// renderer frontend time
-	uint64				time_backend;			// renderer backend time
-	uint64				time_shadows;			// renderer backend waiting for shadow volumes to be created
-	uint64				time_gpu;				// total gpu time, at least for PC
+	uint64_t				time_frontend;			// renderer frontend time
+	uint64_t				time_backend;			// renderer backend time
+	uint64_t				time_shadows;			// renderer backend waiting for shadow volumes to be created
+	uint64_t				time_gpu;				// total gpu time, at least for PC
 
 	// RB: r_speeds counters
 	backEndCounters_t		stats_backend;
 	performanceCounters_t	stats_frontend;
 
 	// SRS - MoltenVK's Vulkan to Metal command buffer encoding time, set default to 0 for non-macOS platforms (Windows and Linux)
-	uint64					metal_encode = 0;
+	uint64_t					metal_encode = 0;
 	// SRS - Cross-platform GPU Memory usage counter, set default to 0 in case platform or graphics API does not support queries
-	uint64					gpu_memory = 0;
+	uint64_t					gpu_memory = 0;
 
 	// Used during loading screens
 	int					lastPacifierSessionTime;

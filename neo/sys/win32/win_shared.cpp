@@ -79,17 +79,17 @@ int Sys_Milliseconds()
 Sys_Microseconds
 ========================
 */
-uint64 Sys_Microseconds()
+uint64_t Sys_Microseconds()
 {
-	static uint64 ticksPerMicrosecondTimes1024 = 0;
+	static uint64_t ticksPerMicrosecondTimes1024 = 0;
 
 	if( ticksPerMicrosecondTimes1024 == 0 )
 	{
-		ticksPerMicrosecondTimes1024 = ( ( uint64 )Sys_ClockTicksPerSecond() << 10 ) / 1000000;
+		ticksPerMicrosecondTimes1024 = ( ( uint64_t )Sys_ClockTicksPerSecond() << 10 ) / 1000000;
 		assert( ticksPerMicrosecondTimes1024 > 0 );
 	}
 
-	return ( ( uint64 )( ( int64 )Sys_GetClockTicks() << 10 ) ) / ticksPerMicrosecondTimes1024;
+	return ( ( uint64_t )( ( int64_t )Sys_GetClockTicks() << 10 ) ) / ticksPerMicrosecondTimes1024;
 }
 
 /*
@@ -117,12 +117,12 @@ int Sys_GetDriveFreeSpace( const char* path )
 Sys_GetDriveFreeSpaceInBytes
 ========================
 */
-int64 Sys_GetDriveFreeSpaceInBytes( const char* path )
+int64_t Sys_GetDriveFreeSpaceInBytes( const char* path )
 {
 	DWORDLONG lpFreeBytesAvailable;
 	DWORDLONG lpTotalNumberOfBytes;
 	DWORDLONG lpTotalNumberOfFreeBytes;
-	int64 ret = 1;
+	int64_t ret = 1;
 	//FIXME: see why this is failing on some machines
 	if( ::GetDiskFreeSpaceEx( path, ( PULARGE_INTEGER )&lpFreeBytesAvailable, ( PULARGE_INTEGER )&lpTotalNumberOfBytes, ( PULARGE_INTEGER )&lpTotalNumberOfFreeBytes ) )
 	{

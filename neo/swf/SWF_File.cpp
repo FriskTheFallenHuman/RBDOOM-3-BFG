@@ -44,11 +44,11 @@ idFile_SWF::~idFile_SWF()
 
 
 
-int idFile_SWF::BitCountS( const int64 value, bool isSigned )
+int idFile_SWF::BitCountS( const int64_t value, bool isSigned )
 {
 	int number = idMath::Abs( value );
 
-	int64 x = 1;
+	int64_t x = 1;
 	int i;
 
 	for( i = 1; i <= 64; i++ )
@@ -149,24 +149,24 @@ void idFile_SWF::WriteUBits( int value, int numBits )
 
 void idFile_SWF::WriteSBits( int value, int numBits )
 {
-	int32 tmp = value & 0x7FFFFFFF;
+	int32_t tmp = value & 0x7FFFFFFF;
 
 	if( value < 0 )
 	{
-		tmp |= ( 1L << ( ( int32 )numBits - 1 ) );
+		tmp |= ( 1L << ( ( int32_t )numBits - 1 ) );
 	}
 
 	WriteUBits( tmp, numBits );
 }
 
-void idFile_SWF::WriteU8( uint8 value )
+void idFile_SWF::WriteU8( uint8_t value )
 {
 	ByteAlign();
 
 	WriteByte( value );
 }
 
-void idFile_SWF::WriteU16( uint16 value )
+void idFile_SWF::WriteU16( uint16_t value )
 {
 	ByteAlign();
 
@@ -174,7 +174,7 @@ void idFile_SWF::WriteU16( uint16 value )
 	WriteByte( ( value >> 8 ) & 0xFF );
 }
 
-void idFile_SWF::WriteU32( uint32 value )
+void idFile_SWF::WriteU32( uint32_t value )
 {
 	ByteAlign();
 
@@ -346,9 +346,9 @@ void idFile_SWF::WriteColorRGBA( const swfColorRGBA_t& color )
 }
 
 
-void idFile_SWF::WriteTagHeader( swfTag_t tag, int32 tagLength )
+void idFile_SWF::WriteTagHeader( swfTag_t tag, int32_t tagLength )
 {
-	uint16 tagIDLength = ( ( int ) tag << 6 );
+	uint16_t tagIDLength = ( ( int ) tag << 6 );
 
 	if( tagLength < 0x3F )
 	{
@@ -363,9 +363,9 @@ void idFile_SWF::WriteTagHeader( swfTag_t tag, int32 tagLength )
 	}
 }
 
-int32 idFile_SWF::GetTagHeaderSize( swfTag_t tag, int32 tagLength )
+int32_t idFile_SWF::GetTagHeaderSize( swfTag_t tag, int32_t tagLength )
 {
-	int32 size = 2;
+	int32_t size = 2;
 
 	if( tagLength >= 0x3F )
 	{

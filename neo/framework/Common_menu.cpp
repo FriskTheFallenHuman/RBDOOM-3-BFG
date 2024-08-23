@@ -57,7 +57,7 @@ void idCommonLocal::InitializeMPMapsModes()
 	for( int i = 0; i < numMaps; i++ )
 	{
 		const idDeclEntityDef* mapDef = static_cast<const idDeclEntityDef*>( declManager->DeclByIndex( DECL_MAPDEF, i ) );
-		uint32 supportedModes = 0;
+		uint32_t supportedModes = 0;
 		for( int j = 0; j < numModes; j++ )
 		{
 			if( mapDef->dict.GetBool( gameModes[j], false ) )
@@ -99,7 +99,7 @@ void idCommonLocal::OnStartHosting( idMatchParameters& parms )
 		{
 			// Select a map which supports the chosen mode
 			idList<int> supportedMaps;
-			uint32 supportedMode = BIT( parms.gameMode );
+			uint32_t supportedMode = BIT( parms.gameMode );
 			for( int i = 0; i < mpGameMaps.Num(); i++ )
 			{
 				if( mpGameMaps[i].supportedModes & supportedMode )
@@ -121,8 +121,8 @@ void idCommonLocal::OnStartHosting( idMatchParameters& parms )
 	}
 	if( parms.gameMode < 0 )
 	{
-		uint32 supportedModes = mpGameMaps[parms.gameMap].supportedModes;
-		int8 supportedModeList[32] = {};
+		uint32_t supportedModes = mpGameMaps[parms.gameMap].supportedModes;
+		int8_t supportedModeList[32] = {};
 		int numSupportedModes = 0;
 		for( int i = 0; i < 32; i++ )
 		{

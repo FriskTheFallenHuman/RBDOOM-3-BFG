@@ -288,50 +288,50 @@ float idConsoleLocal::DrawFPS( float y )
 	// DG end
 
 	// SRS - Shouldn't use these getters since they access and return int-sized variables measured in milliseconds
-	//const uint64 gameThreadTotalTime = commonLocal.GetGameThreadTotalTime();
-	//const uint64 gameThreadGameTime = commonLocal.GetGameThreadGameTime();
-	//const uint64 gameThreadRenderTime = commonLocal.GetGameThreadRenderTime();
+	//const uint64_t gameThreadTotalTime = commonLocal.GetGameThreadTotalTime();
+	//const uint64_t gameThreadGameTime = commonLocal.GetGameThreadGameTime();
+	//const uint64_t gameThreadRenderTime = commonLocal.GetGameThreadRenderTime();
 
-	const uint64 gameThreadTotalTime	= commonLocal.mainFrameTiming.finishDrawTime - commonLocal.mainFrameTiming.startGameTime;
-	const uint64 gameThreadGameTime		= commonLocal.mainFrameTiming.finishGameTime - commonLocal.mainFrameTiming.startGameTime;
-	const uint64 gameThreadRenderTime	= commonLocal.mainFrameTiming.finishDrawTime - commonLocal.mainFrameTiming.finishGameTime;
+	const uint64_t gameThreadTotalTime	= commonLocal.mainFrameTiming.finishDrawTime - commonLocal.mainFrameTiming.startGameTime;
+	const uint64_t gameThreadGameTime		= commonLocal.mainFrameTiming.finishGameTime - commonLocal.mainFrameTiming.startGameTime;
+	const uint64_t gameThreadRenderTime	= commonLocal.mainFrameTiming.finishDrawTime - commonLocal.mainFrameTiming.finishGameTime;
 
-	const uint64 rendererBackEndTime = commonLocal.GetRendererBackEndMicroseconds();
-	const uint64 rendererShadowsTime = commonLocal.GetRendererShadowsMicroseconds();
-	const uint64 rendererGPUTime = commonLocal.GetRendererGPUMicroseconds();
-	const uint64 rendererGPUEarlyZTime = commonLocal.GetRendererGpuBeginDrawingMicroseconds() + commonLocal.GetRendererGpuEarlyZMicroseconds() + commonLocal.GetRendererGpuGeometryMicroseconds();
-	const uint64 rendererGPU_SSAOTime = commonLocal.GetRendererGpuSSAOMicroseconds();
-	const uint64 rendererGPU_SSRTime = commonLocal.GetRendererGpuSSRMicroseconds();
-	const uint64 rendererGPUAmbientPassTime = commonLocal.GetRendererGpuAmbientPassMicroseconds();
-	const uint64 rendererGPUShadowAtlasTime = commonLocal.GetRendererGpuShadowAtlasPassMicroseconds();
-	const uint64 rendererGPUInteractionsTime = commonLocal.GetRendererGpuInteractionsMicroseconds();
-	const uint64 rendererGPUShaderPassesTime = commonLocal.GetRendererGpuShaderPassMicroseconds() + commonLocal.GetRendererGpuFogAllLightsMicroseconds() + commonLocal.GetRendererGpuShaderPassPostMicroseconds() + commonLocal.GetRendererGpuDrawGuiMicroseconds();
-	const uint64 rendererGPU_TAATime = commonLocal.GetRendererGpuMotionVectorsMicroseconds() + commonLocal.GetRendererGpuTAAMicroseconds();
-	const uint64 rendererGPUToneMapPassTime = commonLocal.GetRendererGpuToneMapPassMicroseconds();
-	const uint64 rendererGPUPostProcessingTime = commonLocal.GetRendererGpuPostProcessingMicroseconds() + commonLocal.GetRendererGpuCrtPostProcessingMicroseconds();
+	const uint64_t rendererBackEndTime = commonLocal.GetRendererBackEndMicroseconds();
+	const uint64_t rendererShadowsTime = commonLocal.GetRendererShadowsMicroseconds();
+	const uint64_t rendererGPUTime = commonLocal.GetRendererGPUMicroseconds();
+	const uint64_t rendererGPUEarlyZTime = commonLocal.GetRendererGpuBeginDrawingMicroseconds() + commonLocal.GetRendererGpuEarlyZMicroseconds() + commonLocal.GetRendererGpuGeometryMicroseconds();
+	const uint64_t rendererGPU_SSAOTime = commonLocal.GetRendererGpuSSAOMicroseconds();
+	const uint64_t rendererGPU_SSRTime = commonLocal.GetRendererGpuSSRMicroseconds();
+	const uint64_t rendererGPUAmbientPassTime = commonLocal.GetRendererGpuAmbientPassMicroseconds();
+	const uint64_t rendererGPUShadowAtlasTime = commonLocal.GetRendererGpuShadowAtlasPassMicroseconds();
+	const uint64_t rendererGPUInteractionsTime = commonLocal.GetRendererGpuInteractionsMicroseconds();
+	const uint64_t rendererGPUShaderPassesTime = commonLocal.GetRendererGpuShaderPassMicroseconds() + commonLocal.GetRendererGpuFogAllLightsMicroseconds() + commonLocal.GetRendererGpuShaderPassPostMicroseconds() + commonLocal.GetRendererGpuDrawGuiMicroseconds();
+	const uint64_t rendererGPU_TAATime = commonLocal.GetRendererGpuMotionVectorsMicroseconds() + commonLocal.GetRendererGpuTAAMicroseconds();
+	const uint64_t rendererGPUToneMapPassTime = commonLocal.GetRendererGpuToneMapPassMicroseconds();
+	const uint64_t rendererGPUPostProcessingTime = commonLocal.GetRendererGpuPostProcessingMicroseconds() + commonLocal.GetRendererGpuCrtPostProcessingMicroseconds();
 
 	// SRS - Calculate max fps and max frame time based on glConfig.displayFrequency if vsync enabled and lower than engine Hz, otherwise use com_engineHz_latched
 	const int maxFPS = ( r_swapInterval.GetInteger() > 0 && glConfig.displayFrequency > 0 ? std::min( glConfig.displayFrequency, int( com_engineHz_latched ) ) : com_engineHz_latched );
 	const int maxTime = ( 1000.0 / maxFPS ) * 1050; // slight 5% tolerance offset to avoid flickering of the stats
 
 	// SRS - Frame idle and busy time calculations are based on direct frame-over-frame measurement relative to finishSyncTime
-	const int64 frameIdleTime = int64( commonLocal.mainFrameTiming.startGameTime ) - int64( commonLocal.mainFrameTiming.finishSyncTime );
-	const int64 frameBusyTime = int64( commonLocal.frameTiming.finishSyncTime ) - int64( commonLocal.mainFrameTiming.startGameTime );
+	const int64_t frameIdleTime = int64_t( commonLocal.mainFrameTiming.startGameTime ) - int64_t( commonLocal.mainFrameTiming.finishSyncTime );
+	const int64_t frameBusyTime = int64_t( commonLocal.frameTiming.finishSyncTime ) - int64_t( commonLocal.mainFrameTiming.startGameTime );
 
 	// SRS - Frame sync time represents swap buffer synchronization + other frame time spent outside of game thread and renderer backend
-	const int64 gameThreadWaitTime = int64( commonLocal.mainFrameTiming.finishSyncTime_EndFrame ) - int64( commonLocal.mainFrameTiming.finishRenderTime );
-	const int64 frameSyncTime = int64( commonLocal.frameTiming.finishSyncTime ) - int64( commonLocal.mainFrameTiming.startRenderTime + rendererBackEndTime ) - gameThreadWaitTime;
+	const int64_t gameThreadWaitTime = int64_t( commonLocal.mainFrameTiming.finishSyncTime_EndFrame ) - int64_t( commonLocal.mainFrameTiming.finishRenderTime );
+	const int64_t frameSyncTime = int64_t( commonLocal.frameTiming.finishSyncTime ) - int64_t( commonLocal.mainFrameTiming.startRenderTime + rendererBackEndTime ) - gameThreadWaitTime;
 
 	// SRS - GPU idle time is simply the difference between measured frame-over-frame time and GPU busy time (directly from GPU timers)
-	const int64 rendererGPUIdleTime = frameBusyTime + frameIdleTime - rendererGPUTime;
+	const int64_t rendererGPUIdleTime = frameBusyTime + frameIdleTime - rendererGPUTime;
 
 	// SRS - Estimate CPU busy time measured from start of game thread until completion of game thread and renderer backend (including excess MoltenVK encoding time if applicable)
 #if defined(__APPLE__) && defined( USE_MoltenVK )
-	const int64 rendererMvkEncodeTime = commonLocal.GetRendererMvkEncodeMicroseconds();
-	const int64 rendererQueueSubmitTime = int64( commonLocal.mainFrameTiming.finishRenderTime - commonLocal.mainFrameTiming.startRenderTime ) - int64( rendererBackEndTime );
-	const int64 rendererCPUBusyTime = int64( commonLocal.mainFrameTiming.finishSyncTime_EndFrame - commonLocal.mainFrameTiming.startGameTime ) + Min( Max( int64( 0 ), rendererMvkEncodeTime - rendererQueueSubmitTime - gameThreadWaitTime ), frameSyncTime - rendererQueueSubmitTime );
+	const int64_t rendererMvkEncodeTime = commonLocal.GetRendererMvkEncodeMicroseconds();
+	const int64_t rendererQueueSubmitTime = int64_t( commonLocal.mainFrameTiming.finishRenderTime - commonLocal.mainFrameTiming.startRenderTime ) - int64_t( rendererBackEndTime );
+	const int64_t rendererCPUBusyTime = int64_t( commonLocal.mainFrameTiming.finishSyncTime_EndFrame - commonLocal.mainFrameTiming.startGameTime ) + Min( Max( int64_t( 0 ), rendererMvkEncodeTime - rendererQueueSubmitTime - gameThreadWaitTime ), frameSyncTime - rendererQueueSubmitTime );
 #else
-	const int64 rendererCPUBusyTime = int64( commonLocal.mainFrameTiming.finishSyncTime_EndFrame - commonLocal.mainFrameTiming.startGameTime );
+	const int64_t rendererCPUBusyTime = int64_t( commonLocal.mainFrameTiming.finishSyncTime_EndFrame - commonLocal.mainFrameTiming.startGameTime );
 #endif
 
 	// SRS - Save current CPU and GPU usage factors in ring buffer to calculate smoothed averages for future frames
@@ -342,8 +342,8 @@ float idConsoleLocal::DrawFPS( float y )
 	if( imgui->IsReadyToRender() )
 	{
 		// start smaller
-		int32 statsWindowWidth = 320;
-		int32 statsWindowHeight = 330;
+		int32_t statsWindowWidth = 320;
+		int32_t statsWindowHeight = 330;
 
 		if( com_showFPS.GetInteger() > 2 )
 		{

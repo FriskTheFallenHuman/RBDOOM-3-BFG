@@ -304,7 +304,7 @@ int idRenderProgManager::UniformSize()
 idRenderProgManager::CommitUnforms
 ================================================================================================
 */
-void idRenderProgManager::CommitUniforms( uint64 stateBits )
+void idRenderProgManager::CommitUniforms( uint64_t stateBits )
 {
 }
 

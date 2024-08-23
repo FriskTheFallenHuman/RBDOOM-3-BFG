@@ -241,7 +241,7 @@ void R_SampleCubeMapHDR( const idVec3& dir, int size, byte* buffers[6], float re
 	// unpack RGBA8 to 3 floats
 	union
 	{
-		uint32	i;
+		uint32_t	i;
 		byte	b[4];
 	} tmp;
 
@@ -551,7 +551,7 @@ static inline float CubemapTexelSolidAngle( float u, float v, float _invFaceSize
 	return solidAngle;
 }
 
-static inline idVec3 MapXYSToDirection( uint64 x, uint64 y, uint64 s, uint64 width, uint64 height )
+static inline idVec3 MapXYSToDirection( uint64_t x, uint64_t y, uint64_t s, uint64_t width, uint64_t height )
 {
 	float u = ( ( x + 0.5f ) / float( width ) ) * 2.0f - 1.0f;
 	float v = ( ( y + 0.5f ) / float( height ) ) * 2.0f - 1.0f;

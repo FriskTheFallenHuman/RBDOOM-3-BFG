@@ -81,8 +81,8 @@ private:
 
 	nvrhi::CommandListHandle		commandList;
 
-	uint64							frameCounter;
-	uint32							frameParity;
+	uint64_t							frameCounter;
+	uint32_t							frameParity;
 
 	idStaticList<nvrhi::TimerQueryHandle, MRB_TOTAL* NUM_FRAME_DATA> timerQueries;
 	idStaticList<bool, MRB_TOTAL* NUM_FRAME_DATA> timerUsed;

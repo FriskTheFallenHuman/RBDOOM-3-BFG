@@ -260,7 +260,7 @@ void idRenderSystemLocal::SetColor( const idVec4& rgba )
 idRenderSystemLocal::GetColor
 =============
 */
-uint32 idRenderSystemLocal::GetColor()
+uint32_t idRenderSystemLocal::GetColor()
 {
 	return LittleLong( currentColorNativeBytesOrder );
 }
@@ -270,7 +270,7 @@ uint32 idRenderSystemLocal::GetColor()
 idRenderSystemLocal::SetGLState
 =============
 */
-void idRenderSystemLocal::SetGLState( const uint64 glState )
+void idRenderSystemLocal::SetGLState( const uint64_t glState )
 {
 	currentGLState = glState;
 }
@@ -603,10 +603,10 @@ with the rendering of the closed off command buffers by RenderCommandBuffers()
 ====================
 */
 const emptyCommand_t* idRenderSystemLocal::SwapCommandBuffers(
-	uint64* frontEndMicroSec,
-	uint64* backEndMicroSec,
-	uint64* shadowMicroSec,
-	uint64* gpuMicroSec,
+	uint64_t* frontEndMicroSec,
+	uint64_t* backEndMicroSec,
+	uint64_t* shadowMicroSec,
+	uint64_t* gpuMicroSec,
 	backEndCounters_t* bc,
 	performanceCounters_t* pc
 )
@@ -623,10 +623,10 @@ idRenderSystemLocal::SwapCommandBuffers_FinishRendering
 */
 #define	FPS_FRAMES	6
 void idRenderSystemLocal::SwapCommandBuffers_FinishRendering(
-	uint64* frontEndMicroSec,
-	uint64* backEndMicroSec,
-	uint64* shadowMicroSec,
-	uint64* gpuMicroSec,
+	uint64_t* frontEndMicroSec,
+	uint64_t* backEndMicroSec,
+	uint64_t* shadowMicroSec,
+	uint64_t* gpuMicroSec,
 	backEndCounters_t* bc,
 	performanceCounters_t* pc
 )

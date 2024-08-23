@@ -379,19 +379,11 @@ if( OPTICK )
 	set( OPTICK_LIBRARY optimized ${OPTICK_LIBRARY_RELEASE} debug ${OPTICK_LIBRARY_DEBUG} )
 endif()
 
-find_path( OGG_INCLUDE_DIRS "optick.h" )
-include_directories( ${OPTICK_INCLUDE_DIRS} )
-if( OPTICK )
-	find_library( OPTICK_LIBRARY_RELEASE NAMES OptickCore )
-	find_library( OPTICK_LIBRARY_DEBUG NAMES OptickCored )
-	set( OPTICK_LIBRARY optimized ${OPTICK_LIBRARY_RELEASE} debug ${OPTICK_LIBRARY_DEBUG} )
-endif()
-
 find_path( OGG_INCLUDE_DIRS "ogg.h" PATH_SUFFIXES "ogg" )
 include_directories(${OGG_INCLUDE_DIRS})
 find_library( OGG_LIBRARY_RELEASE NAMES ogg )
 find_library( OGG_LIBRARY_DEBUG NAMES ogg )
-set( OOGG_LIBRARY optimized ${OGG_LIBRARY_RELEASE} debug ${OGG_LIBRARY_DEBUG} )
+set( OGG_LIBRARY optimized ${OGG_LIBRARY_RELEASE} debug ${OGG_LIBRARY_DEBUG} )
 
 find_path( VORBIS_INCLUDE_DIRS "vorbisfile.h" PATH_SUFFIXES "vorbis" )
 include_directories(${VORBIS_INCLUDE_DIRS})
@@ -408,6 +400,12 @@ set( VORBIS_LIBRARY optimized ${VORBIS_LIBRARY_RELEASE}
 					debug ${VORBIS_ENCODER_LIBRARY_DEBUG}
 					debug ${VORBIS_FILE_LIBRARY_DEBUG}
 )
+
+find_path( TINYEXR_INCLUDE_DIRS "tinyexr.h" )
+include_directories(${TINYEXR_INCLUDE_DIRS})
+find_library( TINYEXR_LIBRARY_RELEASE NAMES tinyexr )
+find_library( TINYEXR_LIBRARY_DEBUG NAMES tinyexr )
+set( TINYEXR_LIBRARY optimized ${TINYEXR_LIBRARY_RELEASE} debug ${TINYEXR_LIBRARY_DEBUG} )
 
 add_subdirectory(idlib)
 
@@ -1042,6 +1040,7 @@ if(MSVC)
 		${ZLIB_LIBRARY}
 		${OGG_LIBRARY}
 		${VORBIS_LIBRARY}
+		${TINYEXR_LIBRARY}
 		${CMAKE_DL_LIBS}
 		)
 		
@@ -1243,6 +1242,7 @@ else()
 			${ZLIB_LIBRARY}
 			${OGG_LIBRARY}
 			${VORBIS_LIBRARY}
+			${TINYEXR_LIBRARY}
 			${CMAKE_DL_LIBS}
 			)
 	endif()

@@ -188,7 +188,7 @@ void idResourceContainer::UpdateResourceFile( const char* _filename, const idStr
 		return;
 	}
 
-	uint32 magic = 0;
+	uint32_t magic = 0;
 	int _tableOffset = 0;
 	int _tableLength = 0;
 	idList< idResourceCacheEntry > entries;
@@ -329,7 +329,7 @@ void idResourceContainer::ExtractResourceFile( const char* _fileName, const char
 		return;
 	}
 
-	uint32 magic;
+	uint32_t magic;
 	inFile->ReadBig( magic );
 	if( magic != RESOURCE_FILE_MAGIC )
 	{
@@ -390,7 +390,7 @@ void idResourceContainer::ExtractResourceFile( const char* _fileName, const char
 				int				totalBufferSize;
 				idList<sampleBuffer_t, TAG_AUDIO> buffers;
 
-				uint32 magic;
+				uint32_t magic;
 				fileIn->ReadBig( magic );
 				fileIn->ReadBig( timestamp );
 				fileIn->ReadBig( loaded );
@@ -431,7 +431,7 @@ void idResourceContainer::ExtractResourceFile( const char* _fileName, const char
 					{
 						//common->Printf( "writing %s\n", outName.c_str() );
 
-						uint32 fileSize = 12 + 24 + 2 + format.extraSize + 8 + totalBufferSize;
+						uint32_t fileSize = 12 + 24 + 2 + format.extraSize + 8 + totalBufferSize;
 						fileSize -= 8;
 
 						idWaveFile::WriteHeaderDirect( fileSize, fileOut );
@@ -514,7 +514,7 @@ void idResourceContainer::WriteResourceFile( const char* manifestName, const idS
 	idList < idStrList > outPutFiles;
 
 	idFileManifest outManifest;
-	int64 size = 0;
+	int64_t size = 0;
 	idStrList flist;
 	flist.SetGranularity( 16384 );
 	for( int i = 0; i < manifest.Num(); i++ )
@@ -570,7 +570,7 @@ void idResourceContainer::WriteResourceFile( const char* manifestName, const idS
 		int	tableOffset = 0;
 		int	tableLength = 0;
 		int	tableNewLength = 0;
-		uint32	resourceFileMagic = RESOURCE_FILE_MAGIC;
+		uint32_t	resourceFileMagic = RESOURCE_FILE_MAGIC;
 
 		resFile->WriteBig( resourceFileMagic );
 		resFile->WriteBig( tableOffset );

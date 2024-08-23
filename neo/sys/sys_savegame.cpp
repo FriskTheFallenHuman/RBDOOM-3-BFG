@@ -661,7 +661,7 @@ bool idSaveGameManager::DeviceSelectorWaitingOnSaveRetry()
 idSaveGameManager::Set360RetrySaveAfterDeviceSelected
 ========================
 */
-void idSaveGameManager::Set360RetrySaveAfterDeviceSelected( const char* folder, const int64 bytes )
+void idSaveGameManager::Set360RetrySaveAfterDeviceSelected( const char* folder, const int64_t bytes )
 {
 	retryFolder = folder;
 	retryBytes = bytes;
@@ -706,7 +706,7 @@ void idSaveGameManager::ShowRetySaveDialog()
 idSaveGameManager::ShowRetySaveDialog
 ========================
 */
-void idSaveGameManager::ShowRetySaveDialog( const char* folder, const int64 bytes )
+void idSaveGameManager::ShowRetySaveDialog( const char* folder, const int64_t bytes )
 {
 
 	idStaticList< idSWFScriptFunction*, 4 > callbacks;

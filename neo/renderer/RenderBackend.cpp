@@ -612,7 +612,7 @@ void idRenderBackend::FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs
 			currentSpace = drawSurf->space;
 		}
 
-		uint64 surfGLState = 0;
+		uint64_t surfGLState = 0;
 
 		// set polygon offset if necessary
 		if( shader->TestMaterialFlag( MF_POLYGONOFFSET ) )
@@ -683,7 +683,7 @@ void idRenderBackend::FillDepthBufferGeneric( const drawSurf_t* const* drawSurfs
 					continue;
 				}
 
-				uint64 stageGLState = surfGLState;
+				uint64_t stageGLState = surfGLState;
 
 				// set privatePolygonOffset if necessary
 				if( pStage->privatePolygonOffset )
@@ -2271,7 +2271,7 @@ void idRenderBackend::AmbientPass( const drawSurf_t* const* drawSurfs, int numDr
 		}
 
 		/*
-		uint64 surfGLState = 0;
+		uint64_t surfGLState = 0;
 
 		// set polygon offset if necessary
 		if( surfaceMaterial->TestMaterialFlag( MF_POLYGONOFFSET ) )
@@ -2959,7 +2959,7 @@ void idRenderBackend::ShadowMapPassPerforated( const drawSurf_t** drawSurfs, int
 
 	renderLog.OpenBlock( "Render_ShadowMapsPerforated", colorBrown );
 
-	uint64 glState = 0;
+	uint64_t glState = 0;
 
 	// the actual stencil func will be set in the draw code, but we need to make sure it isn't
 	// disabled here, and that the value will get reset for the interactions without looking
@@ -3044,7 +3044,7 @@ void idRenderBackend::ShadowMapPassPerforated( const drawSurf_t** drawSurfs, int
 		const float* regs = drawSurf->shaderRegisters;
 		idVec4 color( 0, 0, 0, 1 );
 
-		uint64 surfGLState = 0;
+		uint64_t surfGLState = 0;
 
 		// set polygon offset if necessary
 		if( shader && shader->TestMaterialFlag( MF_POLYGONOFFSET ) )
@@ -3084,7 +3084,7 @@ void idRenderBackend::ShadowMapPassPerforated( const drawSurf_t** drawSurfs, int
 					continue;
 				}
 
-				uint64 stageGLState = surfGLState;
+				uint64_t stageGLState = surfGLState;
 
 				// set privatePolygonOffset if necessary
 				if( pStage->privatePolygonOffset )
@@ -3181,7 +3181,7 @@ void idRenderBackend::ShadowMapPassFast( const drawSurf_t* drawSurfs, viewLight_
 	GL_SelectTexture( 0 );
 	globalImages->blackImage->Bind();
 
-	uint64 glState = 0;
+	uint64_t glState = 0;
 
 	// the actual stencil func will be set in the draw code, but we need to make sure it isn't
 	// disabled here, and that the value will get reset for the interactions without looking
@@ -3991,7 +3991,7 @@ int idRenderBackend::DrawShaderPasses( const drawSurf_t* const* const drawSurfs,
 		const float*	regs = surf->shaderRegisters;
 
 		// set face culling appropriately
-		uint64 cullMode;
+		uint64_t cullMode;
 		if( surf->space->isGuiSurface )
 		{
 			cullMode = GLS_CULL_TWOSIDED;
@@ -4015,7 +4015,7 @@ int idRenderBackend::DrawShaderPasses( const drawSurf_t* const* const drawSurfs,
 			}
 		}
 
-		uint64 surfGLState = surf->extraGLState | cullMode;
+		uint64_t surfGLState = surf->extraGLState | cullMode;
 
 		// set polygon offset if necessary
 
@@ -4041,7 +4041,7 @@ int idRenderBackend::DrawShaderPasses( const drawSurf_t* const* const drawSurfs,
 				continue;
 			}
 
-			uint64 stageGLState = surfGLState;
+			uint64_t stageGLState = surfGLState;
 			if( ( surfGLState & GLS_OVERRIDE ) == 0 )
 			{
 				stageGLState |= pStage->drawStateBits;
@@ -5368,7 +5368,7 @@ void idRenderBackend::ExecuteBackEndCommands( const emptyCommand_t* cmds )
 		taaPass->Init( deviceManager->GetDevice(), &commonPasses, NULL, taaParams );
 	}
 
-	uint64 backEndStartTime = Sys_Microseconds();
+	uint64_t backEndStartTime = Sys_Microseconds();
 
 	// needed for editor rendering
 	GL_SetDefaultState();
@@ -5439,7 +5439,7 @@ void idRenderBackend::ExecuteBackEndCommands( const emptyCommand_t* cmds )
 	DrawFlickerBox();
 
 	// stop rendering on this thread
-	uint64 backEndFinishTime = Sys_Microseconds();
+	uint64_t backEndFinishTime = Sys_Microseconds();
 	pc.cpuTotalMicroSec = backEndFinishTime - backEndStartTime;
 
 	// SRS - capture backend timing before GL_EndFrame() since it can block when r_mvkSynchronousQueueSubmits is enabled on macOS/MoltenVK

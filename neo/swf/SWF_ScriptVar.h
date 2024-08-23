@@ -97,7 +97,7 @@ public:
 	{
 		SetBool( b );
 	}
-	idSWFScriptVar( int32 i ) : type( SWF_VAR_UNDEF )
+	idSWFScriptVar( int32_t i ) : type( SWF_VAR_UNDEF )
 	{
 		SetInteger( i );
 	}
@@ -176,7 +176,7 @@ public:
 		type = SWF_VAR_BOOL;
 		value.b = b;
 	}
-	void SetInteger( int32 i )
+	void SetInteger( int32_t i )
 	{
 		Free();
 		type = SWF_VAR_INTEGER;
@@ -189,7 +189,7 @@ public:
 	idStr	ToString() const;
 	float	ToFloat() const;
 	bool	ToBool() const;
-	int32	ToInteger() const;
+	int32_t	ToInteger() const;
 
 	idSWFScriptObject* 		GetObject()
 	{
@@ -279,7 +279,7 @@ private:
 	union swfScriptVarValue_t
 	{
 		float	f;
-		int32	i;
+		int32_t	i;
 		bool	b;
 		idSWFScriptObject* object;
 		idSWFScriptString* string;

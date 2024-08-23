@@ -140,7 +140,7 @@ void idGuiModel::EmitSurfaces( float modelMatrix[16], float modelViewMatrix[16],
 		drawSurf->numIndexes = guiSurf.numIndexes;
 		drawSurf->ambientCache = vertexBlock;
 		// build a vertCacheHandle_t that points inside the allocated block
-		drawSurf->indexCache = indexBlock + ( ( int64 )( guiSurf.firstIndex * sizeof( triIndex_t ) ) << VERTCACHE_OFFSET_SHIFT );
+		drawSurf->indexCache = indexBlock + ( ( int64_t )( guiSurf.firstIndex * sizeof( triIndex_t ) ) << VERTCACHE_OFFSET_SHIFT );
 		drawSurf->jointCache = 0;
 		drawSurf->frontEndGeo = NULL;
 		drawSurf->space = guiSpace;
@@ -453,7 +453,7 @@ void idGuiModel::AdvanceSurf()
 AllocTris
 =============
 */
-idDrawVert* idGuiModel::AllocTris( int numVerts, const triIndex_t* indexes, int numIndexes, const idMaterial* material, const uint64 glState, const stereoDepthType_t stereoType )
+idDrawVert* idGuiModel::AllocTris( int numVerts, const triIndex_t* indexes, int numIndexes, const idMaterial* material, const uint64_t glState, const stereoDepthType_t stereoType )
 {
 	idScreenRect clipRect;
 	clipRect.Clear();
@@ -465,7 +465,7 @@ idDrawVert* idGuiModel::AllocTris( int numVerts, const triIndex_t* indexes, int 
 AllocTris
 =============
 */
-idDrawVert* idGuiModel::AllocTris( int vertCount, const triIndex_t* tempIndexes, int indexCount, const idMaterial* material, const uint64 glState, const stereoDepthType_t stereoType, const idScreenRect& clipRect )
+idDrawVert* idGuiModel::AllocTris( int vertCount, const triIndex_t* tempIndexes, int indexCount, const idMaterial* material, const uint64_t glState, const stereoDepthType_t stereoType, const idScreenRect& clipRect )
 {
 	if( material == NULL )
 	{

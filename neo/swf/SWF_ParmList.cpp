@@ -85,7 +85,7 @@ void idSWFParmList::Append( const float f )
 		var->SetFloat( f );
 	}
 }
-void idSWFParmList::Append( const int32 i )
+void idSWFParmList::Append( const int32_t i )
 {
 	idSWFScriptVar* var = Alloc();
 	if( var != NULL )

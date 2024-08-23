@@ -237,7 +237,7 @@ idSoundDecoder_Vorbis::IsEOS
 */
 bool idSoundDecoder_Vorbis::IsEOS( void )
 {
-	int64 size = ov_pcm_total( this->vorbisFile, -1 );
+	int64_t size = ov_pcm_total( this->vorbisFile, -1 );
 	return ov_pcm_tell( vorbisFile ) >= size;
 }
 
@@ -249,7 +249,7 @@ idSoundDecoder_Vorbis::Size
 int64_t idSoundDecoder_Vorbis::Size( void )
 {
 	vorbis_info* vi = ov_info( vorbisFile, -1 );
-	int64 mdwSize = ov_pcm_total( vorbisFile, -1 ) * vi->channels;
+	int64_t mdwSize = ov_pcm_total( vorbisFile, -1 ) * vi->channels;
 	return mdwSize * sizeof( short );
 }
 

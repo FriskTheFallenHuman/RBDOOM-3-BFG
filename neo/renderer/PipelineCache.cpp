@@ -96,10 +96,10 @@ nvrhi::GraphicsPipelineHandle PipelineCache::GetOrCreatePipeline( const Pipeline
 }
 
 
-void PipelineCache::GetRenderState( uint64 stateBits, PipelineKey key, nvrhi::RenderState& renderState )
+void PipelineCache::GetRenderState( uint64_t stateBits, PipelineKey key, nvrhi::RenderState& renderState )
 {
 	/*
-	uint64 diff = stateBits ^ GLS_DEFAULT;
+	uint64_t diff = stateBits ^ GLS_DEFAULT;
 
 	if( diff == 0 )
 	{
@@ -376,8 +376,8 @@ void PipelineCache::GetRenderState( uint64 stateBits, PipelineKey key, nvrhi::Re
 
 	if( stateBits & ( GLS_STENCIL_FUNC_BITS | GLS_STENCIL_FUNC_REF_BITS | GLS_STENCIL_FUNC_MASK_BITS ) )
 	{
-		uint32 ref = uint32( ( stateBits & GLS_STENCIL_FUNC_REF_BITS ) >> GLS_STENCIL_FUNC_REF_SHIFT );
-		uint32 mask = uint32( ( stateBits & GLS_STENCIL_FUNC_MASK_BITS ) >> GLS_STENCIL_FUNC_MASK_SHIFT );
+		uint32_t ref = uint32_t( ( stateBits & GLS_STENCIL_FUNC_REF_BITS ) >> GLS_STENCIL_FUNC_REF_SHIFT );
+		uint32_t mask = uint32_t( ( stateBits & GLS_STENCIL_FUNC_MASK_BITS ) >> GLS_STENCIL_FUNC_MASK_SHIFT );
 
 		depthStencilState.setStencilRefValue( ref );
 		depthStencilState.setStencilReadMask( mask );
@@ -435,7 +435,7 @@ void PipelineCache::GetRenderState( uint64 stateBits, PipelineKey key, nvrhi::Re
 	}
 }
 
-nvrhi::DepthStencilState::StencilOpDesc PipelineCache::GetStencilOpState( uint64 stateBits )
+nvrhi::DepthStencilState::StencilOpDesc PipelineCache::GetStencilOpState( uint64_t stateBits )
 {
 	nvrhi::DepthStencilState::StencilOpDesc stencilOp;
 

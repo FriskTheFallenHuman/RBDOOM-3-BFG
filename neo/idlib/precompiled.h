@@ -39,7 +39,7 @@ If you have questions concerning this license or the applicable additional terms
 
 //-----------------------------------------------------
 
-#define ID_TIME_T int64 // Signed because -1 means "File not found" and we don't want that to compare > than any other time
+#define ID_TIME_T int64_t // Signed because -1 means "File not found" and we don't want that to compare > than any other time
 
 // non-portable system services
 #include "../sys/sys_public.h"
@@ -92,7 +92,7 @@ const int MAX_EXPRESSION_REGISTERS = 4096;
 // to be double buffered to allow it to run in
 // parallel on a dual cpu machine
 // SRS - use triple buffering for NVRHI with command queue event query sync method
-constexpr uint32 NUM_FRAME_DATA	= 3;
+constexpr uint32_t NUM_FRAME_DATA	= 3;
 
 #include "nvrhi/nvrhi.h"
 

@@ -60,7 +60,7 @@ idSWF::DefineSprite
 */
 void idSWF::DefineSprite( idSWFBitStream& bitstream )
 {
-	uint16 characterID = bitstream.ReadU16();
+	uint16_t characterID = bitstream.ReadU16();
 	idSWFDictionaryEntry* entry = AddDictionaryEntry( characterID, SWF_DICT_SPRITE );
 	if( entry == NULL )
 	{
@@ -87,8 +87,8 @@ void idSWFSprite::Load( idSWFBitStream& bitstream, bool parseDictionary )
 
 	while( true )
 	{
-		uint16 codeAndLength = bitstream.ReadU16();
-		uint32 recordLength = ( codeAndLength & 0x3F );
+		uint16_t codeAndLength = bitstream.ReadU16();
+		uint32_t recordLength = ( codeAndLength & 0x3F );
 		if( recordLength == 0x3F )
 		{
 			recordLength = bitstream.ReadU32();
@@ -209,7 +209,7 @@ void idSWFSprite::Read( idFile* f )
 		f->ReadString( frameLabels[i].frameLabel );
 	}
 
-	uint32 bufferSize;
+	uint32_t bufferSize;
 	f->ReadBig( bufferSize );
 
 	commandBuffer = ( byte* )Mem_Alloc( bufferSize, TAG_SWF );
@@ -221,7 +221,7 @@ void idSWFSprite::Read( idFile* f )
 	commands.SetNum( num );
 	for( int i = 0; i < commands.Num(); i++ )
 	{
-		uint32 streamLength = 0;
+		uint32_t streamLength = 0;
 
 		f->ReadBig( commands[i].tag );
 		f->ReadBig( streamLength );
@@ -230,7 +230,7 @@ void idSWFSprite::Read( idFile* f )
 		currentBuffer += streamLength;
 	}
 
-	uint32 doInitActionLength = 0;
+	uint32_t doInitActionLength = 0;
 	f->ReadBig( num );
 	doInitActions.SetNum( num );
 	for( int i = 0; i < num; i++ )
@@ -258,7 +258,7 @@ void idSWFSprite::Write( idFile* f )
 		f->WriteBig( frameLabels[i].frameNum );
 		f->WriteString( frameLabels[i].frameLabel );
 	}
-	uint32 totalLength = 0;
+	uint32_t totalLength = 0;
 	for( int i = 0; i < commands.Num(); i++ )
 	{
 		totalLength += commands[i].stream.Length();
@@ -336,8 +336,8 @@ void idSWFSprite::ReadJSON( rapidjson::Value& entry )
 
 			idFile_SWF file( new idFile_Memory() );
 
-			uint8 flags1 = 0;
-			uint8 flags2 = 0;
+			uint8_t flags1 = 0;
+			uint8_t flags2 = 0;
 			if( type == "Tag_PlaceObject3" )
 			{
 				flags1 = command["flags1"].GetUint();
@@ -352,12 +352,12 @@ void idSWFSprite::ReadJSON( rapidjson::Value& entry )
 				file.WriteU8( flags1 );
 			}
 
-			uint16 depth = command["depth"].GetUint();
+			uint16_t depth = command["depth"].GetUint();
 			file.WriteU16( depth );
 
 			if( ( flags1 & PlaceFlagHasCharacter ) != 0 )
 			{
-				uint16 characterID = command["characterID"].GetUint();
+				uint16_t characterID = command["characterID"].GetUint();
 				file.WriteU16( characterID );
 			}
 
@@ -398,7 +398,7 @@ void idSWFSprite::ReadJSON( rapidjson::Value& entry )
 
 			if( ( flags1 & PlaceFlagHasRatio ) != 0 )
 			{
-				uint16 ratio = command["ratio"].GetUint();
+				uint16_t ratio = command["ratio"].GetUint();
 				file.WriteU16( ratio );
 			}
 
@@ -417,13 +417,13 @@ void idSWFSprite::ReadJSON( rapidjson::Value& entry )
 
 			if( ( flags1 & PlaceFlagHasClipDepth ) != 0 )
 			{
-				uint16 clipDepth = command["clipDepth"].GetUint();
+				uint16_t clipDepth = command["clipDepth"].GetUint();
 				file.WriteU16( clipDepth );
 			}
 
 			if( ( flags2 & PlaceFlagHasBlendMode ) != 0 )
 			{
-				uint8 blendMode = command["blendMode"].GetUint();
+				uint8_t blendMode = command["blendMode"].GetUint();
 				file.WriteU8( blendMode );
 			}
 
@@ -432,7 +432,7 @@ void idSWFSprite::ReadJSON( rapidjson::Value& entry )
 				// FIXME: clip actions
 			}
 
-			uint32 streamLength = file->Length();
+			uint32_t streamLength = file->Length();
 			commands[i].stream.Load( ( byte* ) static_cast<idFile_Memory*>( ( idFile* )file )->GetDataPtr(), streamLength, true );
 		}
 		else if( type == "Tag_RemoveObject2" )
@@ -441,10 +441,10 @@ void idSWFSprite::ReadJSON( rapidjson::Value& entry )
 
 			idFile_SWF file( new idFile_Memory() );
 
-			uint16 depth = command["depth"].GetUint();
+			uint16_t depth = command["depth"].GetUint();
 			file.WriteU16( depth );
 
-			uint32 streamLength = file->Length();
+			uint32_t streamLength = file->Length();
 			commands[i].stream.Load( ( byte* ) static_cast<idFile_Memory*>( ( idFile* )file )->GetDataPtr(), streamLength, true );
 		}
 		else if( type == "Tag_DoAction" )
@@ -456,7 +456,7 @@ void idSWFSprite::ReadJSON( rapidjson::Value& entry )
 			idBase64 base64( command["stream"].GetString() );
 			base64.Decode( file );
 
-			uint32 streamLength = file->Length() - 1; // skip trailing zero added by Decode()
+			uint32_t streamLength = file->Length() - 1; // skip trailing zero added by Decode()
 			commands[i].stream.Load( ( byte* ) static_cast<idFile_Memory*>( ( idFile* )file )->GetDataPtr(), streamLength, true );
 		}
 
@@ -543,7 +543,7 @@ void idSWFSprite::WriteJSON( idFile* f, int characterID )
 
 void idSWFSprite::WriteJSON_PlaceObject2( idFile* file, idSWFBitStream& bitstream, int sourceCharacterID, int commandID, const char* indentPrefix )
 {
-	uint8 flags1 = bitstream.ReadU8();
+	uint8_t flags1 = bitstream.ReadU8();
 	int depth = bitstream.ReadU16();
 
 	file->WriteFloatString( "%s\t\t\t\t{\n", ( commandID != 0 ) ? ",\n" : "" );
@@ -582,7 +582,7 @@ void idSWFSprite::WriteJSON_PlaceObject2( idFile* file, idSWFBitStream& bitstrea
 
 	if( ( flags1 & PlaceFlagHasRatio ) != 0 )
 	{
-		uint16 ratio = bitstream.ReadU16();
+		uint16_t ratio = bitstream.ReadU16();
 		file->WriteFloatString( ",\n\t\t\t\t\t\"ratio\": %i", ratio );
 	}
 
@@ -605,7 +605,7 @@ void idSWFSprite::WriteJSON_PlaceObject2( idFile* file, idSWFBitStream& bitstrea
 
 	if( ( flags1 & PlaceFlagHasClipDepth ) != 0 )
 	{
-		uint16 clipDepth = bitstream.ReadU16();
+		uint16_t clipDepth = bitstream.ReadU16();
 		file->WriteFloatString( ",\n\t\t\t\t\t\"clipDepth\": %i", clipDepth );
 	}
 
@@ -620,9 +620,9 @@ void idSWFSprite::WriteJSON_PlaceObject2( idFile* file, idSWFBitStream& bitstrea
 
 void idSWFSprite::WriteJSON_PlaceObject3( idFile* file, idSWFBitStream& bitstream, int sourceCharacterID, int commandID, const char* indentPrefix )
 {
-	uint8 flags1 = bitstream.ReadU8();
-	uint8 flags2 = bitstream.ReadU8();
-	uint16 depth = bitstream.ReadU16();
+	uint8_t flags1 = bitstream.ReadU8();
+	uint8_t flags2 = bitstream.ReadU8();
+	uint16_t depth = bitstream.ReadU16();
 
 	file->WriteFloatString( "%s\t\t\t\t{\n", ( commandID != 0 ) ? ",\n" : "" );
 	file->WriteFloatString( "\t\t\t\t\t\"type\": \"Tag_PlaceObject3\",\n" );
@@ -660,7 +660,7 @@ void idSWFSprite::WriteJSON_PlaceObject3( idFile* file, idSWFBitStream& bitstrea
 
 	if( ( flags1 & PlaceFlagHasRatio ) != 0 )
 	{
-		uint16 ratio = bitstream.ReadU16();
+		uint16_t ratio = bitstream.ReadU16();
 		file->WriteFloatString( ",\n\t\t\t\t\t\"ratio\": %i", ratio );
 	}
 
@@ -683,7 +683,7 @@ void idSWFSprite::WriteJSON_PlaceObject3( idFile* file, idSWFBitStream& bitstrea
 
 	if( ( flags1 & PlaceFlagHasClipDepth ) != 0 )
 	{
-		uint16 clipDepth = bitstream.ReadU16();
+		uint16_t clipDepth = bitstream.ReadU16();
 		file->WriteFloatString( ",\n\t\t\t\t\t\"clipDepth\": %i", clipDepth );
 	}
 
@@ -698,7 +698,7 @@ void idSWFSprite::WriteJSON_PlaceObject3( idFile* file, idSWFBitStream& bitstrea
 
 	if( ( flags2 & PlaceFlagHasBlendMode ) != 0 )
 	{
-		uint8 blendMode = bitstream.ReadU8();
+		uint8_t blendMode = bitstream.ReadU8();
 		file->WriteFloatString( ",\n\t\t\t\t\t\"blendMode\": %i", blendMode );
 	}
 

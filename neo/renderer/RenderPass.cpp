@@ -323,7 +323,7 @@ void BasicTriangle::Render( nvrhi::IFramebuffer* framebuffer )
 		}
 		else
 		{
-			const uint64 frameNum = ( int )( vertexBlock >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
+			const uint64_t frameNum = ( int )( vertexBlock >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
 			if( frameNum != ( ( vertexCache.currentFrame ) & VERTCACHE_FRAME_MASK ) )
 			{
 				idLib::Warning( "RB_DrawElementsWithCounters, vertexBuffer == NULL" );
@@ -334,7 +334,7 @@ void BasicTriangle::Render( nvrhi::IFramebuffer* framebuffer )
 		vertOffset = ( uint )( vertexBlock >> VERTCACHE_OFFSET_SHIFT ) & VERTCACHE_OFFSET_MASK;
 	}
 
-	vertCacheHandle_t indexBlockTemp = indexBlock + ( ( int64 )( 0 * sizeof( triIndex_t ) ) << VERTCACHE_OFFSET_SHIFT );
+	vertCacheHandle_t indexBlockTemp = indexBlock + ( ( int64_t )( 0 * sizeof( triIndex_t ) ) << VERTCACHE_OFFSET_SHIFT );
 
 	idIndexBuffer* indexBuffer;
 	uint indexOffset = 0;
@@ -344,7 +344,7 @@ void BasicTriangle::Render( nvrhi::IFramebuffer* framebuffer )
 	}
 	else
 	{
-		const uint64 frameNum = ( int )( indexBlockTemp >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
+		const uint64_t frameNum = ( int )( indexBlockTemp >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
 		if( frameNum != ( ( vertexCache.currentFrame ) & VERTCACHE_FRAME_MASK ) )
 		{
 			idLib::Warning( "RB_DrawElementsWithCounters, indexBuffer == NULL" );

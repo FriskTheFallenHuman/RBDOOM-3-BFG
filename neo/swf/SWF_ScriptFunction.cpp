@@ -720,7 +720,7 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 	while( bitstream.Tell() < bitstream.Length() )
 	{
 		swfAction_t code = ( swfAction_t )bitstream.ReadU8();
-		uint16 recordLength = 0;
+		uint16_t recordLength = 0;
 		if( code >= 0x80 )
 		{
 			recordLength = bitstream.ReadU16();
@@ -845,7 +845,7 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 				idSWFBitStream pushstream( bitstream.ReadData( recordLength ), recordLength, false );
 				while( pushstream.Tell() < pushstream.Length() )
 				{
-					uint8 type = pushstream.ReadU8();
+					uint8_t type = pushstream.ReadU8();
 					switch( type )
 					{
 						case 0:
@@ -957,7 +957,7 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 				break;
 			case Action_If:
 			{
-				int16 offset = bitstream.ReadS16();
+				int16_t offset = bitstream.ReadS16();
 				if( stack.A().ToBool() )
 				{
 					bitstream.Seek( offset );
@@ -1005,8 +1005,8 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 			case Action_GotoFrame2:
 			{
 
-				uint32 frameNum = 0;
-				uint8 flags = bitstream.ReadU8();
+				uint32_t frameNum = 0;
+				uint8_t flags = bitstream.ReadU8();
 				if( flags & 2 )
 				{
 					frameNum += bitstream.ReadU16();
@@ -1020,7 +1020,7 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 					}
 					else
 					{
-						frameNum += ( uint32 )stack.A().ToInteger();
+						frameNum += ( uint32_t )stack.A().ToInteger();
 					}
 					if( ( flags & 1 ) != 0 )
 					{
@@ -1170,7 +1170,7 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 			case Action_ConstantPool:
 			{
 				constants.Clear();
-				uint16 numConstants = bitstream.ReadU16();
+				uint16_t numConstants = bitstream.ReadU16();
 				for( int i = 0; i < numConstants; i++ )
 				{
 					constants.Append( idSWFScriptString::Alloc( bitstream.ReadString() ) );
@@ -1186,13 +1186,13 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 				newFunction->SetConstants( constants );
 				newFunction->SetDefaultSprite( defaultSprite );
 
-				uint16 numParms = bitstream.ReadU16();
+				uint16_t numParms = bitstream.ReadU16();
 				newFunction->AllocParameters( numParms );
 				for( int i = 0; i < numParms; i++ )
 				{
 					newFunction->SetParameter( i, 0, bitstream.ReadString() );
 				}
-				uint16 codeSize = bitstream.ReadU16();
+				uint16_t codeSize = bitstream.ReadU16();
 				newFunction->SetData( bitstream.ReadData( codeSize ), codeSize );
 
 				if( functionName.IsEmpty() )
@@ -1215,16 +1215,16 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 				newFunction->SetConstants( constants );
 				newFunction->SetDefaultSprite( defaultSprite );
 
-				uint16 numParms = bitstream.ReadU16();
+				uint16_t numParms = bitstream.ReadU16();
 
 				// The number of registers is from 0 to 255, although valid values are 1 to 256.
 				// There must always be at least one register for DefineFunction2, to hold "this" or "super" when required.
-				uint8 numRegs = bitstream.ReadU8() + 1;
+				uint8_t numRegs = bitstream.ReadU8() + 1;
 
 				// Note that SWF byte-ordering causes the flag bits to be reversed per-byte
 				// from how the swf_file_format_spec_v10.pdf document describes the ordering in ActionDefineFunction2.
 				// PreloadThisFlag is byte 0, not 7, PreloadGlobalFlag is 8, not 15.
-				uint16 flags = bitstream.ReadU16();
+				uint16_t flags = bitstream.ReadU16();
 
 				newFunction->AllocParameters( numParms );
 				newFunction->AllocRegisters( numRegs );
@@ -1232,7 +1232,7 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 
 				for( int i = 0; i < numParms; i++ )
 				{
-					uint8 reg = bitstream.ReadU8();
+					uint8_t reg = bitstream.ReadU8();
 					const char* name = bitstream.ReadString();
 					if( reg >= numRegs )
 					{
@@ -1242,7 +1242,7 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 					newFunction->SetParameter( i, reg, name );
 				}
 
-				uint16 codeSize = bitstream.ReadU16();
+				uint16_t codeSize = bitstream.ReadU16();
 				newFunction->SetData( bitstream.ReadData( codeSize ), codeSize );
 
 				if( functionName.IsEmpty() )
@@ -1611,8 +1611,8 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 			}
 			case Action_Modulo:
 			{
-				int32 a = stack.A().ToInteger();
-				int32 b = stack.B().ToInteger();
+				int32_t a = stack.A().ToInteger();
+				int32_t b = stack.B().ToInteger();
 				if( a == 0 )
 				{
 					stack.B().SetUndefined();
@@ -1641,7 +1641,7 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 				stack.Pop( 1 );
 				break;
 			case Action_BitURShift:
-				stack.B().SetInteger( ( uint32 )stack.B().ToInteger() >> stack.A().ToInteger() );
+				stack.B().SetInteger( ( uint32_t )stack.B().ToInteger() >> stack.A().ToInteger() );
 				stack.Pop( 1 );
 				break;
 			case Action_BitXor:
@@ -1669,7 +1669,7 @@ idSWFScriptVar idSWFScriptFunction_Script::Run( idSWFScriptObject* thisObject, i
 			}
 			case Action_StoreRegister:
 			{
-				uint8 registerNumber = bitstream.ReadU8();
+				uint8_t registerNumber = bitstream.ReadU8();
 				registers[ registerNumber ] = stack.A();
 				break;
 			}
@@ -1810,7 +1810,7 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 	while( bitstream.Tell() < bitstream.Length() )
 	{
 		swfAction_t code = ( swfAction_t )bitstream.ReadU8();
-		uint16 recordLength = 0;
+		uint16_t recordLength = 0;
 		if( code >= 0x80 )
 		{
 			recordLength = bitstream.ReadU16();
@@ -1896,7 +1896,7 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 				idSWFBitStream pushstream( bitstream.ReadData( recordLength ), recordLength, false );
 				while( pushstream.Tell() < pushstream.Length() )
 				{
-					uint8 type = pushstream.ReadU8();
+					uint8_t type = pushstream.ReadU8();
 					switch( type )
 					{
 						case 0:
@@ -2042,7 +2042,7 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 			{
 				AddBlock( va( "if( %s ) then\n", stack.A().ToString().c_str() ) );
 
-				int16 offset = bitstream.ReadS16();
+				int16_t offset = bitstream.ReadS16();
 				//if( stack.A().ToBool() )
 				//{
 				//	bitstream.Seek( offset );
@@ -2111,8 +2111,8 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 			case Action_GotoFrame2:
 			{
 
-				uint32 frameNum = 0;
-				uint8 flags = bitstream.ReadU8();
+				uint32_t frameNum = 0;
+				uint8_t flags = bitstream.ReadU8();
 				if( flags & 2 )
 				{
 					frameNum += bitstream.ReadU16();
@@ -2293,7 +2293,7 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 			case Action_ConstantPool:
 			{
 				constants.Clear();
-				uint16 numConstants = bitstream.ReadU16();
+				uint16_t numConstants = bitstream.ReadU16();
 				for( int i = 0; i < numConstants; i++ )
 				{
 					constants.Append( idSWFScriptString::Alloc( bitstream.ReadString() ) );
@@ -2319,7 +2319,7 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 					line = va( "function %s( ", functionName.c_str() );
 				}
 
-				uint16 numParms = bitstream.ReadU16();
+				uint16_t numParms = bitstream.ReadU16();
 				newFunction->AllocParameters( numParms );
 				for( int i = 0; i < numParms; i++ )
 				{
@@ -2339,7 +2339,7 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 
 				line += ")";
 
-				uint16 codeSize = bitstream.ReadU16();
+				uint16_t codeSize = bitstream.ReadU16();
 				newFunction->SetData( bitstream.ReadData( codeSize ), codeSize );
 
 				if( functionName.IsEmpty() )
@@ -2370,16 +2370,16 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 				newFunction->SetConstants( constants );
 				newFunction->SetDefaultSprite( defaultSprite );
 
-				uint16 numParms = bitstream.ReadU16();
+				uint16_t numParms = bitstream.ReadU16();
 
 				// The number of registers is from 0 to 255, although valid values are 1 to 256.
 				// There must always be at least one register for DefineFunction2, to hold "this" or "super" when required.
-				uint8 numRegs = bitstream.ReadU8() + 1;
+				uint8_t numRegs = bitstream.ReadU8() + 1;
 
 				// Note that SWF byte-ordering causes the flag bits to be reversed per-byte
 				// from how the swf_file_format_spec_v10.pdf document describes the ordering in ActionDefineFunction2.
 				// PreloadThisFlag is byte 0, not 7, PreloadGlobalFlag is 8, not 15.
-				uint16 flags = bitstream.ReadU16();
+				uint16_t flags = bitstream.ReadU16();
 
 				newFunction->AllocParameters( numParms );
 				newFunction->AllocRegisters( numRegs );
@@ -2397,7 +2397,7 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 
 				for( int i = 0; i < numParms; i++ )
 				{
-					uint8 reg = bitstream.ReadU8();
+					uint8_t reg = bitstream.ReadU8();
 					const char* name = bitstream.ReadString();
 					if( reg >= numRegs )
 					{
@@ -2424,7 +2424,7 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 				}
 				AddBlock( line );
 
-				uint16 codeSize = bitstream.ReadU16();
+				uint16_t codeSize = bitstream.ReadU16();
 				newFunction->SetData( bitstream.ReadData( codeSize ), codeSize );
 
 				/*
@@ -2861,8 +2861,8 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 			}
 			case Action_Modulo:
 			{
-				int32 a = stack.A().ToInteger();
-				int32 b = stack.B().ToInteger();
+				int32_t a = stack.A().ToInteger();
+				int32_t b = stack.B().ToInteger();
 				if( a == 0 )
 				{
 					stack.B().SetUndefined();
@@ -2891,7 +2891,7 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 				stack.Pop( 1 );
 				break;
 			case Action_BitURShift:
-				stack.B().SetInteger( ( uint32 )stack.B().ToInteger() >> stack.A().ToInteger() );
+				stack.B().SetInteger( ( uint32_t )stack.B().ToInteger() >> stack.A().ToInteger() );
 				stack.Pop( 1 );
 				break;
 			case Action_BitXor:
@@ -2929,7 +2929,7 @@ idStr idSWFScriptFunction_Script::ExportToScript( idSWFScriptObject* thisObject,
 			}
 			case Action_StoreRegister:
 			{
-				uint8 registerNumber = bitstream.ReadU8();
+				uint8_t registerNumber = bitstream.ReadU8();
 				registers[ registerNumber ] = stack.A();
 				break;
 			}

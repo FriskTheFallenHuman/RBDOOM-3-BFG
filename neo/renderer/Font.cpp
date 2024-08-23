@@ -205,7 +205,7 @@ bool idFont::LoadFont()
 	const int FONT_INFO_VERSION = 42;
 	const int FONT_INFO_MAGIC = ( FONT_INFO_VERSION | ( 'i' << 24 ) | ( 'd' << 16 ) | ( 'f' << 8 ) );
 
-	uint32 version = 0;
+	uint32_t version = 0;
 	fd->ReadBig( version );
 	if( version != FONT_INFO_MAGIC )
 	{
@@ -227,7 +227,7 @@ bool idFont::LoadFont()
 	fd->ReadBig( fontInfo->numGlyphs );
 
 	fontInfo->glyphData = ( glyphInfo_t* )Mem_Alloc( sizeof( glyphInfo_t ) * fontInfo->numGlyphs, TAG_FONT );
-	fontInfo->charIndex = ( uint32* )Mem_Alloc( sizeof( uint32 ) * fontInfo->numGlyphs, TAG_FONT );
+	fontInfo->charIndex = ( uint32_t* )Mem_Alloc( sizeof( uint32_t ) * fontInfo->numGlyphs, TAG_FONT );
 
 	fd->Read( fontInfo->glyphData, fontInfo->numGlyphs * sizeof( glyphInfo_t ) );
 
@@ -242,7 +242,7 @@ bool idFont::LoadFont()
 		idSwap::Little( fontInfo->glyphData[i].t );
 	}
 
-	fd->Read( fontInfo->charIndex, fontInfo->numGlyphs * sizeof( uint32 ) );
+	fd->Read( fontInfo->charIndex, fontInfo->numGlyphs * sizeof( uint32_t ) );
 	idSwap::LittleArray( fontInfo->charIndex, fontInfo->numGlyphs );
 
 	memset( fontInfo->ascii, -1, sizeof( fontInfo->ascii ) );
@@ -318,7 +318,7 @@ bool idFont::LoadFont()
 idFont::GetGlyphIndex
 ==============================
 */
-int	idFont::GetGlyphIndex( uint32 idx ) const
+int	idFont::GetGlyphIndex( uint32_t idx ) const
 {
 	if( idx < 128 )
 	{
@@ -406,7 +406,7 @@ float idFont::GetMaxCharWidth( float scale ) const
 idFont::GetGlyphWidth
 ==============================
 */
-float idFont::GetGlyphWidth( float scale, uint32 idx ) const
+float idFont::GetGlyphWidth( float scale, uint32_t idx ) const
 {
 	if( alias != NULL )
 	{
@@ -433,7 +433,7 @@ float idFont::GetGlyphWidth( float scale, uint32 idx ) const
 idFont::GetScaledGlyph
 ==============================
 */
-void idFont::GetScaledGlyph( float scale, uint32 idx, scaledGlyphInfo_t& glyphInfo ) const
+void idFont::GetScaledGlyph( float scale, uint32_t idx, scaledGlyphInfo_t& glyphInfo ) const
 {
 	if( alias != NULL )
 	{

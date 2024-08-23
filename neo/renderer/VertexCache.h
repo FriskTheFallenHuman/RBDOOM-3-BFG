@@ -45,7 +45,7 @@ If you have questions concerning this license or the applicable additional terms
 	const int STATIC_VERTEX_MEMORY = 4 * 31 * 1024 * 1024;	// make sure it fits in VERTCACHE_OFFSET_MASK!
 
 	// vertCacheHandle_t packs size, offset, and frame number into 64 bits
-	typedef uint64 vertCacheHandle_t;
+	typedef uint64_t vertCacheHandle_t;
 	const int VERTCACHE_STATIC = 1;						// in the static set, not the per-frame set
 
 	const int VERTCACHE_SIZE_SHIFT = 1;
@@ -72,7 +72,7 @@ If you have questions concerning this license or the applicable additional terms
 	const int STATIC_VERTEX_MEMORY = 31 * 1024 * 1024;	// make sure it fits in VERTCACHE_OFFSET_MASK!
 
 	// vertCacheHandle_t packs size, offset, and frame number into 64 bits
-	typedef uint64 vertCacheHandle_t;
+	typedef uint64_t vertCacheHandle_t;
 	const int VERTCACHE_STATIC = 1;					// in the static set, not the per-frame set
 	const int VERTCACHE_SIZE_SHIFT = 1;
 	const int VERTCACHE_SIZE_MASK = 0x7fffff;		// 8 megs

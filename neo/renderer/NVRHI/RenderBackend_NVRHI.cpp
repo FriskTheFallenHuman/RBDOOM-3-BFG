@@ -325,7 +325,7 @@ void idRenderBackend::DrawElementsWithCounters( const drawSurf_t* surf, bool sha
 	}
 	else
 	{
-		const uint64 frameNum = static_cast<uint64>( vbHandle >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
+		const uint64_t frameNum = static_cast<uint64_t>( vbHandle >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
 		if( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
 		{
 			idLib::Warning( "RB_DrawElementsWithCounters, vertexBuffer == NULL" );
@@ -359,7 +359,7 @@ void idRenderBackend::DrawElementsWithCounters( const drawSurf_t* surf, bool sha
 	}
 	else
 	{
-		const uint64 frameNum = static_cast<uint64>( ibHandle >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
+		const uint64_t frameNum = static_cast<uint64_t>( ibHandle >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
 		if( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
 		{
 			idLib::Warning( "RB_DrawElementsWithCounters, indexBuffer == NULL" );
@@ -415,7 +415,7 @@ void idRenderBackend::DrawElementsWithCounters( const drawSurf_t* surf, bool sha
 		}
 		else
 		{
-			const uint64 frameNum = static_cast<uint64>( jointHandle >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
+			const uint64_t frameNum = static_cast<uint64_t>( jointHandle >> VERTCACHE_FRAME_SHIFT ) & VERTCACHE_FRAME_MASK;
 			if( frameNum != ( ( vertexCache.currentFrame - 1 ) & VERTCACHE_FRAME_MASK ) )
 			{
 				idLib::Warning( "RB_DrawElementsWithCounters, jointBuffer == NULL" );
@@ -1667,7 +1667,7 @@ idRenderBackend::GL_State
 This routine is responsible for setting the most commonly changed state
 ====================
 */
-void idRenderBackend::GL_State( uint64 stateBits, bool forceGlState )
+void idRenderBackend::GL_State( uint64_t stateBits, bool forceGlState )
 {
 	glStateBits = stateBits | ( glStateBits & GLS_KEEP );
 	if( viewDef != NULL && viewDef->isMirror )
@@ -1802,7 +1802,7 @@ void idRenderBackend::GL_Clear( bool color, bool depth, bool stencil, byte stenc
 idRenderBackend::GL_GetCurrentState
 =================
 */
-uint64 idRenderBackend::GL_GetCurrentState() const
+uint64_t idRenderBackend::GL_GetCurrentState() const
 {
 	return glStateBits;
 }
@@ -1812,7 +1812,7 @@ uint64 idRenderBackend::GL_GetCurrentState() const
 idRenderBackend::GL_GetCurrentStateMinusStencil
 ========================
 */
-uint64 idRenderBackend::GL_GetCurrentStateMinusStencil() const
+uint64_t idRenderBackend::GL_GetCurrentStateMinusStencil() const
 {
 	return GL_GetCurrentState() & ~( GLS_STENCIL_OP_BITS | GLS_STENCIL_FUNC_BITS | GLS_STENCIL_FUNC_REF_BITS | GLS_STENCIL_FUNC_MASK_BITS );
 }

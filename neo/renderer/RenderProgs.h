@@ -434,7 +434,7 @@ public:
 	void	SetRenderParms( renderParm_t rp, const float values[], int numValues );
 
 	int		FindShader( const char* name, rpStage_t stage );
-	int		FindShader( const char* name, rpStage_t stage, const char* nameOutSuffix, uint32 features, bool builtin, vertexLayoutType_t vertexLayout = LAYOUT_DRAW_VERT );
+	int		FindShader( const char* name, rpStage_t stage, const char* nameOutSuffix, uint32_t features, bool builtin, vertexLayoutType_t vertexLayout = LAYOUT_DRAW_VERT );
 	int		FindShader( const char* name, rpStage_t stage, const char* nameOutSuffix, const idList<shaderMacro_t>& macros, bool builtin, vertexLayoutType_t vertexLayout = LAYOUT_DRAW_VERT );
 
 	nvrhi::ShaderHandle GetShader( int index );
@@ -955,7 +955,7 @@ public:
 	const char*	GetGLSLParmName( int rp ) const;
 
 	void		SetUniformValue( const renderParm_t rp, const float value[4] );
-	void		CommitUniforms( uint64 stateBits );
+	void		CommitUniforms( uint64_t stateBits );
 	int			FindProgram( const char* name, int vIndex, int fIndex, bindingLayoutType_t bindingType = BINDING_LAYOUT_DEFAULT );
 	void		ZeroUniforms();
 	int			UniformSize();
@@ -1021,7 +1021,7 @@ private:
 
 		idStr						name;
 		idStr						nameOutSuffix;
-		uint32						shaderFeatures;
+		uint32_t						shaderFeatures;
 		bool						builtin;
 		idList<shaderMacro_t>		macros;
 		nvrhi::ShaderHandle			handle;

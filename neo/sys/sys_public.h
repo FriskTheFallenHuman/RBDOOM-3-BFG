@@ -518,7 +518,7 @@ void			Sys_Sleep( int msec );
 // Sys_Milliseconds should only be used for profiling purposes,
 // any game related timing information should come from event timestamps
 int				Sys_Milliseconds();
-uint64			Sys_Microseconds();
+uint64_t			Sys_Microseconds();
 
 // for accurate performance testing
 double			Sys_GetClockTicks();
@@ -556,7 +556,7 @@ void			Sys_FPU_SetDAZ( bool enable );
 int				Sys_GetDriveFreeSpace( const char* path );
 
 // returns amount of drive space in path in bytes
-int64			Sys_GetDriveFreeSpaceInBytes( const char* path );
+int64_t			Sys_GetDriveFreeSpaceInBytes( const char* path );
 
 // returns memory stats
 void			Sys_GetCurrentMemoryStatus( sysMemoryStats_t& stats );
@@ -711,7 +711,7 @@ public:
 	{
 		return bound_to;
 	}
-	uint32		GetUIntAdr() const
+	uint32_t		GetUIntAdr() const
 	{
 		return ( bound_to.ip[0] | bound_to.ip[1] << 8 | bound_to.ip[2] << 16 | bound_to.ip[3] << 24 );
 	}

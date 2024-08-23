@@ -30,7 +30,7 @@ If you have questions concerning this license or the applicable additional terms
 
 struct PipelineKey
 {
-	uint64 state;
+	uint64_t state;
 	int program;
 	int depthBias;
 	float slopeBias;
@@ -77,8 +77,8 @@ public:
 
 private:
 
-	void GetRenderState( uint64 stateBits, PipelineKey key, nvrhi::RenderState& renderState );
-	nvrhi::DepthStencilState::StencilOpDesc GetStencilOpState( uint64 stateBits );
+	void GetRenderState( uint64_t stateBits, PipelineKey key, nvrhi::RenderState& renderState );
+	nvrhi::DepthStencilState::StencilOpDesc GetStencilOpState( uint64_t stateBits );
 
 	nvrhi::DeviceHandle												device;
 	idHashIndex														pipelineHash;

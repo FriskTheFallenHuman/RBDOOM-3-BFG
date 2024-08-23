@@ -69,7 +69,7 @@ void idLobby::UpdateSnaps()
 	SCOPED_PROFILE_EVENT( "UpdateSnaps" );
 
 #if 0
-	uint64 startTimeMicroSec = Sys_Microseconds();
+	uint64_t startTimeMicroSec = Sys_Microseconds();
 #endif
 
 	haveSubmittedSnaps = false;
@@ -102,7 +102,7 @@ void idLobby::UpdateSnaps()
 	}
 
 #if 0
-	uint64 endTimeMicroSec = Sys_Microseconds();
+	uint64_t endTimeMicroSec = Sys_Microseconds();
 
 	if( endTimeMicroSec - startTimeMicroSec > 200 )  	// .2 ms
 	{

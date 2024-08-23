@@ -854,7 +854,7 @@ void idRenderProgManager::SetRenderParm( renderParm_t rp, const float value[4] )
 RpPrintState
 ========================
 */
-void RpPrintState( uint64 stateBits )
+void RpPrintState( uint64_t stateBits )
 {
 
 	// culling
@@ -983,7 +983,7 @@ void RpPrintState( uint64 stateBits )
 	idLib::Printf( "DepthBias: %s\n", ( stateBits & GLS_POLYGON_OFFSET ) ? "TRUE" : "FALSE" );
 
 	// stencil
-	auto printStencil = [&]( stencilFace_t face, uint64 bits, uint64 mask, uint64 ref )
+	auto printStencil = [&]( stencilFace_t face, uint64_t bits, uint64_t mask, uint64_t ref )
 	{
 		idLib::Printf( "Stencil: %s, ", ( bits & ( GLS_STENCIL_FUNC_BITS | GLS_STENCIL_OP_BITS ) ) ? "ON" : "OFF" );
 		idLib::Printf( "Face=" );
@@ -1126,8 +1126,8 @@ void RpPrintState( uint64 stateBits )
 		idLib::Printf( ", mask=%llu, ref=%llu\n", mask, ref );
 	};
 
-	uint32 mask = uint32( ( stateBits & GLS_STENCIL_FUNC_MASK_BITS ) >> GLS_STENCIL_FUNC_MASK_SHIFT );
-	uint32 ref = uint32( ( stateBits & GLS_STENCIL_FUNC_REF_BITS ) >> GLS_STENCIL_FUNC_REF_SHIFT );
+	uint32_t mask = uint32_t( ( stateBits & GLS_STENCIL_FUNC_MASK_BITS ) >> GLS_STENCIL_FUNC_MASK_SHIFT );
+	uint32_t ref = uint32_t( ( stateBits & GLS_STENCIL_FUNC_REF_BITS ) >> GLS_STENCIL_FUNC_REF_SHIFT );
 	if( stateBits & GLS_SEPARATE_STENCIL )
 	{
 		printStencil( STENCIL_FACE_FRONT, ( stateBits & GLS_STENCIL_FRONT_OPS ), mask, ref );

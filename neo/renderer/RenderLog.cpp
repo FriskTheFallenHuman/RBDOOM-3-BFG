@@ -62,7 +62,7 @@ const char* renderLogMainBlockLabels[] =
 	ASSERT_ENUM_STRING( MRB_TOTAL,							20 )
 };
 
-extern uint64 Sys_Microseconds();
+extern uint64_t Sys_Microseconds();
 
 /*
 ========================

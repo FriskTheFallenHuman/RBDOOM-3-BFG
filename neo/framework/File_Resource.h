@@ -77,7 +77,7 @@ public:
 	idResourceContainer* owner;
 };
 
-static const uint32 RESOURCE_FILE_MAGIC = 0xD000000D;
+static const uint32_t RESOURCE_FILE_MAGIC = 0xD000000D;
 class idResourceContainer
 {
 	friend class	idFileSystemLocal;

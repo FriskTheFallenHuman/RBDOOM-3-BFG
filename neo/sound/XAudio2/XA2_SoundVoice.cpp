@@ -491,7 +491,7 @@ float idSoundVoice_XAudio2::GetAmplitude()
 	}
 
 	float rms = 0.0f;
-	for( uint32 i = 0; i < levels.ChannelCount; i++ )
+	for( uint32_t i = 0; i < levels.ChannelCount; i++ )
 	{
 		rms += rmsLevels[i];
 	}
@@ -504,7 +504,7 @@ float idSoundVoice_XAudio2::GetAmplitude()
 idSoundVoice_XAudio2::ResetSampleRate
 ========================
 */
-void idSoundVoice_XAudio2::SetSampleRate( uint32 newSampleRate, uint32 operationSet )
+void idSoundVoice_XAudio2::SetSampleRate( uint32_t newSampleRate, uint32_t operationSet )
 {
 	if( pSourceVoice == NULL || leadinSample == NULL )
 	{

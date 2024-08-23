@@ -126,7 +126,7 @@ struct performanceCounters_t
 	int		c_lightReferences;
 	int		c_guiSurfs;
 
-	uint64	frontEndMicroSec;	// sum of time in all RE_RenderScene's in a frame
+	uint64_t	frontEndMicroSec;	// sum of time in all RE_RenderScene's in a frame
 };
 
 // CPU & GPU counters and timers
@@ -147,27 +147,27 @@ struct backEndCounters_t
 
 	float	c_overDraw;
 
-	uint64	cpuTotalMicroSec;		// total microseconds for backend run
-	uint64	cpuShadowMicroSec;
-	uint64	gpuBeginDrawingMicroSec;
-	uint64	gpuDepthMicroSec;
-	uint64	gpuGeometryMicroSec;
-	uint64	gpuScreenSpaceAmbientOcclusionMicroSec;
-	uint64	gpuScreenSpaceReflectionsMicroSec;
-	uint64	gpuAmbientPassMicroSec;
-	uint64	gpuShadowAtlasPassMicroSec;
-	uint64	gpuInteractionsMicroSec;
-	uint64	gpuShaderPassMicroSec;
-	uint64	gpuFogAllLightsMicroSec;
-	uint64	gpuBloomMicroSec;
-	uint64	gpuShaderPassPostMicroSec;
-	uint64	gpuMotionVectorsMicroSec;
-	uint64	gpuTemporalAntiAliasingMicroSec;
-	uint64	gpuToneMapPassMicroSec;
-	uint64	gpuPostProcessingMicroSec;
-	uint64	gpuDrawGuiMicroSec;
-	uint64	gpuCrtPostProcessingMicroSec;
-	uint64	gpuMicroSec;
+	uint64_t	cpuTotalMicroSec;		// total microseconds for backend run
+	uint64_t	cpuShadowMicroSec;
+	uint64_t	gpuBeginDrawingMicroSec;
+	uint64_t	gpuDepthMicroSec;
+	uint64_t	gpuGeometryMicroSec;
+	uint64_t	gpuScreenSpaceAmbientOcclusionMicroSec;
+	uint64_t	gpuScreenSpaceReflectionsMicroSec;
+	uint64_t	gpuAmbientPassMicroSec;
+	uint64_t	gpuShadowAtlasPassMicroSec;
+	uint64_t	gpuInteractionsMicroSec;
+	uint64_t	gpuShaderPassMicroSec;
+	uint64_t	gpuFogAllLightsMicroSec;
+	uint64_t	gpuBloomMicroSec;
+	uint64_t	gpuShaderPassPostMicroSec;
+	uint64_t	gpuMotionVectorsMicroSec;
+	uint64_t	gpuTemporalAntiAliasingMicroSec;
+	uint64_t	gpuToneMapPassMicroSec;
+	uint64_t	gpuPostProcessingMicroSec;
+	uint64_t	gpuDrawGuiMicroSec;
+	uint64_t	gpuCrtPostProcessingMicroSec;
+	uint64_t	gpuMicroSec;
 };
 // RB end
 
@@ -294,9 +294,9 @@ public:
 		SetColor( idVec4( r, g, b, a ) );
 	}
 
-	virtual uint32			GetColor() = 0;
+	virtual uint32_t			GetColor() = 0;
 
-	virtual void			SetGLState( const uint64 glState ) = 0;
+	virtual void			SetGLState( const uint64_t glState ) = 0;
 
 	virtual void			DrawFilled( const idVec4& color, float x, float y, float w, float h ) = 0;
 	virtual void			DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const idMaterial* material, float z = 0.0f ) = 0;
@@ -325,11 +325,11 @@ public:
 	//
 	// After this is called, new command buffers can be built up in parallel
 	// with the rendering of the closed off command buffers by RenderCommandBuffers()
-	virtual const emptyCommand_t* 	SwapCommandBuffers( uint64* frontEndMicroSec, uint64* backEndMicroSec, uint64* shadowMicroSec, uint64* gpuMicroSec, backEndCounters_t* bc, performanceCounters_t* pc ) = 0;
+	virtual const emptyCommand_t* 	SwapCommandBuffers( uint64_t* frontEndMicroSec, uint64_t* backEndMicroSec, uint64_t* shadowMicroSec, uint64_t* gpuMicroSec, backEndCounters_t* bc, performanceCounters_t* pc ) = 0;
 
 	// SwapCommandBuffers operation can be split in two parts for non-smp rendering
 	// where the GPU is idled intentionally for minimal latency.
-	virtual void			SwapCommandBuffers_FinishRendering( uint64* frontEndMicroSec, uint64* backEndMicroSec, uint64* shadowMicroSec, uint64* gpuMicroSec, backEndCounters_t* bc, performanceCounters_t* pc ) = 0;
+	virtual void			SwapCommandBuffers_FinishRendering( uint64_t* frontEndMicroSec, uint64_t* backEndMicroSec, uint64_t* shadowMicroSec, uint64_t* gpuMicroSec, backEndCounters_t* bc, performanceCounters_t* pc ) = 0;
 	virtual const emptyCommand_t* 	SwapCommandBuffers_FinishCommandBuffers() = 0;
 
 	// issues GPU commands to render a built up list of command buffers returned

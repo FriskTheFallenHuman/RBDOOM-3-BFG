@@ -35,13 +35,15 @@ If you have questions concerning this license or the applicable additional terms
 
 #define STBI_NO_STDIO  // images are passed as buffers
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <stb_image.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include <stb_image_write.h>
 
+#undef TINYEXR_USE_MINIZ
+#define TINYEXR_USE_MINIZ 0
 #define TINYEXR_IMPLEMENTATION
-#include "../libs/tinyexr/tinyexr.h"
+#include <tinyexr.h>
 
 #include "../libs/mesa/format_r11g11b10f.h"
 
@@ -454,7 +456,7 @@ void LoadSTB_RGBA8( const char* filename, unsigned char** pic, int* width, int* 
 		return;
 	}
 
-	int32 numChannels;
+	int32_t numChannels;
 
 	byte* rgba = stbi_load_from_memory( ( stbi_uc const* ) fbuffer, fileSize, width, height, &numChannels, 4 );
 
@@ -477,7 +479,7 @@ void LoadSTB_RGBA8( const char* filename, unsigned char** pic, int* width, int* 
 	// so the decoded data must be copied once
 	if( rgba )
 	{
-		int32 pixelCount = *width * *height;
+		int32_t pixelCount = *width * *height;
 		byte* out = ( byte* )R_StaticAlloc( pixelCount * 4, TAG_IMAGE );
 
 		*pic = out;
@@ -595,12 +597,12 @@ static void LoadEXR( const char* filename, unsigned char** pic, int* width, int*
 
 	if( rgba )
 	{
-		int32 pixelCount = *width * *height;
+		int32_t pixelCount = *width * *height;
 		byte* out = ( byte* )R_StaticAlloc( pixelCount * 4, TAG_IMAGE );
 
 		*pic = out;
 
-		// convert to packed R11G11B10F as uint32 for each pixel
+		// convert to packed R11G11B10F as uint32_t for each pixel
 
 		const float* src = rgba;
 		byte* dst = out;
@@ -673,15 +675,15 @@ void R_WriteEXR( const char* filename, const void* rgba16f, int channelsPerPixel
 		'b', 'o', 'x', '2', 'i', 0,
 		16, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0,
-		uint8( ww & 0xFF ), uint8( ( ww >> 8 ) & 0xFF ), uint8( ( ww >> 16 ) & 0xFF ), uint8( ( ww >> 24 ) & 0xFF ),
-		uint8( hh & 0xFF ), uint8( ( hh >> 8 ) & 0xFF ), uint8( ( hh >> 16 ) & 0xFF ), uint8( ( hh >> 24 ) & 0xFF ),
+		uint8_t( ww & 0xFF ), uint8_t( ( ww >> 8 ) & 0xFF ), uint8_t( ( ww >> 16 ) & 0xFF ), uint8_t( ( ww >> 24 ) & 0xFF ),
+		uint8_t( hh & 0xFF ), uint8_t( ( hh >> 8 ) & 0xFF ), uint8_t( ( hh >> 16 ) & 0xFF ), uint8_t( ( hh >> 24 ) & 0xFF ),
 		// displayWindow
 		'd', 'i', 's', 'p', 'l', 'a', 'y', 'W', 'i', 'n', 'd', 'o', 'w', 0,
 		'b', 'o', 'x', '2', 'i', 0,
 		16, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0,
-		uint8( ww & 0xFF ), uint8( ( ww >> 8 ) & 0xFF ), uint8( ( ww >> 16 ) & 0xFF ), uint8( ( ww >> 24 ) & 0xFF ),
-		uint8( hh & 0xFF ), uint8( ( hh >> 8 ) & 0xFF ), uint8( ( hh >> 16 ) & 0xFF ), uint8( ( hh >> 24 ) & 0xFF ),
+		uint8_t( ww & 0xFF ), uint8_t( ( ww >> 8 ) & 0xFF ), uint8_t( ( ww >> 16 ) & 0xFF ), uint8_t( ( ww >> 24 ) & 0xFF ),
+		uint8_t( hh & 0xFF ), uint8_t( ( hh >> 8 ) & 0xFF ), uint8_t( ( hh >> 16 ) & 0xFF ), uint8_t( ( hh >> 24 ) & 0xFF ),
 		// lineOrder
 		'l', 'i', 'n', 'e', 'O', 'r', 'd', 'e', 'r', 0,
 		'l', 'i', 'n', 'e', 'O', 'r', 'd', 'e', 'r', 0,
@@ -903,7 +905,7 @@ static void LoadHDR( const char* filename, unsigned char** pic, int* width, int*
 		return;
 	}
 
-	int32 numChannels;
+	int32_t numChannels;
 
 	float* rgba = stbi_loadf_from_memory( ( stbi_uc const* ) fbuffer, fileSize, width, height, &numChannels, 0 );
 
@@ -914,12 +916,12 @@ static void LoadHDR( const char* filename, unsigned char** pic, int* width, int*
 
 	if( rgba )
 	{
-		int32 pixelCount = *width * *height;
+		int32_t pixelCount = *width * *height;
 		byte* out = ( byte* )R_StaticAlloc( pixelCount * 4, TAG_IMAGE );
 
 		*pic = out;
 
-		// convert to packed R11G11B10F as uint32 for each pixel
+		// convert to packed R11G11B10F as uint32_t for each pixel
 
 		const float* src = rgba;
 		byte* dst = out;

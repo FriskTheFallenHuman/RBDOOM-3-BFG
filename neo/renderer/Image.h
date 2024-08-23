@@ -475,7 +475,7 @@ private:
 
 	int					refCount;				// overall ref count
 
-	static const uint32 TEXTURE_NOT_LOADED = 0xFFFFFFFF;
+	static const uint32_t TEXTURE_NOT_LOADED = 0xFFFFFFFF;
 
 	nvrhi::TextureHandle	texture;
 	nvrhi::SamplerHandle	sampler;

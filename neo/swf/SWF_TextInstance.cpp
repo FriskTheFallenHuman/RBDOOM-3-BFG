@@ -814,7 +814,7 @@ int idSWFTextInstance::CalcMaxScroll( int numLines )
 			}
 		}
 		int glyphStart = charIndex;
-		uint32 tc = textCheck.UTF8Char( charIndex );
+		uint32_t tc = textCheck.UTF8Char( charIndex );
 		scaledGlyphInfo_t glyph;
 		fontInfo->GetScaledGlyph( glyphScale, tc, glyph );
 		float glyphSkip = glyph.xSkip;
@@ -959,7 +959,7 @@ int idSWFTextInstance::CalcNumLines()
 		}
 		else
 		{
-			uint32 tc = textCheck[ charIndex++ ];
+			uint32_t tc = textCheck[ charIndex++ ];
 			scaledGlyphInfo_t glyph;
 			fontInfo->GetScaledGlyph( glyphScale, tc, glyph );
 

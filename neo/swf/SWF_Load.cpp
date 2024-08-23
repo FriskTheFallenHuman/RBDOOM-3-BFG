@@ -93,7 +93,7 @@ bool idSWF::LoadSWF( const char* fullpath )
 	idSwap::Little( header.fileLength );
 
 	// header.fileLength somewhat annoyingly includes the size of the header
-	uint32 fileLength2 = header.fileLength - ( uint32 )sizeof( swfHeader_t );
+	uint32_t fileLength2 = header.fileLength - ( uint32_t )sizeof( swfHeader_t );
 
 	// slurp the raw file into a giant array, which is somewhat atrocious when loading from the preload since it's already an idFile_Memory
 	byte* fileData = ( byte* )Mem_Alloc( fileLength2, TAG_SWF );
@@ -201,7 +201,7 @@ void idSWF::WriteSWF( const char* swfFilename, const byte* atlasImageRGBA, int a
 				int width = entry.imageSize[0];
 				int height = entry.imageSize[1];
 
-				uint32 colorDataSize = width * height * 4;
+				uint32_t colorDataSize = width * height * 4;
 				idTempArray<byte> colorData( colorDataSize );
 
 				idTempArray<byte> pngData( colorDataSize );
@@ -390,7 +390,7 @@ void idSWF::WriteSWF( const char* swfFilename, const byte* atlasImageRGBA, int a
 	file.WriteTagHeader( Tag_End, 0 );
 
 	// go back and write filesize into header
-	uint32 fileSize = file->Length();
+	uint32_t fileSize = file->Length();
 
 	file->Seek( offsetof( swfHeader_t, fileLength ), FS_SEEK_SET );
 	file.WriteU32( fileSize );
@@ -410,7 +410,7 @@ bool idSWF::LoadBinary( const char* bfilename, ID_TIME_T sourceTimeStamp )
 		return false;
 	}
 
-	uint32 magic = 0;
+	uint32_t magic = 0;
 	ID_TIME_T btimestamp = 0;
 	f->ReadBig( magic );
 	f->ReadBig( btimestamp );
@@ -1001,18 +1001,18 @@ bool idSWF::LoadJSON( const char* filename )
 					if( fillDraw.style.type == 0 ) //style.HasMember["startColor"] )// )
 					{
 						Value& startColor = style["startColor"];
-						fillDraw.style.startColor.r = ( uint8 )( startColor[0].GetDouble() * 255 ) & 0xFF;
-						fillDraw.style.startColor.g = ( uint8 )( startColor[1].GetDouble() * 255 ) & 0xFF;
-						fillDraw.style.startColor.b = ( uint8 )( startColor[2].GetDouble() * 255 ) & 0xFF;
-						fillDraw.style.startColor.a = ( uint8 )( startColor[3].GetDouble() * 255 ) & 0xFF;
+						fillDraw.style.startColor.r = ( uint8_t )( startColor[0].GetDouble() * 255 ) & 0xFF;
+						fillDraw.style.startColor.g = ( uint8_t )( startColor[1].GetDouble() * 255 ) & 0xFF;
+						fillDraw.style.startColor.b = ( uint8_t )( startColor[2].GetDouble() * 255 ) & 0xFF;
+						fillDraw.style.startColor.a = ( uint8_t )( startColor[3].GetDouble() * 255 ) & 0xFF;
 
 						if( style.HasMember( "endColor" ) )
 						{
 							Value& endColor = style["endColor"];
-							fillDraw.style.endColor.r = ( uint8 )( startColor[0].GetDouble() * 255 ) & 0xFF;
-							fillDraw.style.endColor.g = ( uint8 )( startColor[1].GetDouble() * 255 ) & 0xFF;
-							fillDraw.style.endColor.b = ( uint8 )( startColor[2].GetDouble() * 255 ) & 0xFF;
-							fillDraw.style.endColor.a = ( uint8 )( startColor[3].GetDouble() * 255 ) & 0xFF;
+							fillDraw.style.endColor.r = ( uint8_t )( startColor[0].GetDouble() * 255 ) & 0xFF;
+							fillDraw.style.endColor.g = ( uint8_t )( startColor[1].GetDouble() * 255 ) & 0xFF;
+							fillDraw.style.endColor.b = ( uint8_t )( startColor[2].GetDouble() * 255 ) & 0xFF;
+							fillDraw.style.endColor.a = ( uint8_t )( startColor[3].GetDouble() * 255 ) & 0xFF;
 						}
 						else
 						{
@@ -1062,16 +1062,16 @@ bool idSWF::LoadJSON( const char* filename )
 							gr.endRatio = gradientRecord["endRatio"].GetUint() & 0xFF;
 
 							Value& startColor = gradientRecord["startColor"];
-							gr.startColor.r = ( uint8 )( startColor[0].GetDouble() * 255 ) & 0xFF;
-							gr.startColor.g = ( uint8 )( startColor[1].GetDouble() * 255 ) & 0xFF;
-							gr.startColor.b = ( uint8 )( startColor[2].GetDouble() * 255 ) & 0xFF;
-							gr.startColor.a = ( uint8 )( startColor[3].GetDouble() * 255 ) & 0xFF;
+							gr.startColor.r = ( uint8_t )( startColor[0].GetDouble() * 255 ) & 0xFF;
+							gr.startColor.g = ( uint8_t )( startColor[1].GetDouble() * 255 ) & 0xFF;
+							gr.startColor.b = ( uint8_t )( startColor[2].GetDouble() * 255 ) & 0xFF;
+							gr.startColor.a = ( uint8_t )( startColor[3].GetDouble() * 255 ) & 0xFF;
 
 							Value& endColor = gradientRecord["endColor"];
-							gr.endColor.r = ( uint8 )( startColor[0].GetDouble() * 255 ) & 0xFF;
-							gr.endColor.g = ( uint8 )( startColor[1].GetDouble() * 255 ) & 0xFF;
-							gr.endColor.b = ( uint8 )( startColor[2].GetDouble() * 255 ) & 0xFF;
-							gr.endColor.a = ( uint8 )( startColor[3].GetDouble() * 255 ) & 0xFF;
+							gr.endColor.r = ( uint8_t )( startColor[0].GetDouble() * 255 ) & 0xFF;
+							gr.endColor.g = ( uint8_t )( startColor[1].GetDouble() * 255 ) & 0xFF;
+							gr.endColor.b = ( uint8_t )( startColor[2].GetDouble() * 255 ) & 0xFF;
+							gr.endColor.a = ( uint8_t )( startColor[3].GetDouble() * 255 ) & 0xFF;
 						}
 
 						if( style.HasMember( "focalPoint" ) )
@@ -1132,14 +1132,14 @@ bool idSWF::LoadJSON( const char* filename )
 #if 1
 						for( int v = 0; v < fillDraw.indices.Num(); v++ )
 						{
-							uint16& vert = fillDraw.indices[v];
+							uint16_t& vert = fillDraw.indices[v];
 
 							vert = indices[v].GetUint();
 						}
 #else
 						for( int v = fillDraw.indices.Num() - 1; v >= 0; v-- )
 						{
-							uint16& vert = fillDraw.indices[v];
+							uint16_t& vert = fillDraw.indices[v];
 
 							vert = indices[v].GetUint();
 						}
@@ -1161,18 +1161,18 @@ bool idSWF::LoadJSON( const char* filename )
 					lineDraw.style.endWidth = style["endWidth"].GetUint();
 
 					Value& startColor = style["startColor"];
-					lineDraw.style.startColor.r = ( uint8 )( startColor[0].GetDouble() * 255 ) & 0xFF;
-					lineDraw.style.startColor.g = ( uint8 )( startColor[1].GetDouble() * 255 ) & 0xFF;
-					lineDraw.style.startColor.b = ( uint8 )( startColor[2].GetDouble() * 255 ) & 0xFF;
-					lineDraw.style.startColor.a = ( uint8 )( startColor[3].GetDouble() * 255 ) & 0xFF;
+					lineDraw.style.startColor.r = ( uint8_t )( startColor[0].GetDouble() * 255 ) & 0xFF;
+					lineDraw.style.startColor.g = ( uint8_t )( startColor[1].GetDouble() * 255 ) & 0xFF;
+					lineDraw.style.startColor.b = ( uint8_t )( startColor[2].GetDouble() * 255 ) & 0xFF;
+					lineDraw.style.startColor.a = ( uint8_t )( startColor[3].GetDouble() * 255 ) & 0xFF;
 
 					if( style.HasMember( "endColor" ) )
 					{
 						Value& endColor = style["endColor"];
-						lineDraw.style.endColor.r = ( uint8 )( startColor[0].GetDouble() * 255 ) & 0xFF;
-						lineDraw.style.endColor.g = ( uint8 )( startColor[1].GetDouble() * 255 ) & 0xFF;
-						lineDraw.style.endColor.b = ( uint8 )( startColor[2].GetDouble() * 255 ) & 0xFF;
-						lineDraw.style.endColor.a = ( uint8 )( startColor[3].GetDouble() * 255 ) & 0xFF;
+						lineDraw.style.endColor.r = ( uint8_t )( startColor[0].GetDouble() * 255 ) & 0xFF;
+						lineDraw.style.endColor.g = ( uint8_t )( startColor[1].GetDouble() * 255 ) & 0xFF;
+						lineDraw.style.endColor.b = ( uint8_t )( startColor[2].GetDouble() * 255 ) & 0xFF;
+						lineDraw.style.endColor.a = ( uint8_t )( startColor[3].GetDouble() * 255 ) & 0xFF;
 					}
 					else
 					{
@@ -1212,14 +1212,14 @@ bool idSWF::LoadJSON( const char* filename )
 #if 1
 					for( int v = 0; v < lineDraw.indices.Num(); v++ )
 					{
-						uint16& vert = lineDraw.indices[v];
+						uint16_t& vert = lineDraw.indices[v];
 
 						vert = indices[v].GetUint();
 					}
 #else
 					for( int v = fillDraw.indices.Num() - 1; v >= 0; v-- )
 					{
-						uint16& vert = fillDraw.indices[v];
+						uint16_t& vert = fillDraw.indices[v];
 
 						vert = indices[v].GetUint();
 					}
@@ -1273,10 +1273,10 @@ bool idSWF::LoadJSON( const char* filename )
 			edittext->fontHeight = entry["fontHeight"].GetUint();
 
 			Value& color = entry["color"];
-			edittext->color.r = ( uint8 )( color[0].GetDouble() * 255 ) & 0xFF;
-			edittext->color.g = ( uint8 )( color[1].GetDouble() * 255 ) & 0xFF;
-			edittext->color.b = ( uint8 )( color[2].GetDouble() * 255 ) & 0xFF;
-			edittext->color.a = ( uint8 )( color[3].GetDouble() * 255 ) & 0xFF;
+			edittext->color.r = ( uint8_t )( color[0].GetDouble() * 255 ) & 0xFF;
+			edittext->color.g = ( uint8_t )( color[1].GetDouble() * 255 ) & 0xFF;
+			edittext->color.b = ( uint8_t )( color[2].GetDouble() * 255 ) & 0xFF;
+			edittext->color.a = ( uint8_t )( color[3].GetDouble() * 255 ) & 0xFF;
 
 			edittext->maxLength = entry["maxLength"].GetUint();
 
@@ -1551,14 +1551,14 @@ void idSWF::WriteJSON( const char* jsonFilename )
 #if 1
 							for( int v = 0; v < fillDraw.indices.Num(); v++ )
 							{
-								const uint16& vert = fillDraw.indices[v];
+								const uint16_t& vert = fillDraw.indices[v];
 
 								file->WriteFloatString( "%i%s", vert, ( v == fillDraw.indices.Num() - 1 ) ? "" : ", " );
 							}
 #else
 							for( int v = fillDraw.indices.Num() - 1; v >= 0; v-- )
 							{
-								const uint16& vert = fillDraw.indices[v];
+								const uint16_t& vert = fillDraw.indices[v];
 
 								file->WriteFloatString( "%i%s", vert, ( v == 0 ) ? "" : ", " );
 							}
@@ -1638,14 +1638,14 @@ void idSWF::WriteJSON( const char* jsonFilename )
 #if 1
 							for( int v = 0; v < lineDraw.indices.Num(); v++ )
 							{
-								const uint16& vert = lineDraw.indices[v];
+								const uint16_t& vert = lineDraw.indices[v];
 
 								file->WriteFloatString( "%i%s", vert, ( v == lineDraw.indices.Num() - 1 ) ? "" : ", " );
 							}
 #else
 							for( int v = fillDraw.indices.Num() - 1; v >= 0; v-- )
 							{
-								const uint16& vert = fillDraw.indices[v];
+								const uint16_t& vert = fillDraw.indices[v];
 
 								file->WriteFloatString( "%i%s", vert, ( v == 0 ) ? "" : ", " );
 							}
@@ -1692,7 +1692,7 @@ void idSWF::WriteJSON( const char* jsonFilename )
 					file->WriteFloatString( "\t\t\t\t<Indices num=\"%i\">", font->glyphs[g].indices.Num() );
 					for( int v = 0; v < font->glyphs[g].indices.Num(); v++ )
 					{
-						const uint16& vert = font->glyphs[g].indices[v];
+						const uint16_t& vert = font->glyphs[g].indices[v];
 
 						file->WriteFloatString( "%i ", vert );
 					}

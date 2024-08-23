@@ -83,7 +83,7 @@ public:
 	virtual void			SetSystemUIShowing( bool show );
 
 	// Invites
-	virtual void			HandleBootableInvite( int64 lobbyId = 0 );
+	virtual void			HandleBootableInvite( int64_t lobbyId = 0 );
 	virtual void			ClearBootableInvite();
 	virtual void			ClearPendingInvite();
 
@@ -99,7 +99,7 @@ public:
 	// Leaderboards
 	virtual void			LeaderboardUpload( lobbyUserID_t lobbyUserID, const leaderboardDefinition_t* leaderboard, const column_t* stats, const idFile_Memory* attachment = NULL );
 	virtual void			LeaderboardDownload( int sessionUserIndex, const leaderboardDefinition_t* leaderboard, int startingRank, int numRows, const idLeaderboardCallback& callback );
-	virtual void			LeaderboardDownloadAttachment( int sessionUserIndex, const leaderboardDefinition_t* leaderboard, int64 attachmentID );
+	virtual void			LeaderboardDownloadAttachment( int sessionUserIndex, const leaderboardDefinition_t* leaderboard, int64_t attachmentID );
 
 	// Scoring (currently just for TrueSkill)
 	virtual void			SetLobbyUserRelativeScore( lobbyUserID_t lobbyUserID, int relativeScore, int team ) {}
@@ -522,7 +522,7 @@ void idSessionLocalWin::ClearPendingInvite()
 idSessionLocalWin::HandleBootableInvite
 ========================
 */
-void idSessionLocalWin::HandleBootableInvite( int64 lobbyId )
+void idSessionLocalWin::HandleBootableInvite( int64_t lobbyId )
 {
 }
 
@@ -596,7 +596,7 @@ void idSessionLocalWin::LeaderboardDownload( int sessionUserIndex, const leaderb
 idSessionLocalWin::LeaderboardDownloadAttachment
 ========================
 */
-void idSessionLocalWin::LeaderboardDownloadAttachment( int sessionUserIndex, const leaderboardDefinition_t* leaderboard, int64 attachmentID )
+void idSessionLocalWin::LeaderboardDownloadAttachment( int sessionUserIndex, const leaderboardDefinition_t* leaderboard, int64_t attachmentID )
 {
 }
 

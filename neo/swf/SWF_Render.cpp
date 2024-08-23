@@ -503,9 +503,9 @@ void idSWF::RenderSprite( idRenderSystem* gui, idSWFSpriteInstance* spriteInstan
 idSWF::GLStateForBlendMode
 ========================
 */
-uint64 idSWF::GLStateForRenderState( const swfRenderState_t& renderState )
+uint64_t idSWF::GLStateForRenderState( const swfRenderState_t& renderState )
 {
-	uint64 extraGLState = GLS_OVERRIDE | GLS_DEPTHFUNC_LESS | GLS_DEPTHMASK; // SWF GL State always overrides what's set in the material
+	uint64_t extraGLState = GLS_OVERRIDE | GLS_DEPTHFUNC_LESS | GLS_DEPTHMASK; // SWF GL State always overrides what's set in the material
 
 	if( renderState.activeMasks > 0 )
 	{
@@ -596,8 +596,8 @@ void idSWF::RenderMorphShape( idRenderSystem* gui, const idSWFShape* shape, cons
 		{
 			continue;
 		}
-		uint32 packedColorM = LittleLong( PackColor( color.mul ) );
-		uint32 packedColorA = LittleLong( PackColor( ( color.add * 0.5f ) + idVec4( 0.5f ) ) ); // Compress from -1..1 to 0..1
+		uint32_t packedColorM = LittleLong( PackColor( color.mul ) );
+		uint32_t packedColorA = LittleLong( PackColor( ( color.add * 0.5f ) + idVec4( 0.5f ) ) ); // Compress from -1..1 to 0..1
 
 		swfRect_t bounds;
 		bounds.tl = Lerp( shape->startBounds.tl, shape->endBounds.tl, renderState.ratio );
@@ -745,8 +745,8 @@ void idSWF::RenderShape( idRenderSystem* gui, const idSWFShape* shape, const swf
 			continue;
 		}
 
-		uint32 packedColorM = LittleLong( PackColor( color.mul ) );
-		uint32 packedColorA = LittleLong( PackColor( ( color.add * 0.5f ) + idVec4( 0.5f ) ) ); // Compress from -1..1 to 0..1
+		uint32_t packedColorM = LittleLong( PackColor( color.mul ) );
+		uint32_t packedColorA = LittleLong( PackColor( ( color.add * 0.5f ) + idVec4( 0.5f ) ) ); // Compress from -1..1 to 0..1
 
 		const swfRect_t& bounds = shape->startBounds;
 		if( renderState.materialWidth > 0 )
@@ -831,8 +831,8 @@ void idSWF::RenderShape( idRenderSystem* gui, const idSWFShape* shape, const swf
 			{
 				continue;
 			}
-			uint32 packedColorM = LittleLong( PackColor( color.mul ) );
-			uint32 packedColorA = LittleLong( PackColor( ( color.add * 0.5f ) + idVec4( 0.5f ) ) ); // Compress from -1..1 to 0..1
+			uint32_t packedColorM = LittleLong( PackColor( color.mul ) );
+			uint32_t packedColorA = LittleLong( PackColor( ( color.add * 0.5f ) + idVec4( 0.5f ) ) ); // Compress from -1..1 to 0..1
 
 			gui->SetGLState( GLStateForRenderState( renderState ) | GLS_POLYMODE_LINE );
 
@@ -1124,7 +1124,7 @@ void idSWF::RenderEditText( idRenderSystem* gui, idSWFTextInstance* textInstance
 			}
 		}
 		int glyphStart = charIndex;
-		uint32 tc = text.UTF8Char( charIndex );
+		uint32_t tc = text.UTF8Char( charIndex );
 		scaledGlyphInfo_t glyph;
 		fontInfo->GetScaledGlyph( glyphScale, tc, glyph );
 		float glyphSkip = glyph.xSkip;
@@ -1353,7 +1353,7 @@ void idSWF::RenderEditText( idRenderSystem* gui, idSWFTextInstance* textInstance
 			int c = startCheckIndex;
 			while( c < text.Length() )
 			{
-				uint32 tc = text.UTF8Char( c );
+				uint32_t tc = text.UTF8Char( c );
 				scaledGlyphInfo_t glyph;
 				fontInfo->GetScaledGlyph( glyphScale, tc, glyph );
 				float glyphSkip = glyph.xSkip;
@@ -1633,7 +1633,7 @@ void idSWF::RenderEditText( idRenderSystem* gui, idSWFTextInstance* textInstance
 				}
 			}
 
-			uint32 character = text.UTF8Char( i );
+			uint32_t character = text.UTF8Char( i );
 
 			if( character == '\n' )
 			{
@@ -1693,7 +1693,7 @@ void idSWF::RenderEditText( idRenderSystem* gui, idSWFTextInstance* textInstance
 				float s2 = 1.0f;
 				float t2 = 1.0f;
 
-				//uint32 color = gui->GetColor();
+				//uint32_t color = gui->GetColor();
 				idVec4 imgColor = colorWhite;
 				imgColor.w = defaultColor.w;
 				gui->SetColor( imgColor );
@@ -2047,8 +2047,8 @@ int idSWF::DrawText( idRenderSystem* gui, float x, float y, float scale, idVec4 
 		return 0;
 	}
 
-	const uint32 currentColor = PackColor( color );
-	uint32 currentColorNativeByteOrder = LittleLong( currentColor );
+	const uint32_t currentColor = PackColor( color );
+	uint32_t currentColorNativeByteOrder = LittleLong( currentColor );
 
 	int len = drawText.Length();
 	if( limit > 0 && len > limit )
@@ -2059,13 +2059,13 @@ int idSWF::DrawText( idRenderSystem* gui, float x, float y, float scale, idVec4 
 	int charIndex = 0;
 	while( charIndex < drawText.Length() )
 	{
-		uint32 textChar = drawText.UTF8Char( charIndex );
+		uint32_t textChar = drawText.UTF8Char( charIndex );
 		if( textChar == C_COLOR_ESCAPE )
 		{
 			// I'm not sure if inline text color codes are used anywhere in the game,
 			// they may only be needed for multi-color user names
 			idVec4		newColor;
-			uint32 colorIndex = drawText.UTF8Char( charIndex );
+			uint32_t colorIndex = drawText.UTF8Char( charIndex );
 			if( colorIndex == C_COLOR_DEFAULT )
 			{
 				newColor = color;
@@ -2182,7 +2182,7 @@ int idSWF::DrawText( idRenderSystem* gui, const char* text, float textScale, int
 
 	while( charIndex < drawText.Length() )
 	{
-		uint32 textChar = drawText.UTF8Char( charIndex );
+		uint32_t textChar = drawText.UTF8Char( charIndex );
 
 		// See if we need to start a new line.
 		if( textChar == '\n' || textChar == '\r' || charIndex == drawText.Length() )

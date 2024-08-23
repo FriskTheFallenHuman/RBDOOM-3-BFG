@@ -139,7 +139,7 @@ bool idSnapshotProcessor::ApplyDeltaToSnapshot( idSnapShot& snap, const char* de
 idSnapshotProcessor::SubmitPendingSnap
 ========================
 */
-void idSnapshotProcessor::SubmitPendingSnap( int visIndex, uint8* objMemory, int objMemorySize, lzwCompressionData_t* lzwData )
+void idSnapshotProcessor::SubmitPendingSnap( int visIndex, uint8_t* objMemory, int objMemorySize, lzwCompressionData_t* lzwData )
 {
 
 	assert_16_byte_aligned( objMemory );
@@ -233,7 +233,7 @@ int idSnapshotProcessor::GetPendingSnapDelta( byte* outBuffer, int maxLength )
 		idLib::Error( "GetPendingSnapDelta: Delta failed." );
 	}
 
-	uint8* deltaData = &jobMemory->lzwMem[jobMemory->lzwDeltas[0].offset];
+	uint8_t* deltaData = &jobMemory->lzwMem[jobMemory->lzwDeltas[0].offset];
 
 	int deltaSequence		= 0;
 	int deltaBaseSequence	= 0;
@@ -558,7 +558,7 @@ idSnapshotProcessor::AddSnapObjTemplate
 void idSnapshotProcessor::AddSnapObjTemplate( int objID, idBitMsg& msg )
 {
 	extern idCVar net_ssTemplateDebug;
-	idSnapShot::objectState_t* state = templateStates.S_AddObject( objID, MAX_UNSIGNED_TYPE( uint32 ), msg );
+	idSnapShot::objectState_t* state = templateStates.S_AddObject( objID, MAX_UNSIGNED_TYPE( uint32_t ), msg );
 	if( verify( state != NULL ) )
 	{
 		if( net_ssTemplateDebug.GetBool() )

@@ -532,9 +532,9 @@ void R_VerticalFlip( byte* data, int width, int height )
 // RB: halfFloat_t helper
 struct ColorRGB16F
 {
-	uint16	red;
-	uint16	green;
-	uint16	blue;
+	uint16_t	red;
+	uint16_t	green;
+	uint16_t	blue;
 };
 
 void R_VerticalFlipRGB16F( byte* data, int width, int height )

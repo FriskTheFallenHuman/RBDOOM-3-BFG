@@ -877,7 +877,7 @@ static inline float CubemapTexelSolidAngle( float u, float v, float _invFaceSize
 	return solidAngle;
 }
 
-static inline idVec3 MapXYSToDirection( uint64 x, uint64 y, uint64 s, uint64 width, uint64 height )
+static inline idVec3 MapXYSToDirection( uint64_t x, uint64_t y, uint64_t s, uint64_t width, uint64_t height )
 {
 	float u = ( ( x + 0.5f ) / float( width ) ) * 2.0f - 1.0f;
 	float v = ( ( y + 0.5f ) / float( height ) ) * 2.0f - 1.0f;
