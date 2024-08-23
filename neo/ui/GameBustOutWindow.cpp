@@ -30,7 +30,6 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "../renderer/Image.h"
 
-#include "DeviceContext.h"
 #include "Window.h"
 #include "UserInterfaceLocal.h"
 #include "GameBustOutWindow.h"

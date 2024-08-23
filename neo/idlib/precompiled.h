@@ -68,7 +68,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "../framework/File_Zip.h"
 #include "../framework/FileSystem.h"
 #include "../framework/UsercmdGen.h"
-#include "../framework/Serializer.h"
 #include "../framework/PlayerProfile.h"
 
 // decls
@@ -107,6 +106,7 @@ constexpr uint32_t NUM_FRAME_DATA	= 3;
 #include "../renderer/ModelManager.h"
 #include "../renderer/RenderSystem.h"
 #include "../renderer/RenderWorld.h"
+#include "../renderer/DeviceContext.h"
 #include "../renderer/BindingCache.h"
 #include "../renderer/RenderCommon.h"
 

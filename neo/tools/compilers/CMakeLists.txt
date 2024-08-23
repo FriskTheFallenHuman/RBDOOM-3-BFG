@@ -60,7 +60,6 @@ set(MC_FRAMEWORK_SOURCES
 
 set(MC_RENDERER_INCLUDES 
 	../../renderer/BinaryImage.h
-	../../renderer/Color/ColorSpace.h
 	../../renderer/Image.h
 	../../renderer/Material.h
 	#../../renderer/VertexCache.h
@@ -74,9 +73,6 @@ set(MC_RENDERER_INCLUDES
 	)
 set(MC_RENDERER_SOURCES
 	../../renderer/BinaryImage.cpp
-	../../renderer/Color/ColorSpace.cpp
-	../../renderer/DXT/DXTEncoder.cpp
-	../../renderer/DXT/DXTEncoder_SSE2.cpp
 	../../renderer/GLMatrix.cpp
 	../../renderer/ImageManager.cpp
 	../../renderer/Image_files.cpp
@@ -118,21 +114,6 @@ file(GLOB MC_IMTUI_SOURCES ../../libs/imtui/*.cpp)
 
 file(GLOB MC_IMGUI_INCLUDES ../../libs/imtui/imgui/*.h)
 file(GLOB MC_IMGUI_SOURCES ../../libs/imtui/imgui/*.cpp)
-
-if(ZLIB_FOUND)
-	include_directories(${ZLIB_INCLUDE_DIRS})
-	set(ZLIB_LIBRARY ${ZLIB_LIBRARIES})
-
-	set(MC_ZLIB_INCLUDES "")
-	set(MC_ZLIB_SOURCES "")
-else()
-	include_directories("libs/zlib")
-	set(ZLIB_LIBRARY "" )
-	
-	file(GLOB MC_ZLIB_INCLUDES ../../libs/zlib/*.h)
-	file(GLOB MC_ZLIB_SOURCES ../../libs/zlib/*.c)
-endif()
-
 
 file(GLOB MC_MINIZIP_INCLUDES ../../libs/zlib/minizip/*.h)
 file(GLOB MC_MINIZIP_SOURCES ../../libs/zlib/minizip/*.c ../../libs/zlib/minizip/*.cpp)
@@ -188,7 +169,6 @@ set(MC_INCLUDES_ALL
 			${MC_GAME_INCLUDES}
 			${MC_IMGUI_INCLUDES}
 			${MC_IMTUI_INCLUDES}
-			${MC_ZLIB_INCLUDES}
 			${MC_MINIZIP_INCLUDES}
 			)
 			
@@ -229,8 +209,6 @@ source_group("libs\\imtui" FILES ${MC_IMTUI_SOURCES})
 source_group("libs\\imtui\\imgui" FILES ${MC_IMGUI_INCLUDES})
 source_group("libs\\imtui\\imgui" FILES ${MC_IMGUI_SOURCES})
 
-source_group("libs\\zlib" FILES ${MC_ZLIB_INCLUDES})
-source_group("libs\\zlib" FILES ${MC_ZLIB_SOURCES})
 source_group("libs\\zlib\\minizip" FILES ${MC_MINIZIP_INCLUDES})
 source_group("libs\\zlib\\minizip" FILES ${MC_MINIZIP_SOURCES})
 

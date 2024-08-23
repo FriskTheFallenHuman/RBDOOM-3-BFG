@@ -32,7 +32,6 @@ If you have questions concerning this license or the applicable additional terms
 // device context support for gui stuff
 //
 
-#include "Rectangle.h"
 #include "../renderer/Font.h"
 
 const int VIRTUAL_WIDTH = 640;

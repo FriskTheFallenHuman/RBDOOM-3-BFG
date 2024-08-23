@@ -32,8 +32,6 @@ If you have questions concerning this license or the applicable additional terms
 
 #if !defined( DMAP )
 	#include "../renderer/Image.h"
-	#include "../renderer/DXT/DXTCodec.h"
-	#include "../renderer/Color/ColorSpace.h"
 	#include "../renderer/CmdlineProgressbar.h"
 #endif
 

@@ -1,16 +1,24 @@
-
+project( idlib CXX )
 add_definitions(-D__IDLIB__ -D__DOOM_DLL__)
 
 file(GLOB ID__INCLUDES *.h)
 file(GLOB ID__SOURCES *.cpp)
 file(GLOB ID_BV_INCLUDES bv/*.h)
 file(GLOB ID_BV_SOURCES bv/*.cpp)
+file(GLOB ID_COLOR_INCLUDES color/*.h)
+file(GLOB ID_COLOR_SOURCES color/*.cpp)
 file(GLOB ID_CONTAINERS_INCLUDES containers/*.h)
 file(GLOB ID_CONTAINERS_SOURCES containers/*.cpp)
+file(GLOB ID_DECODERS_INCLUDES decoders/*.h)
+file(GLOB ID_DECODERS_SOURCES decoders/*.cpp)
+file(GLOB ID_ENCODERS_INCLUDES encoders/*.h)
+file(GLOB ID_ENCODERS_SOURCES encoders/*.cpp)
 file(GLOB ID_GEOMETRY_INCLUDES geometry/*.h)
 file(GLOB ID_GEOMETRY_SOURCES geometry/*.cpp)
 file(GLOB ID_HASHING_INCLUDES hashing/*.h)
 file(GLOB ID_HASHING_SOURCES hashing/*.cpp)
+file(GLOB ID_IMAGES_INCLUDES images/*.h)
+file(GLOB ID_IMAGES_SOURCES images/*.cpp)
 file(GLOB ID_MATH_INCLUDES math/*.h)
 file(GLOB ID_MATH_SOURCES math/*.cpp)
 file(GLOB ID_SYS_INCLUDES sys/*.h)
@@ -27,23 +35,31 @@ endif()
 set(ID_INCLUDES_ALL
 		${ID__INCLUDES}
 		${ID_BV_INCLUDES}
+		${ID_COLOR_INCLUDES}
 		${ID_CONTAINERS_INCLUDES}
+		${ID_DECODERS_INCLUDES}
+		${ID_ENCODERS_INCLUDES}
 		${ID_GEOMETRY_INCLUDES}
 		${ID_HASHING_INCLUDES}
+		${ID_IMAGES_INCLUDES}
 		${ID_MATH_INCLUDES}
 		${ID_SYS_INCLUDES}
 		)
-			
+
 set(ID_SOURCES_ALL
 		${ID__SOURCES}
 		${ID_BV_SOURCES}
+		${ID_COLOR_SOURCES}
 		${ID_CONTAINERS_SOURCES}
+		${ID_DECODERS_SOURCES}
+		${ID_ENCODERS_SOURCES}
 		${ID_GEOMETRY_SOURCES}
 		${ID_HASHING_SOURCES}
+		${ID_IMAGES_SOURCES}
 		${ID_MATH_SOURCES}
 		${ID_SYS_SOURCES}
 		)
-			
+
 if(MSVC)
 	list(APPEND ID_INCLUDES_ALL ${ID_SYS_WIN32_INCLUDES})
 	list(APPEND ID_SOURCES_ALL ${ID_SYS_WIN32_SOURCES})
@@ -56,12 +72,20 @@ source_group("" FILES ${ID__INCLUDES})
 source_group("" FILES ${ID__SOURCES})
 source_group("bv" FILES ${ID_BV_INCLUDES})
 source_group("bv" FILES ${ID_BV_SOURCES})
+source_group("color" FILES ${ID_COLOR_INCLUDES})
+source_group("color" FILES ${ID_COLOR_SOURCES})
 source_group("containers" FILES ${ID_CONTAINERS_INCLUDES})
 source_group("containers" FILES ${ID_CONTAINERS_SOURCES})
+source_group("decoders" FILES ${ID_DECODERS_INCLUDES})
+source_group("decoders" FILES ${ID_DECODERS_SOURCES})
+source_group("encoders" FILES ${ID_ENCODERS_INCLUDES})
+source_group("encoders" FILES ${ID_ENCODERS_SOURCES})
 source_group("geometry" FILES ${ID_GEOMETRY_INCLUDES})
 source_group("geometry" FILES ${ID_GEOMETRY_SOURCES})
 source_group("hashing" FILES ${ID_HASHING_INCLUDES})
 source_group("hashing" FILES ${ID_HASHING_SOURCES})
+source_group("images" FILES ${ID_IMAGES_INCLUDES})
+source_group("images" FILES ${ID_IMAGES_SOURCES})
 source_group("math" FILES ${ID_MATH_INCLUDES})
 source_group("math" FILES ${ID_MATH_SOURCES})
 source_group("sys" FILES ${ID_SYS_INCLUDES})
@@ -80,22 +104,22 @@ list(REMOVE_ITEM ID_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/geometry/Ren
 list(REMOVE_ITEM ID_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/SoftwareCache.cpp)
 
 if(MSVC)
-    list(REMOVE_ITEM ID_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/precompiled.cpp)
+	list(REMOVE_ITEM ID_PRECOMPILED_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/precompiled.cpp)
 
-    #set_target_properties(idlib PROPERTIES COMPILE_FLAGS "/Yuprecompiled.h")
-    set_source_files_properties(precompiled.cpp
-        PROPERTIES
-        COMPILE_FLAGS "/Ycprecompiled.h"
-        OBJECT_OUTPUTS "precompiled.pch"
-        )
-        set_source_files_properties(
-            ${ID_PRECOMPILED_SOURCES}
-            PROPERTIES
-            COMPILE_FLAGS "/Yuprecompiled.h"
-            OBJECT_DEPENDS "precompiled.pch"
-            )
+	#set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/Yuprecompiled.h")
+	set_source_files_properties(precompiled.cpp
+		PROPERTIES
+		COMPILE_FLAGS "/Ycprecompiled.h"
+		OBJECT_OUTPUTS "precompiled.pch"
+		)
+		set_source_files_properties(
+			${ID_PRECOMPILED_SOURCES}
+			PROPERTIES
+			COMPILE_FLAGS "/Yuprecompiled.h"
+			OBJECT_DEPENDS "precompiled.pch"
+			)
 
-    add_library(idlib ${ID_SOURCES_ALL} ${ID_INCLUDES_ALL})
+	add_library(${PROJECT_NAME} ${ID_SOURCES_ALL} ${ID_INCLUDES_ALL})
 else()
 	if (USE_PRECOMPILED_HEADERS)
 	foreach( src_file ${ID_PRECOMPILED_SOURCES} )
@@ -131,31 +155,31 @@ else()
 	else()
 		LIST(APPEND _compiler_FLAGS -DUSE_OPTICK=0)
 	endif()
-	add_custom_target(precomp_header_idlib ALL
-	                  COMMAND ${CMAKE_CXX_COMPILER} ${_compiler_FLAGS} -x c++-header precompiled.h -o precompiled.h.gch
-	                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	                  COMMENT "Creating idlib/precompiled.h.gch for idlib"
-	                  )
+	add_custom_target(precomp_header_${PROJECT_NAME} ALL
+					  COMMAND ${CMAKE_CXX_COMPILER} ${_compiler_FLAGS} -x c++-header precompiled.h -o precompiled.h.gch
+					  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+					  COMMENT "Creating idlib/precompiled.h.gch for idlib"
+					  )
 	endif()
 	
-	add_library(idlib ${ID_SOURCES_ALL} ${ID_INCLUDES_ALL})
+	add_library(${PROJECT_NAME} ${ID_SOURCES_ALL} ${ID_INCLUDES_ALL})
 	if (USE_PRECOMPILED_HEADERS)
-	add_dependencies(idlib precomp_header_idlib)
+	add_dependencies(${PROJECT_NAME} precomp_header_idlib)
 	endif()
 	
 endif()
 	
 if(OPTICK)
-	target_compile_definitions(idlib PUBLIC USE_OPTICK=1)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC USE_OPTICK=1)
 else()
-	target_compile_definitions(idlib PUBLIC USE_OPTICK=0)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC USE_OPTICK=0)
 endif()
 
 # if(MSVC)
 	# # set_source_files_properties(precompiled.cpp
-        # # PROPERTIES
-        # # COMPILE_FLAGS "/Ycprecompiled.h"
-        # # )
+		# # PROPERTIES
+		# # COMPILE_FLAGS "/Ycprecompiled.h"
+		# # )
 		
-	# #set_target_properties(idlib PROPERTIES COMPILE_FLAGS "/Yuprecompiled.h")
+	# #set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/Yuprecompiled.h")
 # endif()

@@ -41,8 +41,6 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #include "RenderCommon.h"
-#include "DXT/DXTCodec.h"
-#include "Color/ColorSpace.h"
 
 #include "../libs/mesa/format_r11g11b10f.h"
 

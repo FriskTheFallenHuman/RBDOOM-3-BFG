@@ -443,11 +443,7 @@ file(GLOB RENDERER_SMAA_INCLUDES renderer/SMAA/*.h)
 file(GLOB RENDERER_NVRHI_INCLUDES renderer/NVRHI/*.h)
 file(GLOB RENDERER_NVRHI_SOURCES renderer/NVRHI/*.cpp)
 
-file(GLOB STB_INCLUDES libs/stb/*.h)
-
 file(GLOB MESA_INCLUDES libs/mesa/*.h)
-
-file(GLOB TINYEXR_INCLUDES libs/tinyexr/*.h)
 
 file(GLOB MIKKTSPACE_INCLUDES libs/mikktspace/*.h)
 file(GLOB MIKKTSPACE_SOURCES libs/mikktspace/*.c)
@@ -707,11 +703,7 @@ source_group("renderer\\NVRHI" FILES ${RENDERER_NVRHI_SOURCES})
 
 source_group("renderer\\SMAA" FILES ${RENDERER_SMAA_INCLUDES})
 
-source_group("libs\\stb" FILES ${STB_INCLUDES})
-
 source_group("libs\\mesa" FILES ${MESA_INCLUDES})
-
-source_group("libs\\tinyexr" FILES ${TINYEXR_INCLUDES})
 
 source_group("libs\\mikktspace" FILES ${MIKKTSPACE_INCLUDES})
 source_group("libs\\mikktspace" FILES ${MIKKTSPACE_SOURCES})
@@ -812,7 +804,6 @@ set(RBDOOM3_INCLUDES
 			
 			${RENDERER_SMAA_INCLUDES}
 			${FRAMEWORK_IMGUI_INCLUDES}
-			${STB_INCLUDES}
 			${MESA_INCLUDES}
 			${TINYEXR_INCLUDES}
 			${MIKKTSPACE_INCLUDES}

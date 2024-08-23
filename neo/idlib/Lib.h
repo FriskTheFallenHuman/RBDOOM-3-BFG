@@ -285,6 +285,7 @@ public:
 // geometry
 #include "geometry/RenderMatrix.h"
 #include "geometry/JointTransform.h"
+#include "geometry/Rectangle.h"
 #include "geometry/DrawVert.h"
 #include "geometry/Winding.h"
 #include "geometry/Winding2D.h"
@@ -337,5 +338,15 @@ public:
 #include "ParallelJobList.h"
 #include "SoftwareCache.h"
 #include "TileMap.h" // RB
+#include "Serializer.h"
+
+// Image Decoders
+#include "decoders/BareDCTDecoder.h"
+#include "color/ColorSpace.h"
+#include "decoders/DXTDecoder.h"
+#include "encoders/DXTEncoder.h"
+
+#include "images/Filter.h"
+#include "images/MipMap.h"
 
 #endif	/* !__LIB_H__ */
