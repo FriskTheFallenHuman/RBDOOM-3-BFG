@@ -48,12 +48,6 @@ void main( in PS_IN fragment, out PS_OUT result )
 {
 	float2 uv = fragment.texcoord0.xy;
 
-	// PSX affine texture mapping
-	if( rpPSXDistortions.z > 0.0 )
-	{
-		uv /= fragment.texcoord0.z;
-	}
-
 	float4 color = t_BaseColor.Sample( s_Sampler, uv ) * fragment.color;
 	clip( color.a - rpAlphaTest.x );
 	result.color = sRGBAToLinearRGBA( color );
