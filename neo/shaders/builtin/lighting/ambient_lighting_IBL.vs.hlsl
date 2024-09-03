@@ -3,7 +3,7 @@
 
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
-Copyright (C) 2013-2015 Robert Beckebans
+Copyright (C) 2021-2024 Robert Beckebans
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
 
@@ -28,7 +28,6 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #include "global_inc.hlsl"
-
 
 // *INDENT-OFF*
 #if USE_GPU_SKINNING
@@ -62,7 +61,6 @@ struct VS_OUT
 
 void main( VS_IN vertex, out VS_OUT result )
 {
-
 	float4 vNormal = vertex.normal * 2.0 - 1.0;
 	float4 vTangent = vertex.tangent * 2.0 - 1.0;
 	float3 vBitangent = cross( vNormal.xyz, vTangent.xyz ) * vTangent.w;

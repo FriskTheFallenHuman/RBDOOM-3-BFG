@@ -3,7 +3,7 @@
 
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
-Copyright (C) 2014 Robert Beckebans
+Copyright (C) 2014-2024 Robert Beckebans
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
 
@@ -44,7 +44,7 @@ struct VS_IN
 	float4 color2	: COLOR1;
 };
 
-struct VS_OUT 
+struct VS_OUT
 {
 	float4 position		: SV_Position;
 	float4 texcoord0	: TEXCOORD0_centroid;
@@ -56,7 +56,6 @@ struct VS_OUT
 	float4 texcoord6	: TEXCOORD6_centroid;
 	float4 color		: COLOR0;
 };
-
 // *INDENT-ON*
 
 void main( VS_IN vertex, out VS_OUT result )

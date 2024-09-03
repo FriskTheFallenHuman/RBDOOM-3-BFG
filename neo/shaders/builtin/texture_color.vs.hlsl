@@ -46,7 +46,7 @@ struct VS_IN
 struct VS_OUT
 {
 	float4 position	: SV_Position;
-	float2 texcoord0 : TEXCOORD0_centroid;
+	float3 texcoord0 : TEXCOORD0_centroid;
 	float4 color	: COLOR0;
 };
 // *INDENT-ON*
@@ -91,6 +91,12 @@ void main( VS_IN vertex, out VS_OUT result )
 	modelPosition.z = dot4( matZ, vertex.position );
 	modelPosition.w = 1.0;
 
+#else
+
+	float4 modelPosition = vertex.position;
+
+#endif
+
 	result.position.x = dot4( modelPosition, rpMVPmatrixX );
 	result.position.y = dot4( modelPosition, rpMVPmatrixY );
 	result.position.z = dot4( modelPosition, rpMVPmatrixZ );
@@ -107,25 +113,6 @@ void main( VS_IN vertex, out VS_OUT result )
 		result.texcoord0.x = dot4( vertex.texcoord.xy, rpTextureMatrixS );
 		result.texcoord0.y = dot4( vertex.texcoord.xy, rpTextureMatrixT );
 	}
-#else
-
-	result.position.x = dot4( vertex.position, rpMVPmatrixX );
-	result.position.y = dot4( vertex.position, rpMVPmatrixY );
-	result.position.z = dot4( vertex.position, rpMVPmatrixZ );
-	result.position.w = dot4( vertex.position, rpMVPmatrixW );
-
-	// Compute oldschool texgen or multiply by texture matrix
-	BRANCH if( rpTexGen0Enabled.x > 0.0 )
-	{
-		result.texcoord0.x = dot4( vertex.position, rpTexGen0S );
-		result.texcoord0.y = dot4( vertex.position, rpTexGen0T );
-	}
-	else
-	{
-		result.texcoord0.x = dot4( vertex.texcoord.xy, rpTextureMatrixS );
-		result.texcoord0.y = dot4( vertex.texcoord.xy, rpTextureMatrixT );
-	}
-#endif
 
 	float4 vertexColor = ( swizzleColor( vertex.color ) * rpVertexColorModulate ) + rpVertexColorAdd;
 	result.color =  vertexColor * rpColor;
