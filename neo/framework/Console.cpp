@@ -3,6 +3,7 @@
 
 Doom 3 BFG Edition GPL Source Code
 Copyright (C) 1993-2012 id Software LLC, a ZeniMax Media company.
+Copyright (C) 2017-2024 Robert Beckebans
 
 This file is part of the Doom 3 BFG Edition GPL Source Code ("Doom 3 BFG Edition Source Code").
 
@@ -75,6 +76,8 @@ public:
 	void				Clear();
 
 private:
+	void				Resize();
+
 	void				KeyDownEvent( int key );
 
 	void				Linefeed();
@@ -142,6 +145,9 @@ private:
 
 	idList< overlayText_t >	overlayText;
 	idList< idDebugGraph*> debugGraphs;
+
+	int					lastVirtualScreenWidth;
+	int					lastVirtualScreenHeight;
 
 	static idCVar		con_speed;
 	static idCVar		con_notifyTime;
@@ -292,7 +298,7 @@ float idConsoleLocal::DrawFPS( float y )
 	const uint64_t gameThreadRenderTime	= commonLocal.mainFrameTiming.finishDrawTime - commonLocal.mainFrameTiming.finishGameTime;
 
 	const uint64_t rendererBackEndTime = commonLocal.GetRendererBackEndMicroseconds();
-	const uint64_t rendererShadowsTime = commonLocal.GetRendererShadowsMicroseconds();
+	const uint64_t rendererMaskedOcclusionCullingTime = commonLocal.GetRendererMaskedOcclusionRasterizationMicroseconds();
 	const uint64_t rendererGPUTime = commonLocal.GetRendererGPUMicroseconds();
 	const uint64_t rendererGPUEarlyZTime = commonLocal.GetRendererGpuBeginDrawingMicroseconds() + commonLocal.GetRendererGpuEarlyZMicroseconds() + commonLocal.GetRendererGpuGeometryMicroseconds();
 	const uint64_t rendererGPU_SSAOTime = commonLocal.GetRendererGpuSSAOMicroseconds();
@@ -343,7 +349,7 @@ float idConsoleLocal::DrawFPS( float y )
 		if( com_showFPS.GetInteger() > 2 )
 		{
 			statsWindowWidth += 230;
-			statsWindowHeight += 120;
+			statsWindowHeight += 140;
 		}
 
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -478,6 +484,13 @@ float idConsoleLocal::DrawFPS( float y )
 			//ImGui::Text( "Cull: %i box in %i box out\n",
 			//					commonLocal.stats_frontend.c_box_cull_in, commonLocal.stats_frontend.c_box_cull_out );
 
+			ImGui::TextColored( colorLtGrey, "MASKCULL: tests:%-3i lightCulls:%i surfCulls:%i verts:%i tris:%i",
+								commonLocal.stats_frontend.c_mocTests,
+								commonLocal.stats_frontend.c_mocCulledLights,
+								commonLocal.stats_frontend.c_mocCulledSurfaces,
+								commonLocal.stats_frontend.c_mocVerts,
+								commonLocal.stats_frontend.c_mocIndexes );
+
 			ImGui::TextColored( colorLtGrey, "ADDMODEL: callback:%-2i createInteractions:%i createShadowVolumes:%i",
 								commonLocal.stats_frontend.c_entityDefCallbacks,
 								commonLocal.stats_frontend.c_createInteractions,
@@ -516,7 +529,7 @@ float idConsoleLocal::DrawFPS( float y )
 		ImGui::TextColored( gameThreadGameTime > maxTime ? colorRed : colorWhite,			"Game:    %5llu us   SSAO:         %5llu us", gameThreadGameTime, rendererGPU_SSAOTime );
 		ImGui::TextColored( gameThreadRenderTime > maxTime ? colorRed : colorWhite,			"RF:      %5llu us   SSR:          %5llu us", gameThreadRenderTime, rendererGPU_SSRTime );
 		ImGui::TextColored( rendererBackEndTime > maxTime ? colorRed : colorWhite,			"RB:      %5llu us   Ambient Pass: %5llu us", rendererBackEndTime, rendererGPUAmbientPassTime );
-		ImGui::TextColored( rendererGPUShadowAtlasTime > maxTime ? colorRed : colorWhite,	"Shadows: %5llu us   Shadow Atlas: %5llu us", rendererShadowsTime, rendererGPUShadowAtlasTime );
+		ImGui::TextColored( rendererMaskedOcclusionCullingTime > maxTime ? colorRed : colorWhite,	"MOC:     %5llu us   Shadow Atlas: %5llu us", rendererMaskedOcclusionCullingTime, rendererGPUShadowAtlasTime );
 #if defined(__APPLE__) && defined( USE_MoltenVK )
 		// SRS - For more recent versions of MoltenVK with enhanced performance statistics (v1.2.6 and later), display the Vulkan to Metal encoding thread time on macOS
 		ImGui::TextColored( rendererMvkEncodeTime > maxTime || rendererGPUInteractionsTime > maxTime ? colorRed : colorWhite,	"Encode:  %5lld us   Interactions: %5llu us", rendererMvkEncodeTime, rendererGPUInteractionsTime );
@@ -593,10 +606,10 @@ void idConsoleLocal::Init()
 
 	keyCatching = false;
 
-	LOCALSAFE_LEFT		= 32;
-	LOCALSAFE_RIGHT		= 608;
+	LOCALSAFE_LEFT		= 0;
+	LOCALSAFE_RIGHT		= SCREEN_WIDTH - LOCALSAFE_LEFT;
 	LOCALSAFE_TOP		= 24;
-	LOCALSAFE_BOTTOM	= 456;
+	LOCALSAFE_BOTTOM	= SCREEN_HEIGHT - LOCALSAFE_TOP;
 	LOCALSAFE_WIDTH		= LOCALSAFE_RIGHT - LOCALSAFE_LEFT;
 	LOCALSAFE_HEIGHT	= LOCALSAFE_BOTTOM - LOCALSAFE_TOP;
 
@@ -772,6 +785,39 @@ void idConsoleLocal::Dump( const char* fileName )
 	}
 
 	fileSystem->CloseFile( f );
+}
+
+/*
+==============
+idConsoleLocal::Resize
+==============
+*/
+void idConsoleLocal::Resize()
+{
+	if( renderSystem->GetVirtualWidth() == lastVirtualScreenWidth && renderSystem->GetVirtualHeight() == lastVirtualScreenHeight )
+	{
+		return;
+	}
+
+	lastVirtualScreenWidth = renderSystem->GetVirtualWidth();
+	lastVirtualScreenHeight = renderSystem->GetVirtualHeight();
+	LOCALSAFE_RIGHT		= renderSystem->GetVirtualWidth() - LOCALSAFE_LEFT;
+	LOCALSAFE_BOTTOM	= renderSystem->GetVirtualHeight() - LOCALSAFE_TOP;
+	LOCALSAFE_WIDTH		= LOCALSAFE_RIGHT - LOCALSAFE_LEFT;
+	LOCALSAFE_HEIGHT	= LOCALSAFE_BOTTOM - LOCALSAFE_TOP;
+
+#if 0
+	LINE_WIDTH = ( ( LOCALSAFE_WIDTH / SMALLCHAR_WIDTH ) - 2 );
+
+	consoleField.Clear();
+	consoleField.SetWidthInChars( LINE_WIDTH );
+
+	for( int i = 0 ; i < COMMAND_HISTORY ; i++ )
+	{
+		historyEditLines[i].Clear();
+		historyEditLines[i].SetWidthInChars( LINE_WIDTH );
+	}
+#endif
 }
 
 /*
@@ -1296,7 +1342,7 @@ void idConsoleLocal::DrawInput()
 
 	renderSystem->DrawSmallChar( LOCALSAFE_LEFT + 1 * SMALLCHAR_WIDTH, y, ']' );
 
-	consoleField.Draw( LOCALSAFE_LEFT + 2 * SMALLCHAR_WIDTH, y, SCREEN_WIDTH - 3 * SMALLCHAR_WIDTH, true );
+	consoleField.Draw( LOCALSAFE_LEFT + 2 * SMALLCHAR_WIDTH, y, renderSystem->GetVirtualWidth() - 3 * SMALLCHAR_WIDTH, true );
 }
 
 
@@ -1379,29 +1425,29 @@ void idConsoleLocal::DrawSolidConsole( float frac )
 	int				lines;
 	int				currentColor;
 
-	lines = idMath::Ftoi( SCREEN_HEIGHT * frac );
+	lines = idMath::Ftoi( renderSystem->GetVirtualHeight() * frac );
 	if( lines <= 0 )
 	{
 		return;
 	}
 
-	if( lines > SCREEN_HEIGHT )
+	if( lines > renderSystem->GetVirtualHeight() )
 	{
-		lines = SCREEN_HEIGHT;
+		lines = renderSystem->GetVirtualHeight();
 	}
 
 	// draw the background
-	y = frac * SCREEN_HEIGHT - 2;
+	y = frac * renderSystem->GetVirtualHeight() - 2;
 	if( y < 1.0f )
 	{
 		y = 0.0f;
 	}
 	else
 	{
-		renderSystem->DrawFilled( idVec4( 0.0f, 0.0f, 0.0f, 0.75f ), 0, 0, SCREEN_WIDTH, y );
+		renderSystem->DrawFilled( idVec4( 0.0f, 0.0f, 0.0f, 0.75f ), 0, 0, renderSystem->GetVirtualWidth(), y );
 	}
 
-	renderSystem->DrawFilled( colorCyan, 0, y, SCREEN_WIDTH, 2 );
+	renderSystem->DrawFilled( colorCyan, 0, y, renderSystem->GetVirtualWidth(), 2 );
 
 	// draw the version number
 
@@ -1494,6 +1540,8 @@ ForceFullScreen is used by the editor
 */
 void idConsoleLocal::Draw( bool forceFullScreen )
 {
+	Resize();
+
 	if( forceFullScreen )
 	{
 		// if we are forced full screen because of a disconnect,

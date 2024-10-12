@@ -97,33 +97,45 @@ public:
 
 	// Submit the jobs in this list.
 	void					Submit( idParallelJobList* waitForJobList = NULL, int parallelism = JOBLIST_PARALLELISM_DEFAULT );
+
 	// Wait for the jobs in this list to finish. Will spin in place if any jobs are not done.
 	void					Wait();
+
 	// Try to wait for the jobs in this list to finish but either way return immediately. Returns true if all jobs are done.
 	bool					TryWait();
+
 	// returns true if the job list has been submitted.
 	bool					IsSubmitted() const;
 
 	// Get the number of jobs executed in this job list.
 	unsigned int			GetNumExecutedJobs() const;
+
 	// Get the number of sync points.
 	unsigned int			GetNumSyncs() const;
+
 	// Time at which the job list was submitted.
-	uint64_t					GetSubmitTimeMicroSec() const;
+	uint64_t				GetSubmitTimeMicroSec() const;
+
 	// Time at which execution of this job list started.
-	uint64_t					GetStartTimeMicroSec() const;
+	uint64_t				GetStartTimeMicroSec() const;
+
 	// Time at which all jobs in the list were executed.
-	uint64_t					GetFinishTimeMicroSec() const;
+	uint64_t				GetFinishTimeMicroSec() const;
+
 	// Time the host thread waited for this job list to finish.
-	uint64_t					GetWaitTimeMicroSec() const;
+	uint64_t				GetWaitTimeMicroSec() const;
+
 	// Get the total time all units spent processing this job list.
-	uint64_t					GetTotalProcessingTimeMicroSec() const;
+	uint64_t				GetTotalProcessingTimeMicroSec() const;
+
 	// Get the total time all units wasted while processing this job list.
-	uint64_t					GetTotalWastedTimeMicroSec() const;
+	uint64_t				GetTotalWastedTimeMicroSec() const;
+
 	// Time the given unit spent processing this job list.
-	uint64_t					GetUnitProcessingTimeMicroSec( int unit ) const;
+	uint64_t				GetUnitProcessingTimeMicroSec( int unit ) const;
+
 	// Time the given unit wasted while processing this job list.
-	uint64_t					GetUnitWastedTimeMicroSec( int unit ) const;
+	uint64_t				GetUnitWastedTimeMicroSec( int unit ) const;
 
 	// Get the job list ID
 	jobListId_t				GetId() const;

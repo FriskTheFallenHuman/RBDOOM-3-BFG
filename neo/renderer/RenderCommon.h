@@ -64,6 +64,15 @@ SURFACES
 #include "ModelOverlay.h"
 #include "Interaction.h"
 
+// RB begin
+#define MOC_MULTITHREADED 0
+
+#if MOC_MULTITHREADED
+	class CullingThreadpool;
+#endif
+class MaskedOcclusionCulling;
+// RB end
+
 class idRenderWorldLocal;
 struct viewEntity_t;
 struct viewLight_t;
@@ -900,9 +909,9 @@ public:
 	virtual void			DrawBigChar( int x, int y, int ch );
 	virtual void			DrawBigStringExt( int x, int y, const char* string, const idVec4& setColor, bool forceColor );
 
-	virtual const emptyCommand_t* 	SwapCommandBuffers( uint64_t* frontEndMicroSec, uint64_t* backEndMicroSec, uint64_t* shadowMicroSec, uint64_t* gpuMicroSec, backEndCounters_t* bc, performanceCounters_t* pc );
+	virtual const emptyCommand_t* 	SwapCommandBuffers( uint64_t* frontEndMicroSec, uint64_t* backEndMicroSec, uint64_t* mocMicroSec, uint64_t* gpuMicroSec, backEndCounters_t* bc, performanceCounters_t* pc );
 
-	virtual void					SwapCommandBuffers_FinishRendering( uint64_t* frontEndMicroSec, uint64_t* backEndMicroSec, uint64_t* shadowMicroSec, uint64_t* gpuMicroSec, backEndCounters_t* bc, performanceCounters_t* pc );
+	virtual void					SwapCommandBuffers_FinishRendering( uint64_t* frontEndMicroSec, uint64_t* backEndMicroSec, uint64_t* mocMicroSec, uint64_t* gpuMicroSec, backEndCounters_t* bc, performanceCounters_t* pc );
 	virtual const emptyCommand_t* 	SwapCommandBuffers_FinishCommandBuffers();
 
 	virtual void			RenderCommandBuffers( const emptyCommand_t* commandBuffers );
@@ -1031,6 +1040,17 @@ public:
 	idList<calcLightGridPointParms_t*>	lightGridJobs;
 
 	idRenderBackend			backend;
+
+#if defined(USE_INTRINSICS_SSE)
+
+#if MOC_MULTITHREADED
+	CullingThreadpool*		maskedOcclusionThreaded;
+#endif
+	MaskedOcclusionCulling*	maskedOcclusionCulling;
+	idVec4					maskedUnitCubeVerts[8];
+	idVec4					maskedZeroOneCubeVerts[8];
+	unsigned int			maskedZeroOneCubeIndexes[36];
+#endif
 
 private:
 	bool					bInitialized;
@@ -1187,9 +1207,9 @@ extern idCVar r_debugRenderToTexture;
 extern idCVar stereoRender_enable;
 extern idCVar stereoRender_deGhost;			// subtract from opposite eye to reduce ghosting
 
+// RB begin
 extern idCVar r_useGPUSkinning;
 
-// RB begin
 extern idCVar r_shadowMapAtlasSize;
 extern idCVar r_shadowMapFrustumFOV;
 extern idCVar r_shadowMapSingleSide;
@@ -1246,6 +1266,8 @@ extern idCVar r_taaMaxRadiance;
 extern idCVar r_taaMotionVectors;
 
 extern idCVar r_useFilmicPostFX;
+
+extern idCVar r_useMaskedOcclusionCulling;
 // RB end
 
 /*
@@ -1506,6 +1528,16 @@ void R_LinkDrawSurfToView( drawSurf_t* drawSurf, viewDef_t* viewDef );
 void R_AddModels();
 
 /*
+============================================================
+
+TR_FRONTEND_MASKED_OCCLUSION_CULLING
+
+============================================================
+*/
+
+void R_FillMaskedOcclusionBufferWithModels( viewDef_t* viewDef );
+
+/*
 =============================================================
 
 TR_FRONTEND_DEFORM
@@ -1555,6 +1587,11 @@ void				R_AllocStaticTriSurfDominantTris( srfTriangles_t* tri, int numVerts );
 void				R_AllocStaticTriSurfMirroredVerts( srfTriangles_t* tri, int numMirroredVerts );
 void				R_AllocStaticTriSurfDupVerts( srfTriangles_t* tri, int numDupVerts );
 
+// RB begin
+void				R_AllocStaticTriSurfMocIndexes( srfTriangles_t* tri, int numIndexes );
+void				R_AllocStaticTriSurfMocVerts( srfTriangles_t* tri, int numVerts );
+// RB end
+
 srfTriangles_t* 	R_CopyStaticTriSurf( const srfTriangles_t* tri );
 
 void				R_ResizeStaticTriSurfVerts( srfTriangles_t* tri, int numVerts );
@@ -1571,6 +1608,7 @@ int					R_TriSurfMemory( const srfTriangles_t* tri );
 void				R_BoundTriSurf( srfTriangles_t* tri );
 void				R_RemoveDuplicatedTriangles( srfTriangles_t* tri );
 void				R_CreateSilIndexes( srfTriangles_t* tri );
+void				R_CreateMaskedOcclusionCullingTris( srfTriangles_t* tri ); // RB
 void				R_RemoveDegenerateTriangles( srfTriangles_t* tri );
 void				R_RemoveUnusedVerts( srfTriangles_t* tri );
 void				R_RangeCheckIndexes( const srfTriangles_t* tri );

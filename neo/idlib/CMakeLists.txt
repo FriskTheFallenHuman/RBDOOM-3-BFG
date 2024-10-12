@@ -144,10 +144,14 @@ else()
 	ENDFOREACH(item)
 	endif()
 
-	GET_DIRECTORY_PROPERTY(_directory_flags DEFINITIONS)
+	GET_DIRECTORY_PROPERTY(_directory_flags COMPILE_OPTIONS)
 	LIST(APPEND _compiler_FLAGS ${_directory_flags})
-	
 	SEPARATE_ARGUMENTS(_compiler_FLAGS)
+	
+	GET_DIRECTORY_PROPERTY(_directory_flags COMPILE_DEFINITIONS)
+	FOREACH(item ${_directory_flags})
+		LIST(APPEND _compiler_FLAGS "-D${item}")
+	ENDFOREACH(item)
 	
 	if (USE_PRECOMPILED_HEADERS)
 	if(OPTICK)
