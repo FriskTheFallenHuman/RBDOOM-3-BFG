@@ -1,15 +1,7 @@
 
-add_definitions(-DDMAP -D__DOOM_DLL__)
+project(dmap CXX)
 
-# MC_ for MAP COMPILER
-set(MC_INCLUDES
-	#TypeInfoGen.h
-	)
-set(MC_SOURCES
-	#TypeInfoGen.cpp
-	#main.cpp
-	precompiled.cpp
-	)
+set(MC_SOURCES precompiled.cpp )
 
 file(GLOB MC_DMAP_INCLUDES dmap/*.h)
 file(GLOB MC_DMAP_SOURCES dmap/*.cpp)
@@ -42,8 +34,7 @@ set(MC_FRAMEWORK_INCLUDES
 	../../framework/DeclEntityDef.h
 	../../framework/DeclSkin.h
 	../../framework/DeclTable.h
-	../../idlib/precompiled.h
-	)
+	../../idlib/precompiled.h)
 set(MC_FRAMEWORK_SOURCES
 	../../framework/CmdSystem.cpp
 	../../framework/CVarSystem.cpp
@@ -55,9 +46,7 @@ set(MC_FRAMEWORK_SOURCES
 	../../framework/DeclManager.cpp
 	../../framework/DeclEntityDef.cpp
 	../../framework/DeclSkin.cpp
-	../../framework/DeclTable.cpp
-	)
-
+	../../framework/DeclTable.cpp)
 set(MC_RENDERER_INCLUDES 
 	../../renderer/BinaryImage.h
 	../../renderer/Image.h
@@ -69,8 +58,7 @@ set(MC_RENDERER_INCLUDES
 	../../renderer/Model_ase.h
 	../../renderer/Model_lwo.h
 	../../renderer/Model_ma.h
-	../../renderer/Model_obj.h
-	)
+	../../renderer/Model_obj.h)
 set(MC_RENDERER_SOURCES
 	../../renderer/BinaryImage.cpp
 	../../renderer/GLMatrix.cpp
@@ -91,16 +79,13 @@ set(MC_RENDERER_SOURCES
 	../../renderer/Model_ase.cpp
 	../../renderer/Model_lwo.cpp
 	../../renderer/Model_ma.cpp
-	../../renderer/Model_obj.cpp
-	)
+	../../renderer/Model_obj.cpp)
 
 set(MC_GAME_INCLUDES 
-	../../d3xp/anim/Anim.h
-	)
+	../../d3xp/anim/Anim.h)
 set(MC_GAME_SOURCES
 	../../d3xp/anim/Anim.cpp
-	../../d3xp/anim/Anim_Blend.cpp
-	)
+	../../d3xp/anim/Anim_Blend.cpp)
 	
 file(GLOB MC_MIKKTSPACE_INCLUDES ../../libs/mikktspace/*.h)
 file(GLOB MC_MIKKTSPACE_SOURCES ../../libs/mikktspace/*.c)
@@ -122,39 +107,34 @@ if(MSVC)
 	file(GLOB CURSES_INCLUDES ../../libs/imtui/pdcurses/*.h)
 
 	file(GLOB PDCURSES_INCLUDES ../../libs/imtui/pdcurses/pdcurses/*.h)
-    file(GLOB PDCURSES_SOURCES ../../libs/imtui/pdcurses/pdcurses/*.c)
+	file(GLOB PDCURSES_SOURCES ../../libs/imtui/pdcurses/pdcurses/*.c)
 
-    file(GLOB WINCON_INCLUDES ../../libs/imtui/pdcurses/wincon/*.h)
-    file(GLOB WINCON_SOURCES ../../libs/imtui/pdcurses/wincon/*.c)
+	file(GLOB WINCON_INCLUDES ../../libs/imtui/pdcurses/wincon/*.h)
+	file(GLOB WINCON_SOURCES ../../libs/imtui/pdcurses/wincon/*.c)
 
-    add_library(imtui-pdcurses STATIC
-        ${CURSES_INCLUDES}
+	add_library(imtui-pdcurses STATIC
+		${CURSES_INCLUDES}
 		${PDCURSES_INCLUDES}
-        ${PDCURSES_SOURCES}
-        ${WINCON_INCLUDES}
-        ${WINCON_SOURCES}
-        )
+		${PDCURSES_SOURCES}
+		${WINCON_INCLUDES}
+		${WINCON_SOURCES})
 
-	target_include_directories(imtui-pdcurses PRIVATE
-       ../../libs/imtui/pdcurses
-       )
+	target_include_directories(imtui-pdcurses PRIVATE ../../libs/imtui/pdcurses)
 
 	set_target_properties(imtui-pdcurses PROPERTIES LINKER_LANGUAGE C)
-    target_link_libraries(imtui-pdcurses PUBLIC
-        winmm
-        )
+	target_link_libraries(imtui-pdcurses PUBLIC winmm)
 else()
 	find_package(Curses REQUIRED)
-        CHECK_LIBRARY_EXISTS("${CURSES_NCURSES_LIBRARY}"
-            nodelay "" CURSES_NCURSES_HAS_NODELAY)
-        if(NOT CURSES_NCURSES_HAS_NODELAY)
-            find_library(CURSES_EXTRA_LIBRARY tinfo)
-            CHECK_LIBRARY_EXISTS("${CURSES_EXTRA_LIBRARY}"
-                nodelay "" CURSES_TINFO_HAS_NODELAY)
-        endif()
-        if(CURSES_EXTRA_LIBRARY)
-            set(CURSES_LIBRARIES ${CURSES_LIBRARIES} ${CURSES_EXTRA_LIBRARY})
-        endif()
+		CHECK_LIBRARY_EXISTS("${CURSES_NCURSES_LIBRARY}"
+			nodelay "" CURSES_NCURSES_HAS_NODELAY)
+		if(NOT CURSES_NCURSES_HAS_NODELAY)
+			find_library(CURSES_EXTRA_LIBRARY tinfo)
+			CHECK_LIBRARY_EXISTS("${CURSES_EXTRA_LIBRARY}"
+				nodelay "" CURSES_TINFO_HAS_NODELAY)
+		endif()
+		if(CURSES_EXTRA_LIBRARY)
+			set(CURSES_LIBRARIES ${CURSES_LIBRARIES} ${CURSES_EXTRA_LIBRARY})
+		endif()
 endif()
 
 set(MC_INCLUDES_ALL
@@ -169,9 +149,8 @@ set(MC_INCLUDES_ALL
 			${MC_GAME_INCLUDES}
 			${MC_IMGUI_INCLUDES}
 			${MC_IMTUI_INCLUDES}
-			${MC_MINIZIP_INCLUDES}
-			)
-			
+			${MC_MINIZIP_INCLUDES})
+
 set(MC_SOURCES_ALL
 			${MC_SOURCES}
 			${MC_FRAMEWORK_SOURCES}
@@ -185,8 +164,7 @@ set(MC_SOURCES_ALL
 			${MC_IMGUI_SOURCES}
 			${MC_IMTUI_SOURCES}
 			${MC_ZLIB_SOURCES}
-			${MC_MINIZIP_SOURCES}
-			)
+			${MC_MINIZIP_SOURCES})
 
 source_group("main" FILES ${MC_INCLUDES})
 source_group("main" FILES ${MC_SOURCES})
@@ -218,56 +196,40 @@ source_group("anim" FILES ${MC_GAME_SOURCES})
 set(MC_PRECOMPILED_SOURCES ${MC_SOURCES_ALL})
 list(REMOVE_ITEM MC_PRECOMPILED_SOURCES ${MC_MIKKTSPACE_SOURCES} ${MC_IMGUI_SOURCES} ${MC_IMTUI_SOURCES} ${MC_ZLIB_SOURCES} ${MC_MINIZIP_SOURCES})
 
-include_directories(
-	.
-	../../idlib
-	../../libs/
-	)
-
 if(MSVC)
-
 	list(REMOVE_ITEM MC_PRECOMPILED_SOURCES precompiled.cpp) 
 
-	#foreach( src_file ${MC_PRECOMPILED_SOURCES} )
-	#	message(STATUS "-include precompiled.h for ${src_file}")
-	#endforeach()
-
-    #set_target_properties(idlib PROPERTIES COMPILE_FLAGS "/Yuprecompiled.h")
-    set_source_files_properties(precompiled.cpp
-        PROPERTIES
-        COMPILE_FLAGS "/Ycprecompiled.h"
-        OBJECT_OUTPUTS "precompiled.pch"
-        )
+	set_source_files_properties(precompiled.cpp
+		PROPERTIES
+		COMPILE_FLAGS "/Ycprecompiled.h"
+		OBJECT_OUTPUTS "precompiled.pch")
 		
 	set_source_files_properties(
 		${MC_PRECOMPILED_SOURCES}
 		PROPERTIES
 		COMPILE_FLAGS "/Yuprecompiled.h"
-		OBJECT_DEPENDS "precompiled.pch"
-		)
+		OBJECT_DEPENDS "precompiled.pch")
 
 	# SRS - disable certain MSVC warnings for select third-party source libraries, consider updating versions in the future?
 	# C4005: macro redefinition, C4244: type conversion with possible loss of data, C4305: trucation from double to float
 	set_source_files_properties(
 			${MC_IMTUI_SOURCES} ${MC_IMGUI_SOURCES}
 			PROPERTIES
-			COMPILE_FLAGS "/wd4005 /wd4244 /wd4305"
-			)
+			COMPILE_FLAGS "/wd4005 /wd4244 /wd4305")
 
 	# C4244, C4267: type conversion with possible loss of data, C4996: declared deprecated
 	set_source_files_properties(
 			${PDCURSES_SOURCES} ${WINCON_SOURCES}
 			PROPERTIES
-			COMPILE_FLAGS "/wd4244 /wd4267 /wd4996"
-			)
+			COMPILE_FLAGS "/wd4244 /wd4267 /wd4996")
 
-    add_executable(rbdmap ${MC_SOURCES_ALL} ${MC_INCLUDES_ALL})
-	add_dependencies(rbdmap idlib)
-	target_link_libraries(rbdmap idlib winmm imtui-pdcurses ${ZLIB_LIBRARY})
+	add_executable(${PROJECT_NAME} ${MC_SOURCES_ALL} ${MC_INCLUDES_ALL})
+	add_dependencies(${PROJECT_NAME} idlib)
+	target_link_libraries(${PROJECT_NAME} idlib winmm imtui-pdcurses ${ZLIB_LIBRARY})
 
 	# set MSVC default debug directory on executable	
 	if(CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER_EQUAL 8)
-		set_target_properties(rbdmap PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/..")
+		set_target_properties(${PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/..")
 	endif()
 	
 else()
@@ -300,17 +262,17 @@ else()
 			LIST(APPEND _compiler_FLAGS "-D${item}")
 		ENDFOREACH(item)
 
-		# SRS - USE_OPTICK not useful for rbdmap, but definition required to avoid mismatch with idlib precompiled header
+		# SRS - USE_OPTICK not useful for dmap, but definition required to avoid mismatch with idlib precompiled header
 		if(OPTICK)
 			LIST(APPEND _compiler_FLAGS -DUSE_OPTICK=1)
 		else()
 			LIST(APPEND _compiler_FLAGS -DUSE_OPTICK=0)
 		endif()
 
-		add_custom_target(precomp_header_rbdmap ALL
+		add_custom_target(precomp_header_dmap ALL
 						COMMAND ${CMAKE_CXX_COMPILER} ${_compiler_FLAGS} -x c++-header precompiled.h -o precompiled.h.gch
 						WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-						COMMENT "Creating tools/compilers/precompiled.h.gch for rbdmap"
+						COMMENT "Creating tools/compilers/precompiled.h.gch for dmap"
 						)
 	endif()
 
@@ -319,14 +281,13 @@ else()
 			${MC_ZLIB_SOURCES}
 			${MC_MINIZIP_SOURCES}
 			PROPERTIES
-			COMPILE_FLAGS "-Wno-stringop-overread -Wno-deprecated-non-prototype"
-			)
+			COMPILE_FLAGS "-Wno-stringop-overread -Wno-deprecated-non-prototype")
 
-	add_executable(rbdmap ${MC_SOURCES_ALL} ${MC_INCLUDES_ALL})
-	add_dependencies(rbdmap idlib)
+	add_executable(${PROJECT_NAME} ${MC_SOURCES_ALL} ${MC_INCLUDES_ALL})
+	add_dependencies(${PROJECT_NAME} idlib)
 
 	if (USE_PRECOMPILED_HEADERS)
-		add_dependencies(rbdmap precomp_header_rbdmap)
+		add_dependencies(${PROJECT_NAME} precomp_header_dmap)
 
 		if(WIN32)
 			set(remove_command "del")
@@ -338,26 +299,27 @@ else()
 
 		# SRS - delete precompiled header file after executable is compiled: command line build case
 		if(CMAKE_GENERATOR MATCHES "Makefiles" OR CMAKE_GENERATOR MATCHES "Ninja")
-			add_custom_target(rm_precomp_header_rbdmap ALL
+			add_custom_target(rm_precomp_header_dmap ALL
 					COMMAND ${remove_command} "precompiled.h.gch"
 					WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 					COMMENT "remove tools/compilers/precompiled.h.gch"
 					)
-			add_dependencies(rm_precomp_header_rbdmap rbdmap)
+			add_dependencies(rm_precomp_header_dmap ${PROJECT_NAME})
 
 		# SRS - delete precompiled header files after executable is compiled: IDE build case (e.g. Xcode)
 		else()
-			add_custom_command(TARGET rbdmap POST_BUILD
+			add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 					# SRS - added wildcards to remove tmp files from cmake ZERO_CHECK regeneration
 					COMMAND ${remove_command} "${idlib_dir_slash}precompiled.h*.gch*"
 					COMMAND ${remove_command} "precompiled.h*.gch*"
 					WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-					COMMENT "remove idlib/precompiled.h.gch and tools/compilers/precompiled.h.gch"
-			)
+					COMMENT "remove idlib/precompiled.h.gch and tools/compilers/precompiled.h.gch")
 		endif()
 	endif()
 
-	target_link_libraries(rbdmap idlib ${CURSES_NCURSES_LIBRARY} ${ZLIB_LIBRARY})
+	target_link_libraries(${PROJECT_NAME} idlib ${CURSES_NCURSES_LIBRARY} ${ZLIB_LIBRARY})
 endif()
-	
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE DMAP __DOOM_DLL__)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}	${CMAKE_SOURCE_DIR}/idlib ${CMAKE_SOURCE_DIR}/libs/)
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY $<1:>${CMAKE_SOURCE_DIR}/../bin)

@@ -162,10 +162,10 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 	if(APPLE)
 		# SRS - Also add -fasm-blocks otherwise Xcode complains and -Qunused-arguments to silence MMX/SSE unused arg warnings when compiling for Apple arm64
 		add_compile_options(-fasm-blocks -Qunused-arguments)
-        if(CMAKE_OSX_SYSROOT)
-            add_compile_options(-isysroot ${CMAKE_OSX_SYSROOT})
-            message(STATUS "Using macOS sysroot: " ${CMAKE_OSX_SYSROOT})
-        endif()
+		if(CMAKE_OSX_SYSROOT)
+			add_compile_options(-isysroot ${CMAKE_OSX_SYSROOT})
+			message(STATUS "Using macOS sysroot: " ${CMAKE_OSX_SYSROOT})
+		endif()
 		if(CMAKE_OSX_DEPLOYMENT_TARGET)
 			add_compile_options(-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET})
 		endif()
@@ -1043,7 +1043,11 @@ if(MSVC)
 		
 	# set MSVC default debug directory on executable	
 	if(CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER_EQUAL 8)
-		set_target_properties(RBDoom3BFG PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/..")
+		set_target_properties(RBDoom3BFG PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/../bin")
+		set_target_properties(RBDoom3BFG PROPERTIES VS_STARTUP_PROJECT RBDoom3BFG )
+		set_target_properties(RBDoom3BFG PROPERTIES VS_DEBUGGER_COMMAND "${CMAKE_SOURCE_DIR}/../bin/RBDoom3BFG.exe" )
+		set_target_properties(RBDoom3BFG PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/../bin" )
+		set_target_properties(RBDoom3BFG PROPERTIES VS_DEBUGGER_COMMAND_ARGUMENTS "+set developer 1" )
 	endif()
 	
 	#CMAKE_BINARY_DIR
@@ -1194,8 +1198,8 @@ else()
 	endif()
 
 	if(USE_VULKAN)
-        add_dependencies(RBDoom3BFG nvrhi_vk)
-    endif()
+		add_dependencies(RBDoom3BFG nvrhi_vk)
+	endif()
 
 	if (USE_PRECOMPILED_HEADERS)
 		# make sure precompiled header is created before executable is compiled
@@ -1279,3 +1283,4 @@ add_subdirectory(shaders)
 add_dependencies(Shaders ShaderMake)
 add_dependencies(RBDoom3BFG Shaders ${MASKED_OCCLUSION_LIBRARY})
 
+set_target_properties(RBDoom3BFG PROPERTIES RUNTIME_OUTPUT_DIRECTORY $<1:>${CMAKE_SOURCE_DIR}/../bin)

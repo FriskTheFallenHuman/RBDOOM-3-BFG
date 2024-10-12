@@ -34,10 +34,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "Common_local.h"
 #include "../sys/sys_lobby_backend.h"
 
-
-#define LAUNCH_TITLE_DOOM_EXECUTABLE		"doom1.exe"
-#define LAUNCH_TITLE_DOOM2_EXECUTABLE		"doom2.exe"
-
 idCVar com_wipeSeconds( "com_wipeSeconds", "1", CVAR_SYSTEM, "" );
 idCVar com_disableAutoSaves( "com_disableAutoSaves", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
 idCVar com_disableAllSaves( "com_disableAllSaves", "0", CVAR_SYSTEM | CVAR_BOOL, "" );
@@ -1420,6 +1416,27 @@ Restart the server on a different map
 */
 CONSOLE_COMMAND_SHIP( map, "loads a map", idCmdSystem::ArgCompletion_MapName )
 {
+	idStr map, string;
+	findFile_t	ff;
+
+	map = args.Argv( 1 );
+	if ( !map.Length() ) {
+		return;
+	}
+	map.StripFileExtension();
+
+	// make sure the level exists before trying to change, so that
+	// a typo at the server console won't end the game
+	sprintf( string, "maps/%s.map", map.c_str() );
+	ff = fileSystem->FindFile( string );
+	switch ( ff ) {
+	case FIND_NO:
+		common->Printf( "Can't find map %s\n", string.c_str() );
+		return;
+	default:
+		break;
+	}
+
 	commonLocal.StartNewGame( args.Argv( 1 ), false, GAME_MODE_SINGLEPLAYER );
 }
 
@@ -1445,6 +1462,27 @@ Restart the server on a different map in developer mode
 */
 CONSOLE_COMMAND_SHIP( devmap, "loads a map in developer mode", idCmdSystem::ArgCompletion_MapName )
 {
+	idStr map, string;
+	findFile_t	ff;
+
+	map = args.Argv( 1 );
+	if ( !map.Length() ) {
+		return;
+	}
+	map.StripFileExtension();
+
+	// make sure the level exists before trying to change, so that
+	// a typo at the server console won't end the game
+	sprintf( string, "maps/%s.map", map.c_str() );
+	ff = fileSystem->FindFile( string );
+	switch ( ff ) {
+	case FIND_NO:
+		common->Printf( "Can't find map %s\n", string.c_str() );
+		return;
+	default:
+		break;
+	}
+
 	commonLocal.StartNewGame( args.Argv( 1 ), true, GAME_MODE_SINGLEPLAYER );
 }
 
