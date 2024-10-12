@@ -125,6 +125,8 @@ void main( PS_IN fragment, out PS_OUT result )
 
 	float Ymax = hdrMaxLuminance;
 
+// OPERATORS 0 & 1 ignores some transparency levels OPERATORS >= 2 do. But they make everything darker.
+// OPERATOR 2 and above do ignore transparency at cost of making the game darker (pair it with ligth scale)
 #define OPERATOR 2
 
 #if OPERATOR == 0
