@@ -270,8 +270,6 @@ private:
 	static void					ReloadDecls_f( const idCmdArgs& args );
 	static void					TouchDecl_f( const idCmdArgs& args );
 	// RB begin
-	static void                 ExportEntityDefsToBlender_f( const idCmdArgs& args );
-	static void                 ExportMaterialsToBlender_f( const idCmdArgs& args );
 	static void                 ExportEntityDefsToTrenchBroom_f( const idCmdArgs& args );
 	static void                 ExportModelsToTrenchBroom_f( const idCmdArgs& args );
 	static void                 ExportImagesToTrenchBroom_f( const idCmdArgs& args );
@@ -974,8 +972,6 @@ void idDeclManagerLocal::Init()
 	cmdSystem->AddCommand( "convertPDAsToStrings", ConvertPDAsToStrings_f, CMD_FL_SYSTEM, "Converts *.pda files to text which can be plugged into *.lang files." );
 
 	// RB begin
-	cmdSystem->AddCommand( "exportEntitiesToBlender", ExportEntityDefsToBlender_f, CMD_FL_SYSTEM, "exports all entity and model defs to _bl/entities.json" );
-	cmdSystem->AddCommand( "exportMaterialsToBlender", ExportMaterialsToBlender_f, CMD_FL_SYSTEM, "exports all materials to _bl/entities.json" );
 	cmdSystem->AddCommand( "exportFGD", ExportEntityDefsToTrenchBroom_f, CMD_FL_SYSTEM, "exports all entity and model defs to _tb/fgd/DOOM-3-*.fgd" );
 	cmdSystem->AddCommand( "exportModelsToTrenchBroom", ExportModelsToTrenchBroom_f, CMD_FL_SYSTEM, "exports all generated models like blwo, base .. to _tb/*.obj" );
 	cmdSystem->AddCommand( "exportImagesToTrenchBroom", ExportImagesToTrenchBroom_f, CMD_FL_SYSTEM, "exports all generated bimages to _tb/*.png" );
@@ -2031,109 +2027,6 @@ void idDeclManagerLocal::TouchDecl_f( const idCmdArgs& args )
 
 // RB begin
 #if !defined( DMAP )
-
-void idDeclManagerLocal::ExportEntityDefsToBlender_f( const idCmdArgs& args )
-{
-	idStr jsonStringsFileName = "_bl/entities.json";
-	idFileLocal file( fileSystem->OpenFileWrite( jsonStringsFileName, "fs_basepath" ) );
-
-	if( file == NULL )
-	{
-		idLib::Printf( "Failed to entity declarations data to JSON.\n" );
-	}
-
-	int totalEntitiesCount = 0;
-	int totalModelsCount = 0;
-
-	// avoid media cache
-	com_editors |= EDITOR_EXPORTDEFS;
-
-	file->Printf( "{\n\t\"entities\": {" );
-
-	int count = declManagerLocal.linearLists[ DECL_ENTITYDEF ].Num();
-	for( int i = 0; i < count; i++ )
-	{
-		const idDeclEntityDef* decl = static_cast< const idDeclEntityDef* >( declManagerLocal.FindType( DECL_ENTITYDEF, declManagerLocal.linearLists[ DECL_ENTITYDEF ][ i ]->GetName(), false ) );
-
-		totalEntitiesCount++;
-
-		file->Printf( "\n\t\t\"%s\": {\n", decl->GetName() );
-		decl->dict.WriteJSON( file, "\t\t" );
-
-		if( i == ( count - 1 ) )
-		{
-			file->Printf( "\t\t}\n" );
-		}
-		else
-		{
-			file->Printf( "\t\t},\n" );
-		}
-	}
-
-	file->Printf( "\t}\n" );
-	file->Printf( "}\n" );
-
-	file->Flush();
-
-	com_editors &= ~EDITOR_EXPORTDEFS;
-
-	idLib::Printf( "\nData written to %s\n", jsonStringsFileName.c_str() );
-	idLib::Printf( "----------------------------\n" );
-	idLib::Printf( "Wrote %d Entities.\n", totalEntitiesCount );
-	idLib::Printf( "Wrote %d Models.\n", totalModelsCount );
-}
-
-void idDeclManagerLocal::ExportMaterialsToBlender_f( const idCmdArgs& args )
-{
-	idStr jsonStringsFileName = "_bl/materials.json";
-	idFileLocal file( fileSystem->OpenFileWrite( jsonStringsFileName, "fs_basepath" ) );
-
-	if( file == NULL )
-	{
-		idLib::Printf( "Failed to entity declarations data to JSON.\n" );
-	}
-
-	int totalMaterialsCount = 0;
-
-	// avoid media cache
-	com_editors |= EDITOR_EXPORTDEFS;
-
-	file->Printf( "{\n\t\"materials\": {" );
-
-	int count = declManagerLocal.linearLists[ DECL_MATERIAL ].Num();
-
-	CommandlineProgressBar progressBar( count, renderSystem->GetWidth(), renderSystem->GetHeight() );
-	progressBar.Start();
-
-	for( int i = 0; i < count; i++ )
-	{
-		const idMaterial* material = static_cast< const idMaterial* >( declManagerLocal.FindType( DECL_MATERIAL, declManagerLocal.linearLists[ DECL_MATERIAL ][ i ]->GetName(), false ) );
-
-#if 0
-		const char* matName = material->GetName();
-		if( idStr::FindText( matName, "textures/base_floor/ghotile3", false ) != -1 )
-		{
-			totalMaterialsCount++;
-		}
-#endif
-
-		material->ExportJSON( file, i == ( count - 1 ) );
-
-		totalMaterialsCount++;
-		progressBar.Increment( true );
-	}
-
-	file->Printf( "\t}\n" );
-	file->Printf( "}\n" );
-
-	file->Flush();
-
-	com_editors &= ~EDITOR_EXPORTDEFS;
-
-	idLib::Printf( "\nData written to %s\n", jsonStringsFileName.c_str() );
-	idLib::Printf( "----------------------------\n" );
-	idLib::Printf( "Wrote %d Materials.\n", totalMaterialsCount );
-}
 
 class idSort_CompareEntityDefEntity : public idSort_Quick< const idDeclEntityDef*, idSort_CompareEntityDefEntity >
 {

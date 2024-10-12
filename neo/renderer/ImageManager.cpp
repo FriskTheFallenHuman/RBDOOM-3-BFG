@@ -656,97 +656,6 @@ void idImageManager::ReloadImages( bool all, nvrhi::ICommandList* commandList )
 
 /*
 ===============
-R_CombineCubeImages_f
-
-Used to combine animations of six separate tga files into
-a serials of 6x taller tga files, for preparation to roq compress
-===============
-*/
-void R_CombineCubeImages_f( const idCmdArgs& args )
-{
-	if( args.Argc() != 2 )
-	{
-		common->Printf( "usage: combineCubeImages <baseName>\n" );
-		common->Printf( " combines basename[1-6][0001-9999].tga to basenameCM[0001-9999].tga\n" );
-		common->Printf( " 1: forward 2:right 3:back 4:left 5:up 6:down\n" );
-		return;
-	}
-
-	idStr	baseName = args.Argv( 1 );
-	common->SetRefreshOnPrint( true );
-
-	for( int frameNum = 1 ; frameNum < 10000 ; frameNum++ )
-	{
-		char	filename[MAX_IMAGE_NAME];
-		byte*	pics[6];
-		int		width = 0, height = 0;
-		int		side;
-		int		orderRemap[6] = { 1, 3, 4, 2, 5, 6 };
-		for( side = 0 ; side < 6 ; side++ )
-		{
-			idStr::snPrintf( filename, sizeof( filename ), "%s%i%04i.tga", baseName.c_str(), orderRemap[side], frameNum );
-
-			common->Printf( "reading %s\n", filename );
-			R_LoadImage( filename, &pics[side], &width, &height, NULL, true, NULL );
-
-			if( !pics[side] )
-			{
-				common->Printf( "not found.\n" );
-				break;
-			}
-
-			// convert from "camera" images to native cube map images
-			switch( side )
-			{
-				case 0:	// forward
-					R_RotatePic( pics[side], width );
-					break;
-				case 1:	// back
-					R_RotatePic( pics[side], width );
-					R_HorizontalFlip( pics[side], width, height );
-					R_VerticalFlip( pics[side], width, height );
-					break;
-				case 2:	// left
-					R_VerticalFlip( pics[side], width, height );
-					break;
-				case 3:	// right
-					R_HorizontalFlip( pics[side], width, height );
-					break;
-				case 4:	// up
-					R_RotatePic( pics[side], width );
-					break;
-				case 5: // down
-					R_RotatePic( pics[side], width );
-					break;
-			}
-		}
-
-		if( side != 6 )
-		{
-			for( int i = 0 ; i < side ; side++ )
-			{
-				Mem_Free( pics[side] );
-			}
-			break;
-		}
-
-		idTempArray<byte> buf( width * height * 6 * 4 );
-		byte*	combined = ( byte* )buf.Ptr();
-		for( side = 0 ; side < 6 ; side++ )
-		{
-			memcpy( combined + width * height * 4 * side, pics[side], width * height * 4 );
-			Mem_Free( pics[side] );
-		}
-		idStr::snPrintf( filename, sizeof( filename ), "%sCM%04i.tga", baseName.c_str(), frameNum );
-
-		common->Printf( "writing %s\n", filename );
-		R_WriteTGA( filename, combined, width, height * 6 );
-	}
-	common->SetRefreshOnPrint( false );
-}
-
-/*
-===============
 Init
 ===============
 */
@@ -761,7 +670,6 @@ void idImageManager::Init()
 	cmdSystem->AddCommand( "reloadImages", R_ReloadImages_f, CMD_FL_RENDERER, "reloads images" );
 #endif
 	cmdSystem->AddCommand( "listImages", R_ListImages_f, CMD_FL_RENDERER, "lists images" );
-	cmdSystem->AddCommand( "combineCubeImages", R_CombineCubeImages_f, CMD_FL_RENDERER, "combines six images for roq compression" );
 
 	// should forceLoadImages be here?
 	LoadDeferredImages();

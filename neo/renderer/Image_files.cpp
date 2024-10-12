@@ -58,39 +58,6 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height, bool ma
 */
 
 /*
- * Include file for users of JPEG library.
- * You will need to have included system headers that define at least
- * the typedefs FILE and size_t before you can include jpeglib.h.
- * (stdio.h is sufficient on ANSI-conforming systems.)
- * You may also wish to include "jerror.h".
- */
-void jpg_Error( const char* fmt, ... )
-{
-	va_list		argptr;
-	char		msg[2048];
-
-	va_start( argptr, fmt );
-	idStr::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
-	va_end( argptr );
-
-	common->FatalError( "%s", msg );
-}
-
-void jpg_Printf( const char* fmt, ... )
-{
-	va_list		argptr;
-	char		msg[2048];
-
-	va_start( argptr, fmt );
-	idStr::vsnPrintf( msg, sizeof( msg ), fmt, argptr );
-	va_end( argptr );
-
-	common->Printf( "%s", msg );
-}
-
-
-
-/*
 ================
 R_WriteTGA
 ================

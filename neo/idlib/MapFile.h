@@ -360,11 +360,6 @@ public:
 	static MapPolygonMesh*	Parse( idLexer& src, const idVec3& origin, float version = CURRENT_MAP_VERSION );
 	bool					Write( idFile* fp, int primitiveNum, const idVec3& origin ) const;
 
-	static MapPolygonMesh*	ParseJSON( idLexer& src );
-	bool					WriteJSON( idFile* fp, int primitiveNum, const idVec3& origin ) const;
-
-
-
 	int						GetNumVertices() const
 	{
 		return verts.Num();
@@ -458,11 +453,6 @@ public:
 	static idMapEntity* 	Parse( idLexer& src, bool worldSpawn = false, int version = CURRENT_MAP_VERSION );
 	bool					Write( idFile* fp, int entityNum, bool valve220 ) const;
 
-	// HVG NOTE: this is not compatible with gltf (extra) json!
-	// RB begin
-	static idMapEntity* 	ParseJSON( idLexer& src );
-	bool					WriteJSON( idFile* fp, int entityNum, int numEntities ) const;
-	// RB end
 	int						GetNumPrimitives() const
 	{
 		return primitives.Num();
@@ -502,14 +492,9 @@ public:
 	bool					Write( const char* fileName, const char* ext, bool fromBasePath = true );
 
 	// RB begin
-	bool					WriteJSON( const char* fileName, const char* ext, bool fromBasePath = true );
 	bool					ConvertToPolygonMeshFormat();
 	bool					ConvertToValve220Format();
-
 	void					ClassifyEntitiesForTrenchBroom( idDict& classTypeOverview );
-
-	// converts Wad texture names to valid Doom 3 materials and gives every entity a unique name
-	bool					ConvertQuakeToDoom();
 	void					FixDuplicatedNamesInGroupInstances();
 	// RB end
 
@@ -555,7 +540,6 @@ public:
 	}
 
 	static void				AddMaterialToCollection( const char* material, idStrList& textureCollections );
-	static void				WadTextureToMaterial( const char* material, idStr& matName );
 
 protected:
 	int						version;
