@@ -341,7 +341,8 @@ idCommonLocal::InitTool
 */
 void idCommonLocal::InitTool( const toolFlag_t tool, const idDict* dict, idEntity* entity )
 {
-	if ( imguiTools ) {
+	if( imguiTools )
+	{
 		imguiTools->InitTool( tool, dict, entity );
 	}
 }

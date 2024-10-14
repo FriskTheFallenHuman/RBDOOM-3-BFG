@@ -738,11 +738,6 @@ void idSaveGame::WriteRenderEnvprobe( const renderEnvironmentProbe_t& renderEnvp
 
 	WriteInt( renderEnvprobe.suppressEnvprobeInViewID );
 	WriteInt( renderEnvprobe.allowEnvprobeInViewID );
-
-	for( int i = 0; i < MAX_ENTITY_SHADER_PARMS; i++ )
-	{
-		WriteFloat( renderEnvprobe.shaderParms[ i ] );
-	}
 }
 // Rb end
 
@@ -1647,11 +1642,6 @@ void idRestoreGame::ReadRenderEnvprobe( renderEnvironmentProbe_t& renderEnvprobe
 
 	ReadInt( renderEnvprobe.suppressEnvprobeInViewID );
 	ReadInt( renderEnvprobe.allowEnvprobeInViewID );
-
-	for( int i = 0; i < MAX_ENTITY_SHADER_PARMS; i++ )
-	{
-		ReadFloat( renderEnvprobe.shaderParms[ i ] );
-	}
 }
 // RB end
 

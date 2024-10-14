@@ -17,16 +17,11 @@ endif()
 set_property( GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER  "" )
 set_property( GLOBAL PROPERTY USE_FOLDERS ON )
 
-set( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
+set( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules )
 
 project( RBDoom3BFG CXX C )
 
 set( CMAKE_CXX_STANDARD 17 )
-
-if(CMAKE_MAJOR_VERSION EQUAL 3 AND CMAKE_MINOR_VERSION GREATER_EQUAL 6)
-	# set MSVC startup project
-	set_property (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT RBDoom3BFG)
-endif()
 
 option( FORCE_COLOR_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." OFF )
 option( COMPILE_COMMANDS "Generate compile_commands.json" OFF )
@@ -42,6 +37,7 @@ option( USE_VULKAN "Use Vulkan" ON )
 option( USE_VMA "Use AMD's Vulkan Memory Allocator instead of the NVRHI builtin one" ON )
 option( OPTICK "Enable profiling with Optick" OFF )
 option( RETAIL "Strip certain developer features and cheats from shipping builds" OFF )
+option( USE_BASE "Experimental: Build ported 2004 doom 3 game code instead of D3+ROE+LM" ON )
 
 set(NVRHI_INSTALL OFF)
 
@@ -394,13 +390,12 @@ find_library( VORBIS_FILE_LIBRARY_RELEASE NAMES vorbisfile )
 find_library( VORBIS_LIBRARY_DEBUG NAMES vorbis )
 find_library( VORBIS_ENCODER_LIBRARY_DEBUG NAMES vorbisenc )
 find_library( VORBIS_FILE_LIBRARY_DEBUG NAMES vorbisfile )
-set( VORBIS_LIBRARY optimized ${VORBIS_LIBRARY_RELEASE}
+set(VORBIS_LIBRARY optimized ${VORBIS_LIBRARY_RELEASE}
 					optimized ${VORBIS_ENCODER_LIBRARY_RELEASE}
 					optimized ${VORBIS_FILE_LIBRARY_RELEASE}
 					debug ${VORBIS_LIBRARY_DEBUG}
 					debug ${VORBIS_ENCODER_LIBRARY_DEBUG}
-					debug ${VORBIS_FILE_LIBRARY_DEBUG}
-)
+					debug ${VORBIS_FILE_LIBRARY_DEBUG})
 
 find_path( TINYEXR_INCLUDE_DIRS "tinyexr.h" )
 include_directories(${TINYEXR_INCLUDE_DIRS})
@@ -431,29 +426,20 @@ file(GLOB_RECURSE CM_SOURCES cm/*.cpp)
 
 file(GLOB FRAMEWORK_INCLUDES framework/*.h)
 file(GLOB FRAMEWORK_SOURCES framework/*.cpp)
-
 file(GLOB FRAMEWORK_IMGUI_INCLUDES imgui/*.h)
 file(GLOB FRAMEWORK_IMGUI_SOURCES imgui/*.cpp)
 
 file(GLOB RENDERER_INCLUDES renderer/*.h)
 file(GLOB RENDERER_SOURCES renderer/*.cpp)
-file(GLOB RENDERER_COLOR_INCLUDES renderer/Color/*.h)
-file(GLOB RENDERER_COLOR_SOURCES renderer/Color/*.cpp)
-file(GLOB RENDERER_DXT_INCLUDES renderer/DXT/*.h)
-file(GLOB RENDERER_DXT_SOURCES renderer/DXT/*.cpp)
 file(GLOB RENDERER_PASSES_INCLUDES renderer/Passes/*.h)
 file(GLOB RENDERER_PASSES_SOURCES renderer/Passes/*.cpp)
-
 file(GLOB RENDERER_SMAA_INCLUDES renderer/SMAA/*.h)
-
 file(GLOB RENDERER_NVRHI_INCLUDES renderer/NVRHI/*.h)
 file(GLOB RENDERER_NVRHI_SOURCES renderer/NVRHI/*.cpp)
 
 file(GLOB MESA_INCLUDES libs/mesa/*.h)
-
 file(GLOB MIKKTSPACE_INCLUDES libs/mikktspace/*.h)
 file(GLOB MIKKTSPACE_SOURCES libs/mikktspace/*.c)
-
 if(BINKDEC)
 	file(GLOB BINKDEC_INCLUDES libs/libbinkdec/include/*.h)
 	file(GLOB BINKDEC_SOURCES libs/libbinkdec/src/*.c libs/libbinkdec/src/*.cpp)
@@ -470,7 +456,6 @@ set(SOUND_INCLUDES
 	sound/SoundVoice.h
 	sound/WaveFile.h
 	sound/CinematicAudio.h)
-	
 set(SOUND_SOURCES
 	sound/snd_decoder.cpp
 	sound/snd_emitter.cpp
@@ -479,45 +464,36 @@ set(SOUND_SOURCES
 	sound/snd_world.cpp
 	sound/SoundVoice.cpp
 	sound/WaveFile.cpp)
-	
 set(XAUDIO2_INCLUDES
 	sound/XAudio2/XA2_SoundHardware.h
 	sound/XAudio2/XA2_SoundSample.h
 	sound/XAudio2/XA2_SoundVoice.h
 	sound/Xaudio2/XA2_CinematicAudio.h)
-	
 set(XAUDIO2_SOURCES
 	sound/XAudio2/XA2_SoundHardware.cpp
 	sound/XAudio2/XA2_SoundSample.cpp
 	sound/XAudio2/XA2_SoundVoice.cpp
 	sound/Xaudio2/XA2_CinematicAudio.cpp)
-	
 set(OPENAL_INCLUDES
 	sound/OpenAL/AL_SoundHardware.h
 	sound/OpenAL/AL_SoundSample.h
 	sound/OpenAL/AL_SoundVoice.h
 	sound/OpenAL/AL_CinematicAudio.h)
-	
 set(OPENAL_SOURCES
 	sound/OpenAL/AL_SoundHardware.cpp
 	sound/OpenAL/AL_SoundSample.cpp
 	sound/OpenAL/AL_SoundVoice.cpp
 	sound/OpenAL/AL_CinematicAudio.cpp)
-
 set(STUBAUDIO_INCLUDES
 	sound/stub/SoundStub.h)
-
 set(STUBAUDIO_SOURCES
 	sound/stub/SoundSample.cpp)
-	
 file(GLOB SYS_INCLUDES sys/*.h)
 file(GLOB SYS_SOURCES sys/*.cpp)
-
 if(NOT USE_DX12)
 	get_filename_component(devicemanager_dx12_cpp_full_path ${CMAKE_CURRENT_SOURCE_DIR}/sys/DeviceManager_DX12.cpp ABSOLUTE)
 	list(REMOVE_ITEM SYS_SOURCES "${devicemanager_dx12_cpp_full_path}")
 endif()
-
 if(NOT USE_VULKAN)
 	get_filename_component(devicemanager_vk_cpp_full_path ${CMAKE_CURRENT_SOURCE_DIR}/sys/DeviceManager_VK.cpp ABSOLUTE)
 	list(REMOVE_ITEM SYS_SOURCES "${devicemanager_vk_cpp_full_path}")
@@ -525,131 +501,57 @@ endif()
 
 file(GLOB UI_INCLUDES ui/*.h)
 file(GLOB UI_SOURCES ui/*.cpp)
-
 file(GLOB SWF_INCLUDES swf/*.h)
 file(GLOB SWF_SOURCES swf/*.cpp)
 
-set(GAMED3XP_INCLUDES
-	d3xp/Achievements.h
-	d3xp/Actor.h
-	d3xp/AF.h
-	d3xp/AFEntity.h
-	d3xp/AimAssist.h
-	d3xp/BrittleFracture.h
-	d3xp/Camera.h
-	d3xp/Entity.h
-	d3xp/EnvironmentProbe.h
-	d3xp/Fx.h
-	d3xp/Game.h
-	d3xp/GameEdit.h
-	d3xp/Game_local.h
-	d3xp/Grabber.h
-	d3xp/IK.h
-	d3xp/Item.h
-	d3xp/Leaderboards.h
-	d3xp/Light.h
-	d3xp/Misc.h
-	d3xp/Moveable.h
-	d3xp/Mover.h
-	d3xp/MultiplayerGame.h
-	d3xp/Player.h
-	d3xp/PlayerIcon.h
-	d3xp/PlayerView.h
-	d3xp/PredictedValue.h
-	d3xp/Projectile.h
-	d3xp/Pvs.h
-	d3xp/SecurityCamera.h
-	d3xp/SmokeParticles.h
-	d3xp/Sound.h
-	d3xp/Target.h
-	d3xp/Trigger.h
-	d3xp/Weapon.h
-	d3xp/WorldSpawn.h)
-	
-set(GAMED3XP_SOURCES
-	d3xp/Achievements.cpp
-	d3xp/Actor.cpp
-	d3xp/AF.cpp
-	d3xp/AFEntity.cpp
-	d3xp/AimAssist.cpp
-	d3xp/BrittleFracture.cpp
-	d3xp/Camera.cpp
-	d3xp/Entity.cpp
-	d3xp/EnvironmentProbe.cpp
-	d3xp/Fx.cpp
-	d3xp/GameEdit.cpp
-	d3xp/Game_local.cpp
-	d3xp/Game_network.cpp
-	d3xp/Grabber.cpp
-	d3xp/IK.cpp
-	d3xp/Item.cpp
-	d3xp/Leaderboards.cpp
-	d3xp/Light.cpp
-	d3xp/Misc.cpp
-	d3xp/Moveable.cpp
-	d3xp/Mover.cpp
-	d3xp/MultiplayerGame.cpp
-	d3xp/Player.cpp
-	d3xp/PlayerIcon.cpp
-	d3xp/PlayerView.cpp
-	d3xp/precompiled.cpp
-	d3xp/Projectile.cpp
-	d3xp/Pvs.cpp
-	d3xp/SecurityCamera.cpp
-	d3xp/SmokeParticles.cpp
-	d3xp/Sound.cpp
-	d3xp/Target.cpp
-	d3xp/Trigger.cpp
-	d3xp/Weapon.cpp
-	d3xp/WorldSpawn.cpp)
+file(GLOB GAME_INCLUDES d3xp/*.h)
+file(GLOB GAME_SOURCES d3xp/*.cpp)
+file(GLOB GAME_AI_INCLUDES d3xp/ai/*.h)
+file(GLOB GAME_AI_SOURCES d3xp/ai/*.cpp)
+file(GLOB GAME_ANIM_INCLUDES d3xp/anim/*.h)
+file(GLOB GAME_ANIM_SOURCES d3xp/anim/*.cpp)
+file(GLOB GAME_GAMESYS_INCLUDES d3xp/gamesys/*.h)
+file(GLOB GAME_GAMESYS_SOURCES d3xp/gamesys/*.cpp)
+list(REMOVE_ITEM GAME_GAMESYS_SOURCES ${CMAKE_SOURCE_DIR}/d3xp/gamesys/Callbacks.cpp)
+file(GLOB GAME_MENUS_INCLUDES d3xp/menus/*.h)
+file(GLOB GAME_MENUS_SOURCES d3xp/menus/*.cpp)
+file(GLOB GAME_PHYSICS_INCLUDES d3xp/physics/*.h)
+file(GLOB GAME_PHYSICS_SOURCES d3xp/physics/*.cpp)
+file(GLOB GAME_SCRIPT_INCLUDES d3xp/script/*.h)
+file(GLOB GAME_SCRIPT_SOURCES d3xp/script/*.cpp)
 
-file(GLOB GAMED3XP_AI_INCLUDES d3xp/ai/*.h)
-file(GLOB GAMED3XP_AI_SOURCES d3xp/ai/*.cpp)
-
-file(GLOB GAMED3XP_ANIM_INCLUDES d3xp/anim/*.h)
-file(GLOB GAMED3XP_ANIM_SOURCES d3xp/anim/*.cpp)
-
-file(GLOB GAMED3XP_GAMESYS_INCLUDES d3xp/gamesys/*.h)
-set(GAMED3XP_GAMESYS_SOURCES
-	#d3xp/gamesys/Callbacks.cpp
-	d3xp/gamesys/Class.cpp
-	#d3xp/gamesys/DebugGraph.cpp
-	d3xp/gamesys/Event.cpp
-	d3xp/gamesys/SaveGame.cpp
-	d3xp/gamesys/SysCmds.cpp
-	d3xp/gamesys/SysCvar.cpp
-	#d3xp/gamesys/TypeInfo.cpp
-	)
-
-file(GLOB GAMED3XP_MENUS_INCLUDES d3xp/menus/*.h)
-file(GLOB GAMED3XP_MENUS_SOURCES d3xp/menus/*.cpp)
-	
-file(GLOB GAMED3XP_PHYSICS_INCLUDES d3xp/physics/*.h)
-file(GLOB GAMED3XP_PHYSICS_SOURCES d3xp/physics/*.cpp)
-
-file(GLOB GAMED3XP_SCRIPT_INCLUDES d3xp/script/*.h)
-file(GLOB GAMED3XP_SCRIPT_SOURCES d3xp/script/*.cpp)
+set(GAME_INCLUDES_ALL
+	${GAME_INCLUDES}
+	${GAME_AI_INCLUDES}
+	${GAME_ANIM_INCLUDES}
+	${GAME_GAMESYS_INCLUDES}
+	${GAME_MENUS_SOURCES}
+	${GAME_PHYSICS_INCLUDES}
+	${GAME_SCRIPT_INCLUDES})
+set(GAME_SOURCES_ALL
+	${GAME_SOURCES}
+	${GAME_AI_SOURCES}
+	${GAME_ANIM_SOURCES}
+	${GAME_GAMESYS_SOURCES}
+	${GAME_MENUS_INCLUDES}
+	${GAME_PHYSICS_SOURCES}
+	${GAME_SCRIPT_SOURCES})
 
 file(GLOB COMPILER_INCLUDES tools/compilers/*.h)
-
 file(GLOB COMPILER_AAS_INCLUDES tools/compilers/aas/*.h)
 file(GLOB COMPILER_AAS_SOURCES tools/compilers/aas/*.cpp)
-
 file(GLOB COMPILER_DMAP_INCLUDES tools/compilers/dmap/*.h)
 file(GLOB COMPILER_DMAP_SOURCES tools/compilers/dmap/*.cpp)
 
 file(GLOB IMGUI_EDITOR_INCLUDES tools/imgui/*.h)
 file(GLOB IMGUI_EDITOR_SOURCES tools/imgui/*.cpp)
-
 file(GLOB IMGUI_EDITOR_LIGHT_INCLUDES tools/imgui/lighteditor/*.h)
 file(GLOB IMGUI_EDITOR_LIGHT_SOURCES tools/imgui/lighteditor/*.cpp)
-
 file(GLOB IMGUI_EDITOR_UTIL_INCLUDES tools/imgui/util/*.h)
 file(GLOB IMGUI_EDITOR_UTIL_SOURCES tools/imgui/util/*.cpp)
 
 file(GLOB_RECURSE WIN32_INCLUDES sys/win32/*.h)
 #file(GLOB_RECURSE WIN32_SOURCES sys/win32/*.cpp)
-
 set(WIN32_SOURCES
 	sys/win32/win_glimp.cpp
 	sys/win32/win_input.cpp
@@ -658,222 +560,157 @@ set(WIN32_SOURCES
 	sys/win32/win_snd.cpp
 	sys/win32/win_syscon.cpp
 	sys/win32/win_taskkeyhook.cpp
-	sys/win32/win_wndproc.cpp
-)
-
+	sys/win32/win_wndproc.cpp)
 if(MSVC)
 	list(APPEND WIN32_SOURCES sys/win32/win_cpu.cpp)
 endif()
-
 set(WIN32_RESOURCES
 	sys/win32/rc/res/doom.ico
 	sys/win32/rc/doom.rc
-	sys/win32/rc/RBDoom3BFG.exe.manifest
-)
-
+	sys/win32/rc/RBDoom3BFG.exe.manifest)
+if(MSVC)
+	list(APPEND WIN32_SOURCES ${NATVIS_SOURCES})
+endif()
 file(GLOB POSIX_INCLUDES sys/posix/*.h)
 file(GLOB POSIX_SOURCES sys/posix/*.cpp)
-
 file(GLOB COMMON_INCLUDES sys/common/*.h)
 file(GLOB COMMON_SOURCES sys/common/*.cpp)
-
 file(GLOB SDL_INCLUDES sys/sdl/*.h)
 file(GLOB SDL_SOURCES sys/sdl/*.cpp)
 
-source_group("aas" FILES ${AAS_INCLUDES})
-source_group("aas" FILES ${AAS_SOURCES})
-
-source_group("cm" FILES ${CM_INCLUDES})
-source_group("cm" FILES ${CM_SOURCES})
-
-source_group("framework" FILES ${FRAMEWORK_INCLUDES})
-source_group("framework" FILES ${FRAMEWORK_SOURCES})
-
-source_group("imgui" FILES ${FRAMEWORK_IMGUI_INCLUDES})
-source_group("imgui" FILES ${FRAMEWORK_IMGUI_SOURCES})
-
-source_group("renderer" FILES ${RENDERER_INCLUDES})
-source_group("renderer" FILES ${RENDERER_SOURCES})
-
-source_group("renderer\\Color" FILES ${RENDERER_COLOR_INCLUDES})
-source_group("renderer\\Color" FILES ${RENDERER_COLOR_SOURCES})
-
-source_group("renderer\\Passes" FILES ${RENDERER_PASSES_INCLUDES})
-source_group("renderer\\Passes" FILES ${RENDERER_PASSES_SOURCES})
-
-source_group("renderer\\DXT" FILES ${RENDERER_DXT_INCLUDES})
-source_group("renderer\\DXT" FILES ${RENDERER_DXT_SOURCES})
-
-source_group("renderer\\NVRHI" FILES ${RENDERER_NVRHI_INCLUDES})
-source_group("renderer\\NVRHI" FILES ${RENDERER_NVRHI_SOURCES})
-
-source_group("renderer\\SMAA" FILES ${RENDERER_SMAA_INCLUDES})
-
-source_group("libs\\mesa" FILES ${MESA_INCLUDES})
-
-source_group("libs\\mikktspace" FILES ${MIKKTSPACE_INCLUDES})
-source_group("libs\\mikktspace" FILES ${MIKKTSPACE_SOURCES})
-
-source_group("libs\\libbinkdec" FILES ${BINKDEC_INCLUDES})
-source_group("libs\\libbinkdec" FILES ${BINKDEC_SOURCES})
-
-source_group("libs\\minizip" FILES ${MINIZIP_INCLUDES})
-source_group("libs\\minizip" FILES ${MINIZIP_SOURCES})
-
-source_group("sound" FILES ${SOUND_INCLUDES})
-source_group("sound" FILES ${SOUND_SOURCES})
-
-source_group("sound\\XAudio2" FILES ${XAUDIO2_INCLUDES})
-source_group("sound\\XAudio2" FILES ${XAUDIO2_SOURCES})
-
-source_group("sound\\OpenAL" FILES ${OPENAL_INCLUDES})
-source_group("sound\\OpenAL" FILES ${OPENAL_SOURCES})
-
-source_group("sound\\stub" FILES ${STUBAUDIO_INCLUDES})
-source_group("sound\\stub" FILES ${STUBAUDIO_SOURCES})
-
-source_group("ui" FILES ${UI_INCLUDES})
-source_group("ui" FILES ${UI_SOURCES})
-
-source_group("swf" FILES ${SWF_INCLUDES})
-source_group("swf" FILES ${SWF_SOURCES})
-
-source_group("sys" FILES ${SYS_INCLUDES})
-source_group("sys" FILES ${SYS_SOURCES})
-
-source_group("game-d3xp" FILES ${GAMED3XP_INCLUDES})
-source_group("game-d3xp" FILES ${GAMED3XP_SOURCES})
-
-source_group("game-d3xp\\ai" FILES ${GAMED3XP_AI_INCLUDES})
-source_group("game-d3xp\\ai" FILES ${GAMED3XP_AI_SOURCES})
-
-source_group("game-d3xp\\anim" FILES ${GAMED3XP_ANIM_INCLUDES})
-source_group("game-d3xp\\anim" FILES ${GAMED3XP_ANIM_SOURCES})
-
-source_group("game-d3xp\\gamesys" FILES ${GAMED3XP_GAMESYS_INCLUDES})
-source_group("game-d3xp\\gamesys" FILES ${GAMED3XP_GAMESYS_SOURCES})
-
-source_group("game-d3xp\\menus" FILES ${GAMED3XP_MENUS_INCLUDES})
-source_group("game-d3xp\\menus" FILES ${GAMED3XP_MENUS_SOURCES})
-
-source_group("game-d3xp\\physics" FILES ${GAMED3XP_PHYSICS_INCLUDES})
-source_group("game-d3xp\\physics" FILES ${GAMED3XP_PHYSICS_SOURCES})
-
-source_group("game-d3xp\\script" FILES ${GAMED3XP_SCRIPT_INCLUDES})
-source_group("game-d3xp\\script" FILES ${GAMED3XP_SCRIPT_SOURCES})
-
-
-source_group("sys\\win32" FILES ${WIN32_INCLUDES})
-source_group("sys\\win32" FILES ${WIN32_SOURCES})
-source_group("sys\\win32\\Resources" FILES ${WIN32_RESOURCES})
-
-source_group("sys\\posix" FILES ${POSIX_INCLUDES})
-source_group("sys\\posix" FILES ${POSIX_SOURCES})
-
-source_group("sys\\common" FILES ${COMMON_INCLUDES})
-source_group("sys\\common" FILES ${COMMON_SOURCES})
-
-source_group("sys\\sdl" FILES ${SDL_INCLUDES})
-source_group("sys\\sdl" FILES ${SDL_SOURCES})
-
-
-source_group("tools\\compilers" FILES ${COMPILER_INCLUDES})
-
-source_group("tools\\compilers\\aas" FILES ${COMPILER_AAS_INCLUDES})
-source_group("tools\\compilers\\aas" FILES ${COMPILER_AAS_SOURCES})
-
-source_group("tools\\compilers\\dmap" FILES ${COMPILER_DMAP_INCLUDES})
-source_group("tools\\compilers\\dmap" FILES ${COMPILER_DMAP_SOURCES})
-
-source_group("tools\\imgui" FILES ${IMGUI_EDITOR_INCLUDES})
-source_group("tools\\imgui" FILES ${IMGUI_EDITOR_SOURCES})
-
-source_group("tools\\imgui\\lighteditor" FILES ${IMGUI_EDITOR_LIGHT_INCLUDES})
-source_group("tools\\imgui\\lighteditor" FILES ${IMGUI_EDITOR_LIGHT_SOURCES})
-
-source_group("tools\\imgui\\util" FILES ${IMGUI_EDITOR_UTIL_INCLUDES})
-source_group("tools\\imgui\\util" FILES ${IMGUI_EDITOR_UTIL_SOURCES})
+source_group("AAS" FILES ${AAS_INCLUDES})
+source_group("AAS" FILES ${AAS_SOURCES})
+source_group("CM" FILES ${CM_INCLUDES})
+source_group("CM" FILES ${CM_SOURCES})
+source_group("Framework" FILES ${FRAMEWORK_INCLUDES})
+source_group("Framework" FILES ${FRAMEWORK_SOURCES})
+source_group("Renderer" FILES ${RENDERER_INCLUDES})
+source_group("Renderer" FILES ${RENDERER_SOURCES})
+source_group("Renderer\\Passes" FILES ${RENDERER_PASSES_INCLUDES})
+source_group("Renderer\\Passes" FILES ${RENDERER_PASSES_SOURCES})
+source_group("Renderer\\NVRHI" FILES ${RENDERER_NVRHI_INCLUDES})
+source_group("Renderer\\NVRHI" FILES ${RENDERER_NVRHI_SOURCES})
+source_group("Renderer\\SMAA" FILES ${RENDERER_SMAA_INCLUDES})
+source_group("Libs\\Mesa" FILES ${MESA_INCLUDES})
+source_group("Libs\\MikktSpace" FILES ${MIKKTSPACE_INCLUDES})
+source_group("Libs\\MikktSpace" FILES ${MIKKTSPACE_SOURCES})
+source_group("Libs\\BinkDec" FILES ${BINKDEC_INCLUDES})
+source_group("Libs\\BinkDec" FILES ${BINKDEC_SOURCES})
+source_group("Libs\\MiniZip" FILES ${MINIZIP_INCLUDES})
+source_group("Libs\\MiniZip" FILES ${MINIZIP_SOURCES})
+source_group("Sound" FILES ${SOUND_INCLUDES})
+source_group("Sound" FILES ${SOUND_SOURCES})
+source_group("Sound\\XAudio2" FILES ${XAUDIO2_INCLUDES})
+source_group("Sound\\XAudio2" FILES ${XAUDIO2_SOURCES})
+source_group("Sound\\OpenAL" FILES ${OPENAL_INCLUDES})
+source_group("Sound\\OpenAL" FILES ${OPENAL_SOURCES})
+source_group("Sound\\Stub" FILES ${STUBAUDIO_INCLUDES})
+source_group("Sound\\Stub" FILES ${STUBAUDIO_SOURCES})
+source_group("UI" FILES ${UI_INCLUDES})
+source_group("UI" FILES ${UI_SOURCES})
+source_group("SWF" FILES ${SWF_INCLUDES})
+source_group("SWF" FILES ${SWF_SOURCES})
+source_group("Sys" FILES ${SYS_INCLUDES})
+source_group("Sys" FILES ${SYS_SOURCES})
+source_group("Game-D3XP" FILES ${GAME_INCLUDES})
+source_group("Game-D3XP" FILES ${GAME_SOURCES})
+source_group("Game-D3XP\\AI" FILES ${GAME_AI_INCLUDES})
+source_group("Game-D3XP\\AI" FILES ${GAME_AI_SOURCES})
+source_group("Game-D3XP\\Anim" FILES ${GAME_ANIM_INCLUDES})
+source_group("Game-D3XP\\Anim" FILES ${GAME_ANIM_SOURCES})
+source_group("Game-D3XP\\GameSys" FILES ${GAME_GAMESYS_INCLUDES})
+source_group("Game-D3XP\\GameSys" FILES ${GAME_GAMESYS_SOURCES})
+source_group("Game-D3XP\\Menus" FILES ${GAME_MENUS_INCLUDES})
+source_group("Game-D3XP\\Menus" FILES ${GAME_MENUS_SOURCES})
+source_group("Game-D3XP\\Physics" FILES ${GAME_PHYSICS_INCLUDES})
+source_group("Game-D3XP\\Physics" FILES ${GAME_PHYSICS_SOURCES})
+source_group("Game-D3XP\\Script" FILES ${GAME_SCRIPT_INCLUDES})
+source_group("Game-D3XP\\Script" FILES ${GAME_SCRIPT_SOURCES})
+source_group("Sys\\Win32" FILES ${WIN32_INCLUDES})
+source_group("Sys\\Win32" FILES ${WIN32_SOURCES})
+source_group("Sys\\Win32\\Resources" FILES ${WIN32_RESOURCES})
+source_group("Sys\\Posix" FILES ${POSIX_INCLUDES})
+source_group("Sys\\Posix" FILES ${POSIX_SOURCES})
+source_group("Sys\\Common" FILES ${COMMON_INCLUDES})
+source_group("Sys\\Common" FILES ${COMMON_SOURCES})
+source_group("Sys\\ImGui" FILES ${FRAMEWORK_IMGUI_INCLUDES})
+source_group("Sys\\ImGui" FILES ${FRAMEWORK_IMGUI_SOURCES})
+source_group("sys\\Sdl" FILES ${SDL_INCLUDES})
+source_group("sys\\Sdl" FILES ${SDL_SOURCES})
+source_group("Tools\\Compilers" FILES ${COMPILER_INCLUDES})
+source_group("Tools\\Compilers\\AAS" FILES ${COMPILER_AAS_INCLUDES})
+source_group("Tools\\Compilers\\AAS" FILES ${COMPILER_AAS_SOURCES})
+source_group("Tools\\Compilers\\Dmap" FILES ${COMPILER_DMAP_INCLUDES})
+source_group("Tools\\Compilers\\Dmap" FILES ${COMPILER_DMAP_SOURCES})
+source_group("Tools\\ImGui" FILES ${IMGUI_EDITOR_INCLUDES})
+source_group("Tools\\ImGui" FILES ${IMGUI_EDITOR_SOURCES})
+source_group("Tools\\ImGui\\LightEditor" FILES ${IMGUI_EDITOR_LIGHT_INCLUDES})
+source_group("Tools\\ImGui\\LightEditor" FILES ${IMGUI_EDITOR_LIGHT_SOURCES})
+source_group("Tools\\ImGui\\Util" FILES ${IMGUI_EDITOR_UTIL_INCLUDES})
+source_group("Tools\\ImGui\\Util" FILES ${IMGUI_EDITOR_UTIL_SOURCES})
 
 set(RBDOOM3_INCLUDES
-			${AAS_INCLUDES}
-			${CM_INCLUDES}
-			${FRAMEWORK_INCLUDES}
-			${FRAMEWORK_ASYNC_INCLUDES}
-			${RENDERER_INCLUDES}
-			${RENDERER_COLOR_INCLUDES}
-			${RENDERER_DXT_INCLUDES}
-			${RENDERER_JOBS_INCLUDES}
-			${RENDERER_JOBS_DYNAMICSHADOWVOLUME_INCLUDES}
-			${RENDERER_JOBS_PRELIGHTSHADOWVOLUME_INCLUDES}
-			${RENDERER_JOBS_STATICSHADOWVOLUME_INCLUDES}
-			${RENDERER_PASSES_INCLUDES}
-			
-			${RENDERER_SMAA_INCLUDES}
-			${FRAMEWORK_IMGUI_INCLUDES}
-			${MESA_INCLUDES}
-			${TINYEXR_INCLUDES}
-			${MIKKTSPACE_INCLUDES}
-			${MINIZIP_INCLUDES}
-			${BINKDEC_INCLUDES}
-			${SOUND_INCLUDES}
-			${VMA_INCLUDES}
-			${UI_INCLUDES}
-			${SWF_INCLUDES}
-			${COMMON_INCLUDES}
-			
-			${COMPILER_INCLUDES}
-			${COMPILER_AAS_INCLUDES} ${COMPILER_AAS_SOURCES}
-			${COMPILER_DMAP_INCLUDES} ${COMPILER_DMAP_SOURCES}
-			
-			${IMGUI_EDITOR_INCLUDES}
-			
-			${GAMED3XP_INCLUDES}
-			${GAMED3XP_AI_INCLUDES} 
-			${GAMED3XP_ANIM_INCLUDES} 
-			${GAMED3XP_GAMESYS_INCLUDES} 
-			${GAMED3XP_MENUS_INCLUDES}
-			${GAMED3XP_PHYSICS_INCLUDES}
-			${GAMED3XP_SCRIPT_INCLUDES}
-			)
-			
+	${AAS_INCLUDES}
+	${CM_INCLUDES}
+	${FRAMEWORK_INCLUDES}
+	${FRAMEWORK_ASYNC_INCLUDES}
+	${RENDERER_INCLUDES}
+	${RENDERER_JOBS_INCLUDES}
+	${RENDERER_JOBS_DYNAMICSHADOWVOLUME_INCLUDES}
+	${RENDERER_JOBS_PRELIGHTSHADOWVOLUME_INCLUDES}
+	${RENDERER_JOBS_STATICSHADOWVOLUME_INCLUDES}
+	${RENDERER_PASSES_INCLUDES}
+	
+	${RENDERER_SMAA_INCLUDES}
+	${FRAMEWORK_IMGUI_INCLUDES}
+	${MESA_INCLUDES}
+	${TINYEXR_INCLUDES}
+	${MIKKTSPACE_INCLUDES}
+	${MINIZIP_INCLUDES}
+	${BINKDEC_INCLUDES}
+	${SOUND_INCLUDES}
+	${VMA_INCLUDES}
+	${UI_INCLUDES}
+	${SWF_INCLUDES}
+	${COMMON_INCLUDES}
+	
+	${COMPILER_INCLUDES}
+	${COMPILER_AAS_INCLUDES} ${COMPILER_AAS_SOURCES}
+	${COMPILER_DMAP_INCLUDES} ${COMPILER_DMAP_SOURCES}
+	
+	${IMGUI_EDITOR_INCLUDES}
+	
+	${GAME_INCLUDES_ALL})
+
 set(RBDOOM3_SOURCES
-			${NATVIS_SOURCES}
-			${AAS_SOURCES}
-			${CM_SOURCES}
-			${FRAMEWORK_SOURCES}
-			${FRAMEWORK_ASYNC_SOURCES} 
-			${RENDERER_SOURCES}
-			${RENDERER_COLOR_SOURCES}
-			${RENDERER_DXT_SOURCES}
-			${RENDERER_JOBS_SOURCES}
-			${RENDERER_JOBS_DYNAMICSHADOWVOLUME_SOURCES}
-			${RENDERER_JOBS_PRELIGHTSHADOWVOLUME_SOURCES}
-			${RENDERER_JOBS_STATICSHADOWVOLUME_SOURCES}
-			${RENDERER_PASSES_SOURCES}
-			${FRAMEWORK_IMGUI_SOURCES}
-			${MIKKTSPACE_SOURCES}
-			${MINIZIP_SOURCES}
-			${BINKDEC_SOURCES}
-			${SOUND_SOURCES}
-			${UI_SOURCES}
-			${SWF_SOURCES}
-			${COMMON_SOURCES}
-			
-			${COMPILER_AAS_SOURCES}
-			${COMPILER_DMAP_SOURCES}
-			
-			${IMGUI_EDITOR_SOURCES}
-			${IMGUI_EDITOR_LIGHT_SOURCES}
-			${IMGUI_EDITOR_UTIL_SOURCES}
-			
-			${GAMED3XP_SOURCES}
-			${GAMED3XP_AI_SOURCES}
-			${GAMED3XP_ANIM_SOURCES}
-			${GAMED3XP_GAMESYS_SOURCES}
-			${GAMED3XP_MENUS_SOURCES}
-			${GAMED3XP_PHYSICS_SOURCES}
-			${GAMED3XP_SCRIPT_SOURCES}
-			)
+	${NATVIS_SOURCES}
+	${AAS_SOURCES}
+	${CM_SOURCES}
+	${FRAMEWORK_SOURCES}
+	${FRAMEWORK_ASYNC_SOURCES} 
+	${RENDERER_SOURCES}
+	${RENDERER_JOBS_SOURCES}
+	${RENDERER_JOBS_DYNAMICSHADOWVOLUME_SOURCES}
+	${RENDERER_JOBS_PRELIGHTSHADOWVOLUME_SOURCES}
+	${RENDERER_JOBS_STATICSHADOWVOLUME_SOURCES}
+	${RENDERER_PASSES_SOURCES}
+	${FRAMEWORK_IMGUI_SOURCES}
+	${MIKKTSPACE_SOURCES}
+	${MINIZIP_SOURCES}
+	${BINKDEC_SOURCES}
+	${SOUND_SOURCES}
+	${UI_SOURCES}
+	${SWF_SOURCES}
+	${COMMON_SOURCES}
+	
+	${COMPILER_AAS_SOURCES}
+	${COMPILER_DMAP_SOURCES}
+	
+	${IMGUI_EDITOR_SOURCES}
+	${IMGUI_EDITOR_LIGHT_SOURCES}
+	${IMGUI_EDITOR_UTIL_SOURCES}
+	
+	${GAME_SOURCES_ALL})
 
 macro(AddSubdirectory dirName)
 	file(GLOB DIR_INCLUDES ${dirName}/*.h)

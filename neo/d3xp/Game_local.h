@@ -68,7 +68,7 @@ class idThread;
 class idEditEntities;
 class idLocationEntity;
 class idMenuHandler_Shell;
-class EnvironmentProbe; // RB
+class idEnvProbes; // RB
 
 const int MAX_CLIENTS			= MAX_PLAYERS;
 const int MAX_CLIENTS_IN_PVS	= MAX_CLIENTS >> 3;

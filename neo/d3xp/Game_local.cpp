@@ -1271,7 +1271,7 @@ void idGameLocal::PopulateEnvironmentProbes()
 
 	for( ent = spawnedEntities.Next(); ent != NULL; ent = ent->spawnNode.Next() )
 	{
-		if( ent->IsType( EnvironmentProbe::Type ) )
+		if( ent->IsType( idEnvProbes::Type ) )
 		{
 			numEnvprobes++;
 		}
@@ -3440,7 +3440,7 @@ void idGameLocal::RunDebugInfo()
 			}
 			if( viewTextBounds.IntersectsBounds( entBounds ) )
 			{
-				//if( ent->IsType( EnvironmentProbe::Type ) )
+				//if( ent->IsType( idEnvProbes::Type ) )
 				{
 					gameRenderWorld->DrawText( ent->name.c_str(), entBounds.GetCenter(), 0.1f, colorWhite, axis, 1 );
 				}

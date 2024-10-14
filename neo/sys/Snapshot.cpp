@@ -436,7 +436,7 @@ bool idSnapShot::ReadDeltaForJob( const char* deltaMem, int deltaSize, int visIn
 			}
 		}
 #ifdef SNAPSHOT_CHECKSUMS
-		extern uint32_t SnapObjChecksum( const uint8_t * data, int length );
+		extern uint32_t SnapObjChecksum( const uint8_t* data, int length );
 		if( state.buffer.Size() > 0 )
 		{
 			uint32_t checksum = 0;

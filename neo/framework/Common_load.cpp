@@ -1420,7 +1420,8 @@ CONSOLE_COMMAND_SHIP( map, "loads a map", idCmdSystem::ArgCompletion_MapName )
 	findFile_t	ff;
 
 	map = args.Argv( 1 );
-	if ( !map.Length() ) {
+	if( !map.Length() )
+	{
 		return;
 	}
 	map.StripFileExtension();
@@ -1429,12 +1430,13 @@ CONSOLE_COMMAND_SHIP( map, "loads a map", idCmdSystem::ArgCompletion_MapName )
 	// a typo at the server console won't end the game
 	sprintf( string, "maps/%s.map", map.c_str() );
 	ff = fileSystem->FindFile( string );
-	switch ( ff ) {
-	case FIND_NO:
-		common->Printf( "Can't find map %s\n", string.c_str() );
-		return;
-	default:
-		break;
+	switch( ff )
+	{
+		case FIND_NO:
+			common->Printf( "Can't find map %s\n", string.c_str() );
+			return;
+		default:
+			break;
 	}
 
 	commonLocal.StartNewGame( args.Argv( 1 ), false, GAME_MODE_SINGLEPLAYER );
@@ -1466,7 +1468,8 @@ CONSOLE_COMMAND_SHIP( devmap, "loads a map in developer mode", idCmdSystem::ArgC
 	findFile_t	ff;
 
 	map = args.Argv( 1 );
-	if ( !map.Length() ) {
+	if( !map.Length() )
+	{
 		return;
 	}
 	map.StripFileExtension();
@@ -1475,12 +1478,13 @@ CONSOLE_COMMAND_SHIP( devmap, "loads a map in developer mode", idCmdSystem::ArgC
 	// a typo at the server console won't end the game
 	sprintf( string, "maps/%s.map", map.c_str() );
 	ff = fileSystem->FindFile( string );
-	switch ( ff ) {
-	case FIND_NO:
-		common->Printf( "Can't find map %s\n", string.c_str() );
-		return;
-	default:
-		break;
+	switch( ff )
+	{
+		case FIND_NO:
+			common->Printf( "Can't find map %s\n", string.c_str() );
+			return;
+		default:
+			break;
 	}
 
 	commonLocal.StartNewGame( args.Argv( 1 ), true, GAME_MODE_SINGLEPLAYER );

@@ -2202,7 +2202,7 @@ Cmd_SaveEnvprobes_f
 static void Cmd_SaveEnvprobes_f( const idCmdArgs& args )
 {
 	int e;
-	EnvironmentProbe* envProbe = NULL;
+	idEnvProbes* envProbe = NULL;
 	idMapEntity* mapEnt = NULL;
 	idMapFile* mapFile = gameLocal.GetLevelMap();
 	idDict dict;
@@ -2229,9 +2229,9 @@ static void Cmd_SaveEnvprobes_f( const idCmdArgs& args )
 
 	for( e = 0; e < MAX_GENTITIES; e++ )
 	{
-		envProbe = static_cast<EnvironmentProbe*>( gameLocal.entities[ e ] );
+		envProbe = static_cast<idEnvProbes*>( gameLocal.entities[ e ] );
 
-		if( !envProbe || !envProbe->IsType( EnvironmentProbe::Type ) )
+		if( !envProbe || !envProbe->IsType( idEnvProbes::Type ) )
 		{
 			continue;
 		}

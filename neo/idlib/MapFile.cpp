@@ -2967,4 +2967,152 @@ idMapBrush* idMapBrush::MakeOriginBrush( const idVec3& origin, const idVec3& sca
 	return brush;
 }
 
+CONSOLE_COMMAND( convertMap, "Convert .map file to new map format with polygons instead of brushes", idCmdSystem::ArgCompletion_MapNameNoJson )
+{
+	common->SetRefreshOnPrint( true );
+
+	if( args.Argc() != 2 )
+	{
+		common->Printf( "Usage: convertMap <map>\n" );
+		return;
+	}
+
+	idStr filename = args.Argv( 1 );
+	if( !filename.Length() )
+	{
+		return;
+	}
+	filename.StripFileExtension();
+
+	idStr mapName;
+	sprintf( mapName, "maps/%s.map", filename.c_str() );
+
+	idMapFile map;
+	if( map.Parse( mapName, true, false ) )
+	{
+		map.ConvertToPolygonMeshFormat();
+
+		idStrStatic< MAX_OSPATH > canonical = mapName;
+		canonical.ToLower();
+
+		idStrStatic< MAX_OSPATH > extension;
+		canonical.StripFileExtension();
+
+		idStrStatic< MAX_OSPATH > convertedFileName;
+
+		convertedFileName = canonical;
+		convertedFileName += "_converted";
+
+		map.Write( convertedFileName, ".map" );
+	}
+
+	common->SetRefreshOnPrint( false );
+}
+
+CONSOLE_COMMAND_SHIP( convertMapToValve220, "Convert .map file to the Valve 220 map format for TrenchBroom", idCmdSystem::ArgCompletion_MapNameNoJson )
+{
+	common->SetRefreshOnPrint( true );
+
+	if( args.Argc() != 2 )
+	{
+		common->Printf( "Usage: convertMapToValve220 <map>\n" );
+		return;
+	}
+
+	idStr filename = args.Argv( 1 );
+	if( !filename.Length() )
+	{
+		return;
+	}
+	filename.StripFileExtension();
+
+	idStr mapName;
+	sprintf( mapName, "maps/%s.map", filename.c_str() );
+
+	idMapFile map;
+	if( map.Parse( mapName, true, false ) )
+	{
+		// make sure we have access to all .bimage files for that map
+		fileSystem->BeginLevelLoad( filename, NULL, 0 );
+
+		map.ConvertToValve220Format();
+
+		fileSystem->EndLevelLoad();
+
+		idStrStatic< MAX_OSPATH > canonical = mapName;
+		canonical.ToLower();
+
+		idStrStatic< MAX_OSPATH > extension;
+		canonical.StripFileExtension();
+
+		idStrStatic< MAX_OSPATH > convertedFileName;
+
+		convertedFileName = canonical;
+		convertedFileName += "_valve220";
+
+		map.Write( convertedFileName, ".map" );
+	}
+
+	common->SetRefreshOnPrint( false );
+}
+
+CONSOLE_COMMAND( checkMapsForBrushEntities, "List all brush entities in all .map files", idCmdSystem::ArgCompletion_MapNameNoJson )
+{
+	//int totalImagesCount = 0;
+
+	idFileList* files = fileSystem->ListFilesTree( "maps/game", ".map", true, true );
+
+	idDict classTypeOverview;
+
+	for( int f = 0; f < files->GetList().Num(); f++ )
+	{
+		idStr mapName = files->GetList()[ f ];
+
+		idMapFile map;
+		if( map.Parse( mapName, true, false ) )
+		{
+			map.ClassifyEntitiesForTrenchBroom( classTypeOverview );
+		}
+	}
+
+	fileSystem->FreeFileList( files );
+
+	int n = classTypeOverview.GetNumKeyVals();
+
+	idLib::Printf( "BrushClasses:\n" );
+	for( int i = 0; i < n; i++ )
+	{
+		const idKeyValue* kv = classTypeOverview.GetKeyVal( i );
+
+		if( kv->GetValue() == "BrushClass" )
+		{
+			idLib::Printf( "'%s'\n", kv->GetKey().c_str() );
+		}
+	}
+
+	/*
+	idLib::Printf( "\nPointClasses:\n" );
+	for( int i = 0; i < n; i++ )
+	{
+		const idKeyValue* kv = classTypeOverview.GetKeyVal( i );
+
+		if( kv->GetValue() == "PointClass" )
+		{
+			idLib::Printf( "'%s'\n", kv->GetKey().c_str() );
+		}
+	}
+	*/
+
+	idLib::Printf( "\nMixedClasses:\n" );
+	for( int i = 0; i < n; i++ )
+	{
+		const idKeyValue* kv = classTypeOverview.GetKeyVal( i );
+
+		if( kv->GetValue() == "Mixed" )
+		{
+			idLib::Printf( "'%s'\n", kv->GetKey().c_str() );
+		}
+	}
+}
+
 // RB end

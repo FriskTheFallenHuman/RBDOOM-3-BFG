@@ -1,0 +1,16 @@
+textures/__TB_empty
+{
+	qer_editorimage	textures/base_wall/snpanel2rust.tga
+	bumpmap			textures/base_wall/snpanel2_local.tga
+	diffusemap		textures/base_wall/snpanel2rust_d.tga
+	specularmap		textures/base_wall/snpanel2rust_s.tga
+}
+
+// if an ASE/LWO/OBJ/GLTF model has a surface that uses this material that surface will
+// be used for occlusion culling instead of the visual surface(s)
+textures/common/occlusion
+{
+	qer_editorimage textures/common/occlusion.tga
+	noshadows
+	occlusion
+}
